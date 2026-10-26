@@ -30,7 +30,7 @@ export const NAV: readonly NavItem[] = [
 		label: 'nav.devices',
 		icon: 'device',
 		milestone: 'AKL-M040',
-		implemented: false,
+		implemented: true,
 		group: 'main'
 	},
 	{

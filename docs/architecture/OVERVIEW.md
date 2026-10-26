@@ -29,7 +29,7 @@
 | `crates/persistence` | Pool, Migrationen, Repositories | core, sqlx | vorhanden |
 | `apps/api` | HTTP/SSE, Konfiguration, Auslieferung der SPA, Security-Header | core, persistence | vorhanden |
 | `apps/web` | SvelteKit-SPA, Design-System, i18n | nur HTTP-API | vorhanden |
-| `crates/protect-compat` | Versionsprofile, Protokolladapter, Contract-Fixtures | core | M030 |
+| `crates/protect-compat` | Versionsprofile (`profiles/*.json`, eingebettet und beim Laden validiert), Fähigkeitsfreigabe nach Evidenz, konservativer Modus; später Protokolladapter | core | Profile ✓ (M030-01), Adapter M030/M040 |
 | `crates/device-lifecycle` | Discovery, Adoption, Identität, Keepalive | core, protect-compat, persistence | M040 |
 | `crates/event-engine` | Persistente Queue, Jobs, Idempotenz, Limits, Callbacks | core, persistence, providers | M060 |
 | `crates/providers` | Modell-Provider-Abstraktion, SSRF-Schutz | core | M060 |

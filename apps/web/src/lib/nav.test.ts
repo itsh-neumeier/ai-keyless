@@ -30,7 +30,7 @@ describe('Navigation', () => {
 
 describe('Routing-Vertrag', () => {
 	it('implementierte Bereiche haben eigene Routen, alle anderen nutzen den Platzhalter', () => {
-		const ownRoutes = ['/', '/system', '/settings'];
+		const ownRoutes = ['/', '/devices', '/system', '/settings'];
 		for (const item of NAV) expect(ownRoutes.includes(item.href)).toBe(item.implemented);
 	});
 });

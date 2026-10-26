@@ -119,10 +119,9 @@ async fn setup_login_session_logout() {
     // Vor der Einrichtung: Einrichtung nötig, Status geschützt.
     let r = c.send("GET", "/api/v1/auth/state", None).await;
     assert_eq!(r.body["setup_required"], true);
-    assert_eq!(
-        c.send("GET", "/api/v1/system/status", None).await.status,
-        401
-    );
+    for uri in ["/api/v1/system/status", "/api/v1/compat/profiles"] {
+        assert_eq!(c.send("GET", uri, None).await.status, 401, "{uri}");
+    }
 
     // Falsches Token, zu kurzes Passwort, ungültiger Name.
     let r = c
@@ -192,6 +191,14 @@ async fn setup_login_session_logout() {
     assert_eq!(r.body["database"]["status"], "ok");
     let r = c.send("GET", "/api/v1/auth/session", None).await;
     assert_eq!(r.body["user"]["username"], "admin");
+
+    // Kompatibilitätsprofile: getrennt pro Gerät, ohne native Evidenz.
+    let r = c.send("GET", "/api/v1/compat/profiles", None).await;
+    assert_eq!(r.status, 200);
+    let profiles = r.body["profiles"].as_array().unwrap();
+    assert_eq!(profiles[0]["profile"], "ai_key");
+    assert_eq!(profiles[1]["profile"], "ai_port");
+    assert!(!r.body.to_string().contains("native_verified"));
 
     // Abmelden ohne CSRF-Token wird abgelehnt.
     let csrf = c.csrf.take();

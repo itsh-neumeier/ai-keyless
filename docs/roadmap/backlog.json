@@ -342,12 +342,12 @@
     {
       "id": "AKL-M030-01",
       "ms": "AKL-M030",
-      "status": "open",
+      "status": "done",
       "prio": "P0",
       "deps": [
         "AKL-M010-01"
       ],
-      "title": "crate protect-compat: Versionsprofile + konservativer Modus",
+      "title": "crate protect-compat: Versionsprofile + konservativer Modus (+ API/UI unter Geräte)",
       "accept": [
         "Unbekannte Version → konservativ + Warnung (Test)"
       ]

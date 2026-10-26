@@ -83,6 +83,45 @@ paths:
         '403': { $ref: '#/components/responses/Error' }
         '409': { $ref: '#/components/responses/Error' }
         '422': { $ref: '#/components/responses/Error' }
+  /api/v1/compat/profiles:
+    get:
+      summary: Versionierte Kompatibilitätsprofile mit Evidenzstufen (jede Rolle)
+      responses:
+        '200':
+          description: Profile ai_key und ai_port
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [profiles]
+                properties:
+                  profiles:
+                    type: array
+                    items:
+                      type: object
+                      required: [profile, ranges]
+                      properties:
+                        profile: { $ref: '#/components/schemas/DeviceProfileKind' }
+                        ranges:
+                          type: array
+                          items:
+                            type: object
+                            required: [id, min, max_exclusive, source, claims]
+                            properties:
+                              id: { type: string }
+                              min: { type: string, example: 7.3.0 }
+                              max_exclusive: { type: string, example: 7.4.0 }
+                              source: { type: string }
+                              claims:
+                                type: array
+                                items:
+                                  type: object
+                                  required: [capability, evidence, note]
+                                  properties:
+                                    capability: { type: string }
+                                    evidence: { $ref: '#/components/schemas/EvidenceLevel' }
+                                    note: { type: string }
+        '401': { $ref: '#/components/responses/Error' }
   /api/v1/system/status:
     get:
       summary: Belegter Systemstatus (jede Rolle)

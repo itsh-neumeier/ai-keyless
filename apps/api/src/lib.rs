@@ -21,12 +21,13 @@ use tower_http::{
     trace::TraceLayer,
 };
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct AppState {
     pub db: Option<Database>,
     /// Setzt das `Secure`-Attribut am Sitzungscookie (bei HTTPS bzw. TLS-Proxy).
     pub cookie_secure: bool,
     pub login_limiter: Arc<auth::LoginLimiter>,
+    pub compat: Arc<akl_protect_compat::Registry>,
 }
 
 impl AppState {
@@ -35,7 +36,18 @@ impl AppState {
             db,
             cookie_secure,
             login_limiter: Arc::default(),
+            // Profildaten werden per Test validiert; ein Fehler ist ein Build-Fehler.
+            compat: Arc::new(
+                akl_protect_compat::Registry::embedded()
+                    .expect("eingebettete Kompatibilitätsprofile"),
+            ),
         }
+    }
+}
+
+impl Default for AppState {
+    fn default() -> Self {
+        Self::new(None, false)
     }
 }
 

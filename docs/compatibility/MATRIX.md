@@ -47,6 +47,16 @@ ein echtes UniFi-Protect-System getestet.
 Siehe `REFERENCE-ANALYSIS.md`. Diese Aussagen werden **niemals** in die Tabellen oben
 übernommen, sondern dienen nur als Testhypothesen.
 
+## Maschinenlesbare Quelle
+
+Die Profile pro Protect-Version liegen in `crates/protect-compat/profiles/{ai_key,ai_port}.json`
+und werden in der UI unter *Geräte* angezeigt. Freigaberegel (`Resolution::decide`):
+`native_verified` → aktiv; `synthetic_verified` → nur mit ausdrücklichem Opt-in; alles andere
+→ inaktiv; unbekannte oder nicht lesbare Version → konservativer Modus (nichts aktiv, Warnung).
+Ein `native_verified`-Eintrag ohne Verweis auf `evidence/…` wird beim Laden abgelehnt; ein Test
+stellt sicher, dass es derzeit keinen einzigen gibt. Änderungen an den JSON-Dateien und an dieser
+Matrix erfolgen immer gemeinsam.
+
 ## Nachweisformat für `native_verified`
 
 Jeder Eintrag benötigt: Datum, Protect-Version, Konsolenmodell, Kameramodell + Firmware,

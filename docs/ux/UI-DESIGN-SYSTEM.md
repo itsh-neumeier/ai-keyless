@@ -21,7 +21,7 @@ Name/Logo „AI-Keyless“ verhindern Verwechslung mit einem Herstellerprodukt.
 ```text
 Hauptbereich                      Admin
 ├─ Übersicht        (M010 ✓)      ├─ System         (M010 ✓, Über/Unofficial)
-├─ Geräte           (M040)        └─ Einstellungen  (M020, Theme/Sprache ✓)
+├─ Geräte           (Profile + Kompatibilitätsmatrix ✓; Lifecycle M040)        └─ Einstellungen  (M020, Theme/Sprache ✓)
 ├─ Kameras          (M050)
 ├─ Erkennungen      (M070)
 ├─ Suche            (M090)

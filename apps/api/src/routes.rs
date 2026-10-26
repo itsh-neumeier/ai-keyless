@@ -35,6 +35,7 @@ pub fn api() -> Router<AppState> {
             "/api/v1/users",
             get(auth::list_users).post(auth::create_user),
         )
+        .route("/api/v1/compat/profiles", get(compat_profiles))
         .route("/api/v1/system/status", get(system_status))
         .route("/api/v1/system/status/stream", get(system_status_stream))
         // Unbekannte API-Pfade nie an den SPA-Fallback weiterreichen.
@@ -70,6 +71,21 @@ async fn readyz(State(state): State<AppState>) -> impl IntoResponse {
         code,
         Json(serde_json::json!({ "ready": ready, "database": report.database })),
     )
+}
+
+/// Versionierte Kompatibilitätsprofile mit Evidenzstufen (jede Rolle).
+async fn compat_profiles(State(state): State<AppState>, _user: CurrentUser) -> impl IntoResponse {
+    use akl_core::DeviceProfileKind::{AiKey, AiPort};
+    let profiles: Vec<_> = [AiKey, AiPort]
+        .into_iter()
+        .map(|kind| {
+            serde_json::json!({
+                "profile": kind,
+                "ranges": state.compat.ranges(kind).collect::<Vec<_>>(),
+            })
+        })
+        .collect();
+    Json(serde_json::json!({ "profiles": profiles }))
 }
 
 /// Erfordert eine Sitzung (jede Rolle).

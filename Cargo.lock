@@ -17,6 +17,7 @@ version = "0.1.0"
 dependencies = [
  "akl-core",
  "akl-persistence",
+ "akl-protect-compat",
  "argon2",
  "axum",
  "base64",
@@ -59,6 +60,16 @@ dependencies = [
  "tokio",
  "tracing",
  "uuid",
+]
+
+[[package]]
+name = "akl-protect-compat"
+version = "0.1.0"
+dependencies = [
+ "akl-core",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]
