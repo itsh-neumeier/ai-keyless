@@ -14,6 +14,7 @@ ein echtes UniFi-Protect-System getestet.
 | Funktion | Stufe | Beleg |
 |---|---|---|
 | Management-API `/healthz`, `/readyz`, `/api/v1/system/status` | `synthetic_verified` | `apps/api/tests/http.rs`; Compose-Smoke-Test `scripts/smoke-compose.sh` (2026-10-26, Docker 29.9.2, linux/amd64) |
+| Authentifizierung (Einrichtung, Login, Rollen, CSRF, Audit) | `synthetic_verified` | `apps/api/tests/auth_flow.rs` (echte PG 17), Playwright-Ablauf, Compose-Smoke-Test (2026-10-27) |
 | PostgreSQL-Migrationen | `synthetic_verified` | `crates/persistence/tests/migrations.rs` gegen postgres:17-alpine (2026-10-26) |
 | Gerätezustandsautomat | `implemented` (Unit-Tests) | `crates/core/src/device.rs` – noch ohne Lifecycle-Anbindung |
 | Container linux/amd64 | `synthetic_verified` | Image-Build + Smoke-Test 2026-10-26 |

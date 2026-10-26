@@ -26,8 +26,8 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | AKL-M010-02 | API /healthz, /readyz, Systemstatus + SSE | P0 | ✅ erledigt | AKL-M010-01 | HTTP-Vertragstests<br>kein erfundener Gerätezustand |
 | AKL-M010-03 | PostgreSQL-Grundschema + Migrationstest | P0 | ✅ erledigt | AKL-M010-01 | Migration idempotent gegen echte DB<br>Constraints getestet |
 | AKL-M010-04 | Dockerfile, Compose, Secrets, Smoke-Test | P0 | ✅ erledigt | AKL-M010-02 | Image nonroot/read-only<br>Smoke-Test grün |
-| AKL-M010-05 | Basis-CI (Rust, Web, Security, Container) | P0 | 🔄 in Arbeit | AKL-M010-01 | Workflow vorhanden<br>erster grüner Lauf auf GitHub |
-| AKL-M010-06 | Ersten CI-Lauf auf GitHub verifizieren und Fehler beheben | P1 | ⬜ offen | AKL-M010-05 | Alle Jobs grün auf PR |
+| AKL-M010-05 | Basis-CI (Rust, Web, Security, Container) | P0 | ✅ erledigt | AKL-M010-01 | Workflow vorhanden<br>erster grüner Lauf auf GitHub |
+| AKL-M010-06 | Ersten CI-Lauf auf GitHub verifizieren und Fehler beheben | P1 | ✅ erledigt | AKL-M010-05 | Alle Jobs grün auf PR |
 | AKL-M010-07 | OpenAPI aus Rust-Typen generieren + TS-Client-Typen prüfen | P2 | ⬜ offen | AKL-M010-02 | CI schlägt fehl bei Drift zwischen Rust, OpenAPI und TS |
 | AKL-M010-08 | Branch-Schutz, PR-Template, CODEOWNERS, Issue-Templates | P2 | ⬜ offen | AKL-M010-05 | Review-Pflicht auf main |
 
@@ -35,10 +35,10 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 
 | ID | Titel | Prio | Status | Abhängigkeiten | Abnahmekriterien |
 |---|---|---|---|---|---|
-| AKL-M020-01 | Setup-Modus mit Einmal-Token + Admin-Konto (Argon2id) | P0 | ⬜ offen | AKL-M010-02 | Token einmalig, zeitlich begrenzt<br>Negativtests: Wiederverwendung, Ablauf |
-| AKL-M020-02 | Sessions, Rollen Admin/Operator/Viewer, CSRF, Audit-Log | P0 | ⬜ offen | AKL-M020-01 | HttpOnly/SameSite-Cookies<br>CSRF-Negativtests<br>Audit-Einträge |
+| AKL-M020-01 | Setup-Modus mit Einmal-Token + Admin-Konto (Argon2id) | P0 | ✅ erledigt | AKL-M010-02 | Token einmalig, zeitlich begrenzt<br>Negativtests: Wiederverwendung, Ablauf |
+| AKL-M020-02 | Sessions, Rollen Admin/Operator/Viewer, CSRF, Audit-Log | P0 | ✅ erledigt | AKL-M020-01 | HttpOnly/SameSite-Cookies<br>CSRF-Negativtests<br>Audit-Einträge |
 | AKL-M020-03 | Komponentenbibliothek: Button, Input, Select, Switch, Tabs, Dialog, Drawer, Toast, Menu, DataTable | P1 | ⬜ offen | – | Tastaturbedienung<br>Komponententests |
-| AKL-M020-04 | Login-/Setup-Screens und Nutzerverwaltung | P1 | ⬜ offen | AKL-M020-02 | E2E mit Playwright |
+| AKL-M020-04 | Login-/Setup-Screens und Nutzerverwaltung (Screens fertig; Deaktivieren/Passwort ändern offen) | P1 | 🔄 in Arbeit | AKL-M020-02 | E2E mit Playwright |
 | AKL-M020-05 | Getrennter Demo-Modus mit Banner | P2 | ⬜ offen | AKL-M020-03 | Demo-Daten im Normalbuild technisch ausgeschlossen (Test) |
 | AKL-M020-06 | Accessibility-Audit (axe) + Kontrastprüfung in CI | P1 | ⬜ offen | AKL-M020-03 | 0 kritische axe-Befunde |
 | AKL-M020-07 | CSP ohne unsafe-inline (Hashes) | P2 | ⬜ offen | – | CSP-Test<br>UI funktioniert |

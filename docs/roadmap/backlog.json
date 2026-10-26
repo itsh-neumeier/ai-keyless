@@ -184,7 +184,7 @@
     {
       "id": "AKL-M010-05",
       "ms": "AKL-M010",
-      "status": "in_progress",
+      "status": "done",
       "prio": "P0",
       "deps": [
         "AKL-M010-01"
@@ -198,7 +198,7 @@
     {
       "id": "AKL-M010-06",
       "ms": "AKL-M010",
-      "status": "open",
+      "status": "done",
       "prio": "P1",
       "deps": [
         "AKL-M010-05"
@@ -237,7 +237,7 @@
     {
       "id": "AKL-M020-01",
       "ms": "AKL-M020",
-      "status": "open",
+      "status": "done",
       "prio": "P0",
       "deps": [
         "AKL-M010-02"
@@ -251,7 +251,7 @@
     {
       "id": "AKL-M020-02",
       "ms": "AKL-M020",
-      "status": "open",
+      "status": "done",
       "prio": "P0",
       "deps": [
         "AKL-M020-01"
@@ -278,12 +278,12 @@
     {
       "id": "AKL-M020-04",
       "ms": "AKL-M020",
-      "status": "open",
+      "status": "in_progress",
       "prio": "P1",
       "deps": [
         "AKL-M020-02"
       ],
-      "title": "Login-/Setup-Screens und Nutzerverwaltung",
+      "title": "Login-/Setup-Screens und Nutzerverwaltung (Screens fertig; Deaktivieren/Passwort ändern offen)",
       "accept": [
         "E2E mit Playwright"
       ]

@@ -13,8 +13,25 @@ docker compose -f deploy/compose/compose.yaml --env-file deploy/compose/.env up 
 ```
 
 - Admin-Port ist standardmäßig **nur an 127.0.0.1** gebunden. Für LAN-Zugriff `AKL_ADMIN_BIND`
-  bewusst setzen (z. B. LAN-IP des NAS) und per Firewall einschränken. Authentifizierung folgt in M020 –
-  bis dahin **nicht** ins LAN freigeben.
+  bewusst setzen (z. B. LAN-IP des NAS) und per Firewall einschränken. Ohne TLS laufen Passwort und
+  Sitzungscookie im Klartext durchs LAN → für LAN-Zugriff einen TLS-Reverse-Proxy vorschalten und
+  `AKL_COOKIE_SECURE=true` setzen.
+
+## Ersteinrichtung
+
+```bash
+docker compose -f deploy/compose/compose.yaml exec api ai-keyless-api setup-token
+```
+
+Gibt ein Einrichtungs-Token aus (einmalig, 60 Minuten gültig, nur solange noch kein Konto
+existiert; ein neuer Aufruf macht ältere Tokens ungültig). Das Token wird **nur** auf stdout
+ausgegeben, nicht ins Log geschrieben. In der UI Token, Benutzername und Passwort (≥ 12 Zeichen)
+eingeben → erstes Administrator-Konto. Weitere Konten (Administrator, Operator, Betrachter) unter
+*Einstellungen → Benutzer*.
+
+Sitzungen: HttpOnly-Cookie `akl_session` (SameSite=Strict), 12 h Inaktivität, max. 7 Tage.
+Anmeldung wird nach 5 Fehlversuchen pro Benutzername exponentiell gesperrt (30 s … 15 min,
+Speicher, Neustart setzt zurück). Alle Anmelde- und Kontoereignisse landen in `audit_log`.
 - Secrets liegen als Dateien außerhalb von Git (`.gitignore`), werden als Compose-Secrets gemountet.
 - Container: nonroot, read-only Root-FS, `cap_drop: ALL`, `no-new-privileges`, Healthcheck
   (`ai-keyless-api healthcheck`).

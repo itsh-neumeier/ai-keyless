@@ -15,6 +15,7 @@ pub struct Config {
     pub database_url: Option<String>,
     pub web_dir: Option<PathBuf>,
     pub log_json: bool,
+    pub cookie_secure: bool,
 }
 
 impl std::fmt::Debug for Config {
@@ -27,6 +28,7 @@ impl std::fmt::Debug for Config {
             )
             .field("web_dir", &self.web_dir)
             .field("log_json", &self.log_json)
+            .field("cookie_secure", &self.cookie_secure)
             .finish()
     }
 }
@@ -67,6 +69,16 @@ impl Config {
             database_url,
             web_dir: get("AKL_WEB_DIR").map(PathBuf::from),
             log_json: get("AKL_LOG_FORMAT").is_some_and(|v| v == "json"),
+            cookie_secure: match get("AKL_COOKIE_SECURE").as_deref() {
+                None | Some("false") | Some("0") => false,
+                Some("true") | Some("1") => true,
+                Some(other) => {
+                    return Err(ConfigError::Invalid {
+                        name: "AKL_COOKIE_SECURE",
+                        reason: format!("erwartet true/false, erhalten: {other}"),
+                    });
+                }
+            },
         })
     }
 }
@@ -89,6 +101,13 @@ mod tests {
         let c = cfg(&[]).unwrap();
         assert_eq!(c.bind.to_string(), DEFAULT_BIND);
         assert!(c.database_url.is_none());
+    }
+
+    #[test]
+    fn cookie_secure_flag() {
+        assert!(!cfg(&[]).unwrap().cookie_secure);
+        assert!(cfg(&[("AKL_COOKIE_SECURE", "true")]).unwrap().cookie_secure);
+        assert!(cfg(&[("AKL_COOKIE_SECURE", "ja")]).is_err());
     }
 
     #[test]

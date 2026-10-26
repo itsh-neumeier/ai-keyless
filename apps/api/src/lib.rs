@@ -1,10 +1,13 @@
 //! AI-Keyless Management-API.
 
+pub mod auth;
 pub mod config;
+pub mod crypto;
+mod error;
 mod routes;
 mod status;
 
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 
 use akl_persistence::Database;
 use axum::{
@@ -21,6 +24,19 @@ use tower_http::{
 #[derive(Clone, Default)]
 pub struct AppState {
     pub db: Option<Database>,
+    /// Setzt das `Secure`-Attribut am Sitzungscookie (bei HTTPS bzw. TLS-Proxy).
+    pub cookie_secure: bool,
+    pub login_limiter: Arc<auth::LoginLimiter>,
+}
+
+impl AppState {
+    pub fn new(db: Option<Database>, cookie_secure: bool) -> Self {
+        Self {
+            db,
+            cookie_secure,
+            login_limiter: Arc::default(),
+        }
+    }
 }
 
 const REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
@@ -28,7 +44,9 @@ const REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
 /// Baut den vollständigen Router. `web_dir` liefert die statisch gebaute
 /// SvelteKit-App aus (SPA-Fallback auf `index.html`).
 pub fn app(state: AppState, web_dir: Option<&Path>) -> Router {
-    let mut router = routes::api().with_state(state);
+    let mut router = routes::api()
+        .with_state(state)
+        .layer(axum::middleware::from_fn(auth::origin_guard));
 
     if let Some(dir) = web_dir {
         let spa = ServeDir::new(dir).fallback(ServeFile::new(dir.join("index.html")));

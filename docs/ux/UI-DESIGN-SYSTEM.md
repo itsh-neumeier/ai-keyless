@@ -87,7 +87,12 @@ Tailwind-Utilities: `bg-surface`, `text-muted`, `border-line`, `bg-ok-soft text-
 | StatusChip (ok/warn/danger/neutral/accent) | `StatusChip.svelte`, `tone.ts` | ✓ |
 | Platzhalter für nicht implementierte Bereiche | `Placeholder.svelte` | ✓ |
 | Skeleton (Ladezustand) | inline `animate-pulse` | ✓ (Komponente M020) |
-| Button, Input, Select, Switch, Tabs, Drawer, Dialog, Toast, Menu, DataTable, CameraTile | – | M020 |
+| Button (primary/secondary/ghost, busy) | `Button.svelte` | ✓ |
+| TextField (Label, Hinweis, `aria-describedby`) | `TextField.svelte` | ✓ |
+| FormError (`role=alert`) | `FormError.svelte` | ✓ |
+| Einrichtungs-/Anmeldemaske | `AuthScreen.svelte` | ✓ |
+| Benutzerverwaltung | `UsersSection.svelte` | ✓ |
+| Select, Switch, Tabs, Drawer, Dialog, Toast, Menu, DataTable, CameraTile | – | M020-03 |
 
 ## 6. Zustandsdesign
 

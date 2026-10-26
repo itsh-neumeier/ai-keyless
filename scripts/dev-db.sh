@@ -8,8 +8,19 @@ PORT=${AKL_DEV_DB_PORT:-55432}
 # Nur lokales Wegwerf-Passwort für Tests – niemals produktiv verwenden.
 URL="postgres://akl:akl-dev-only@127.0.0.1:${PORT}/akl"
 
+ensure_docker() {
+  docker info >/dev/null 2>&1 && return 0
+  # Cloud-Sessions: Daemon läuft nach Neustart der Umgebung nicht automatisch.
+  if command -v dockerd >/dev/null 2>&1 && [[ $(id -u) == 0 ]]; then
+    (dockerd >/tmp/dockerd.log 2>&1 &)
+    for _ in $(seq 1 30); do docker info >/dev/null 2>&1 && return 0; sleep 1; done
+  fi
+  echo "Docker-Daemon nicht erreichbar" >&2; exit 1
+}
+
 case "${1:-start}" in
   start)
+    ensure_docker
     if ! docker ps --format '{{.Names}}' | grep -qx "$NAME"; then
       docker rm -f "$NAME" >/dev/null 2>&1 || true
       docker run -d --name "$NAME" -p "127.0.0.1:${PORT}:5432" \

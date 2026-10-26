@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { auth } from '#lib/auth/auth.svelte.ts';
+	import UsersSection from '#lib/components/UsersSection.svelte';
 	import { i18n, LOCALES, t, type Locale } from '#lib/i18n/index.svelte.ts';
 	import { theme, type ThemePreference } from '#lib/stores/theme.svelte.ts';
 
@@ -51,3 +53,7 @@
 		</div>
 	</div>
 </section>
+
+{#if auth.can('admin')}
+	<div class="mt-6"><UsersSection /></div>
+{/if}

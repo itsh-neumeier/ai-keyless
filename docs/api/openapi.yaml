@@ -2,12 +2,18 @@ openapi: 3.1.0
 info:
   title: AI-Keyless Management API
   version: 0.1.0
+  license: { name: AGPL-3.0-or-later, identifier: AGPL-3.0-or-later }
   description: >
     Inoffizielles, unabhängiges Projekt. Quelle der Typen: crates/core/src/status.rs.
     Bis zur Generierung (AKL-M010-07) manuell synchron halten.
+servers:
+  - url: /
+security:
+  - session: []
 paths:
   /healthz:
     get:
+      security: []
       summary: Liveness
       responses:
         '200':
@@ -17,22 +23,105 @@ paths:
               schema: { type: object, properties: { status: { const: ok } }, required: [status] }
   /readyz:
     get:
+      security: []
       summary: Readiness (DB erreichbar und migriert oder nicht konfiguriert)
       responses:
         '200': { description: bereit, content: { application/json: { schema: { $ref: '#/components/schemas/Readiness' } } } }
         '503': { description: nicht bereit, content: { application/json: { schema: { $ref: '#/components/schemas/Readiness' } } } }
+  /api/v1/auth/state:
+    get:
+      security: []
+      summary: Ist eine Ersteinrichtung nötig?
+      responses:
+        '200': { description: Zustand, content: { application/json: { schema: { type: object, required: [setup_required], properties: { setup_required: { type: [boolean, 'null'] } } } } } }
+        '503': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/setup:
+    post:
+      security: []
+      summary: Erstes Admin-Konto mit Einrichtungs-Token anlegen (meldet direkt an)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [token, username, password], properties: { token: { type: string }, username: { type: string }, password: { type: string, minLength: 12, maxLength: 256 } } } } } }
+      responses:
+        '201': { description: angelegt, headers: { Set-Cookie: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/Session' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/login:
+    post:
+      security: []
+      summary: Anmelden
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [username, password], properties: { username: { type: string }, password: { type: string } } } } } }
+      responses:
+        '200': { description: angemeldet, headers: { Set-Cookie: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/Session' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/logout:
+    post:
+      summary: Abmelden (CSRF-Header erforderlich)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '204': { description: abgemeldet }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/session:
+    get:
+      summary: Aktuelle Sitzung inkl. CSRF-Token
+      responses:
+        '200': { description: Sitzung, content: { application/json: { schema: { $ref: '#/components/schemas/Session' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+  /api/v1/users:
+    get:
+      summary: Konten auflisten (Admin)
+      responses:
+        '200': { description: Konten, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/User' } } } } }
+        '403': { $ref: '#/components/responses/Error' }
+    post:
+      summary: Konto anlegen (Admin, CSRF-Header erforderlich)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [username, password, role], properties: { username: { type: string }, password: { type: string, minLength: 12 }, role: { $ref: '#/components/schemas/Role' } } } } } }
+      responses:
+        '201': { description: angelegt, content: { application/json: { schema: { $ref: '#/components/schemas/User' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
   /api/v1/system/status:
     get:
-      summary: Belegter Systemstatus
+      summary: Belegter Systemstatus (jede Rolle)
       responses:
         '200': { description: Status, content: { application/json: { schema: { $ref: '#/components/schemas/SystemStatus' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+        '503': { $ref: '#/components/responses/Error' }
   /api/v1/system/status/stream:
     get:
       summary: Systemstatus als Server-Sent Events (Ereignis `status`, nur bei Änderung)
       responses:
         '200': { description: SSE-Stream, content: { text/event-stream: { schema: { type: string } } } }
 components:
+  securitySchemes:
+    session: { type: apiKey, in: cookie, name: akl_session }
+  parameters:
+    Csrf: { name: x-csrf-token, in: header, required: true, schema: { type: string }, description: 'CSRF-Token aus der Sitzung' }
+  responses:
+    Error:
+      description: >
+        Fehler. Codes u. a.: unauthenticated, forbidden, csrf_failed, origin_rejected,
+        invalid_credentials, too_many_attempts, invalid_setup_token, setup_completed,
+        invalid_username, invalid_password, username_taken, invalid_request,
+        database_unavailable, not_found, internal
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
   schemas:
+    Error:
+      type: object
+      required: [error]
+      properties: { error: { type: object, required: [code, message], properties: { code: { type: string }, message: { type: string } } } }
+    Role: { type: string, enum: [viewer, operator, admin] }
+    User:
+      type: object
+      required: [id, username, role, disabled]
+      properties: { id: { type: string, format: uuid }, username: { type: string }, role: { $ref: '#/components/schemas/Role' }, disabled: { type: boolean } }
+    Session:
+      type: object
+      required: [user, csrf_token]
+      properties: { user: { $ref: '#/components/schemas/User' }, csrf_token: { type: string } }
     EvidenceLevel:
       type: string
       enum: [planned, implemented, synthetic_verified, native_verified, unsupported, needs_evidence]

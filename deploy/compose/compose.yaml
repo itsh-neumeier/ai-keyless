@@ -38,6 +38,8 @@ services:
       AKL_BIND: 0.0.0.0:8090
       AKL_DATABASE_URL_FILE: /run/secrets/akl_database_url
       RUST_LOG: ${AKL_RUST_LOG:-info}
+      # true, sobald die UI per HTTPS (z. B. Reverse-Proxy mit TLS) erreichbar ist.
+      AKL_COOKIE_SECURE: ${AKL_COOKIE_SECURE:-false}
     secrets: [akl_database_url]
     ports:
       # Standardmäßig nur lokal erreichbar; für LAN-Zugriff AKL_ADMIN_BIND anpassen.
