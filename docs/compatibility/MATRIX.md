@@ -17,7 +17,7 @@ ein echtes UniFi-Protect-System getestet.
 | PostgreSQL-Migrationen | `synthetic_verified` | `crates/persistence/tests/migrations.rs` gegen postgres:17-alpine (2026-10-26) |
 | Gerätezustandsautomat | `implemented` (Unit-Tests) | `crates/core/src/device.rs` – noch ohne Lifecycle-Anbindung |
 | Container linux/amd64 | `synthetic_verified` | Image-Build + Smoke-Test 2026-10-26 |
-| Container linux/arm64 | `planned` | AKL-M080-03 |
+| Container linux/arm64 | `planned` | AKL-M080-03 (nachrangig, keine Zielplattform) |
 | Portainer-Stack | `planned` | AKL-M080-02 (Compose ist Portainer-kompatibel formuliert, nicht getestet) |
 
 ### Profil `ai_key`

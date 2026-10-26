@@ -34,6 +34,10 @@ async fn status_without_database_is_honest() {
     assert_eq!(code, 200);
     assert_eq!(body["service"], "ai-keyless");
     assert_eq!(body["unofficial"], true);
+    assert_eq!(
+        body["source_url"],
+        "https://github.com/itsh-neumeier/ai-keyless"
+    );
     assert_eq!(body["database"]["status"], "not_configured");
     let devices = body["devices"].as_array().unwrap();
     assert_eq!(devices.len(), 2);

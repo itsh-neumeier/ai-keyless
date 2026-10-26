@@ -32,7 +32,8 @@ RUN --mount=type=secret,id=extra_ca,required=false \
 FROM ${RUNTIME_IMAGE}
 LABEL org.opencontainers.image.title="AI-Keyless" \
       org.opencontainers.image.description="Inoffizieller, unabhängiger AI-Prozessor für UniFi Protect (nicht von Ubiquiti)" \
-      org.opencontainers.image.source="https://github.com/itsh-neumeier/ai-keyless"
+      org.opencontainers.image.source="https://github.com/itsh-neumeier/ai-keyless" \
+      org.opencontainers.image.licenses="AGPL-3.0-or-later"
 COPY --from=api /ai-keyless-api /usr/local/bin/ai-keyless-api
 COPY --from=web /src/apps/web/build /srv/web
 ENV AKL_BIND=0.0.0.0:8090 \

@@ -5,7 +5,7 @@ members = ["apps/api", "crates/core", "crates/persistence"]
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
-license = "LicenseRef-AI-Keyless-Pending"
+license = "AGPL-3.0-or-later"
 repository = "https://github.com/itsh-neumeier/ai-keyless"
 publish = false
 rust-version = "1.88"

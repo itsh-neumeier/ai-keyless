@@ -13,10 +13,10 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 |---|---|---|---|---|---|
 | AKL-M000-01 | Lizenz-/Provenienzprüfung Referenzprojekt | P0 | ✅ erledigt | – | PROVENANCE.md mit Commit, Lizenzstatus, Methode<br>Go/No-Go-Gates dokumentiert |
 | AKL-M000-02 | Bestandsbericht bestätigte vs. unbestätigte Funktionen | P0 | ✅ erledigt | – | REFERENCE-ANALYSIS.md<br>Matrix ohne übernommene Fremdevidenz |
-| AKL-M000-03 | Offizielle AI-Key-FAQ manuell sichten (help.ui.com nicht abrufbar) | P1 | ⛔ blockiert | – | Funktionsliste, Limits, Mindestversionen in OPEN_QUESTIONS/Matrix erfasst |
+| AKL-M000-03 | Offizielle AI-Key-FAQ manuell sichten (help.ui.com nicht abrufbar) – zurückgestellt | P1 | ⛔ blockiert | – | Funktionsliste, Limits, Mindestversionen in OPEN_QUESTIONS/Matrix erfasst |
 | AKL-M000-04 | Lizenzanfrage an Referenz-Maintainer (nur nach Freigabe, durch Projektverantwortlichen) | P2 | ⛔ blockiert | – | Antwort dokumentiert in PROVENANCE.md |
-| AKL-M000-05 | Projektlizenz für AI-Keyless festlegen | P0 | ⛔ blockiert | – | LICENSE-Datei<br>Cargo/package.json aktualisiert<br>ADR |
-| AKL-M000-06 | Rechtliche Einschätzung Geräteimitation/Interoperabilität (DE/EU) | P1 | ⛔ blockiert | – | Kurzgutachten oder bewusste Risikoentscheidung des Projektverantwortlichen dokumentiert |
+| AKL-M000-05 | Projektlizenz festlegen → AGPL-3.0-or-later (ADR-004) | P0 | ✅ erledigt | – | LICENSE-Datei<br>Cargo/package.json aktualisiert<br>ADR |
+| AKL-M000-06 | Rechtliches Risiko Geräteimitation: bewusste Risikoentscheidung (RISK-ACCEPTANCE.md) | P1 | ✅ erledigt | – | Kurzgutachten oder bewusste Risikoentscheidung des Projektverantwortlichen dokumentiert |
 
 ## AKL-M010 – Projektfundament
 
@@ -61,7 +61,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | AKL-M040-02 | Lifecycle-Service mit Zustandsautomat + Transition-Log | P0 | ⬜ offen | AKL-M040-01 | Unzulässige Übergänge abgelehnt<br>Kill-Switch |
 | AKL-M040-03 | Discovery (UDP) gegen synthetischen Controller | P0 | ⬜ offen | AKL-M040-02, AKL-M080-01 | synthetic_verified |
 | AKL-M040-04 | Adoption, Credential-Rotation, Keepalive, Reconnect (synthetisch) | P0 | ⬜ offen | AKL-M040-03 | synthetic_verified inkl. Restart |
-| AKL-M040-05 | Nativer Akzeptanztest Adoption (autorisierte Umgebung) | P0 | ⛔ blockiert | AKL-M040-04, AKL-M030-04, AKL-M000-06 | native_verified-Nachweis gemäß MATRIX.md |
+| AKL-M040-05 | Nativer Akzeptanztest Adoption (autorisierte Umgebung) – blockiert: keine Testumgebung (Q-003) | P0 | ⛔ blockiert | AKL-M040-04, AKL-M030-04, AKL-M000-06 | native_verified-Nachweis gemäß MATRIX.md |
 | AKL-M040-06 | UI Geräte: Profile, Zustand, Evidenz, Recovery-Assistent | P1 | ⬜ offen | AKL-M040-02, AKL-M020-03 | Echtzeit per SSE<br>keine vorgetäuschten Zustände |
 
 ## AKL-M050 – Protect-Kamerainventar
@@ -76,26 +76,31 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | ID | Titel | Prio | Status | Abhängigkeiten | Abnahmekriterien |
 |---|---|---|---|---|---|
 | AKL-M060-01 | Persistente Job-Queue mit Zuständen, Idempotenz, Backoff, Dead-Letter | P0 | ⬜ offen | AKL-M010-03 | Crash-Recovery-Test<br>uncertain-Zustand |
-| AKL-M060-02 | Provider-Abstraktion (Ollama, OpenAI-kompatibel, Responses) + SSRF-Schutz | P0 | ⬜ offen | – | SSRF-Negativtests<br>Testaufruf nur nach Freigabe bei kostenpflichtigen APIs |
+| AKL-M060-02 | Provider-Abstraktion (Rollen, Fähigkeiten, Limits) + SSRF-Schutz | P0 | ⬜ offen | – | SSRF-Negativtests<br>Fähigkeiten pro Modell explizit geprüft, nicht angenommen |
 | AKL-M060-03 | Rate-/Kostenlimits (Start: 12 Jobs/h global), Medienlimits | P0 | ⬜ offen | AKL-M060-01 | Limit dauerhaft über Neustart |
 | AKL-M060-04 | UI KI-Modelle + Verarbeitung | P1 | ⬜ offen | AKL-M060-01, AKL-M060-02 | Latenz/Fehlerrate aus echten Messungen |
+| AKL-M060-05 | Provider Ollama (lokal) – erster Vision-Provider | P0 | ⬜ offen | AKL-M060-02 | Testaufruf mit synthetischem Bild<br>Latenz/Fehler gemessen<br>keine Bilder verlassen das LAN |
+| AKL-M060-06 | Provider OpenAI-kompatibel lokal (vLLM, LM Studio, llama.cpp) | P1 | ⬜ offen | AKL-M060-02 | Contract-Test gegen lokalen Mock<br>Bild-Input-Fähigkeit pro Modell geprüft |
+| AKL-M060-07 | Provider OpenAI Responses (Cloud, Opt-in, store=false) | P2 | ⬜ offen | AKL-M060-02, AKL-M060-03 | Nur nach Kostenfreigabe getestet<br>Opt-in pro Kamera<br>Kostenlimit greift |
+| AKL-M060-08 | Weitere Cloud-Provider – Anbieter noch zu benennen (Q-013) | P3 | ⛔ blockiert | AKL-M060-02 | Anbieter festgelegt<br>eigener Contract-Test |
 
 ## AKL-M070 – Native Ereignisbeschreibung
 
 | ID | Titel | Prio | Status | Abhängigkeiten | Abnahmekriterien |
 |---|---|---|---|---|---|
 | AKL-M070-01 | Caption-Callback-Vertrag (synthetisch) + Readback-Prüfung | P0 | ⬜ offen | AKL-M060-03, AKL-M040-04 | Status http_accepted ≠ persisted |
-| AKL-M070-02 | Native Ereignisbeschreibung on-demand/automatisch (autorisiert) | P0 | ⛔ blockiert | AKL-M070-01, AKL-M040-05 | native_verified pro Version und Kamera |
+| AKL-M070-02 | Native Ereignisbeschreibung on-demand/automatisch (autorisiert) – blockiert: keine Testumgebung (Q-003) | P0 | ⛔ blockiert | AKL-M070-01, AKL-M040-05 | native_verified pro Version und Kamera |
 
 ## AKL-M080 – Produktiver Linux-/Docker-Betrieb
 
 | ID | Titel | Prio | Status | Abhängigkeiten | Abnahmekriterien |
 |---|---|---|---|---|---|
-| AKL-M080-01 | Netzwerkmodi bewerten (bridge/host/macvlan) für Discovery | P0 | ⬜ offen | – | Messbarer Test pro Modus<br>Empfehlung in NETWORKING.md |
+| AKL-M080-01 | Netzwerkmodi bewerten (bridge/host/macvlan) auf Linux-VM und x86_64-NAS | P0 | ⬜ offen | – | Messbarer Test pro Modus<br>Empfehlung in NETWORKING.md |
 | AKL-M080-02 | Portainer-Stack testen | P1 | ⬜ offen | AKL-M010-04 | Deployment-Protokoll |
-| AKL-M080-03 | ARM64-Image bauen und testen | P1 | ⬜ offen | AKL-M010-04 | Smoke-Test auf arm64 |
+| AKL-M080-03 | ARM64-Image bauen und testen (keine Zielplattform, nachrangig) | P3 | ⬜ offen | AKL-M010-04 | Smoke-Test auf arm64 |
 | AKL-M080-04 | Backup/Restore + Upgrade/Rollback mit Wiederherstellungsprobe | P1 | ⬜ offen | AKL-M010-03 | Restore-Test automatisiert |
 | AKL-M080-05 | 72-h-Endurance- und Lasttest | P2 | ⬜ offen | AKL-M070-02 | Bericht mit Metriken |
+| AKL-M080-06 | GPU-Betrieb: Compose-Profil Ollama + NVIDIA (<12 GB VRAM), Intel/AMD bewerten | P1 | ⬜ offen | AKL-M060-05 | Modellempfehlung für <12 GB gemessen<br>Betrieb ohne GPU weiterhin möglich<br>Intel/AMD-Ergebnis dokumentiert |
 
 ## AKL-M090 – Native Suche
 
@@ -108,6 +113,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | ID | Titel | Prio | Status | Abhängigkeiten | Abnahmekriterien |
 |---|---|---|---|---|---|
 | AKL-M100-01 | AI Alerts, STT, LPR, Gesicht, Enhancement – je eigenes Issue mit DSFA | P3 | ⬜ offen | AKL-M070-02 | Datenschutzprüfung pro Funktion |
+| AKL-M100-02 | Coral Edge TPU als Objekterkennungs-Backend (TFLite, kein VLM) | P3 | ⬜ offen | AKL-M060-02 | Rolle object_detection, nicht caption<br>Messung Latenz/Genauigkeit mit künstlichen Daten |
 
 ## AKL-M110 – AI-Port-Profil
 

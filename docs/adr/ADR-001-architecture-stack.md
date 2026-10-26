@@ -36,7 +36,7 @@ ein unzulässiger Sprung).
 Authentifizierung/CSRF zentral in Rust, keine Node-Laufzeit im Produktivimage. Nachteil: kein SSR –
 für eine authentifizierte Admin-Oberfläche im LAN irrelevant.
 
-**ML-Inferenz:** nicht in Rust neu implementiert. Provider-Schnittstellen (Ollama,
+**ML-Inferenz:** nicht in Rust neu implementiert. Zielhardware (Interview 2026-10-26): NVIDIA < 12 GB VRAM, Intel/AMD-GPU, Coral Edge TPU – Coral nur für Objekterkennung (quantisierte TFLite-Modelle), nicht für Bildbeschreibungen. Provider-Schnittstellen (Ollama,
 OpenAI-kompatibel, OpenAI Responses) in `crates/providers` (M060); optional separater
 Python/ONNX-Worker in `workers/inference` nur bei Bedarf. CUDA/Coral sind optionale Backends.
 

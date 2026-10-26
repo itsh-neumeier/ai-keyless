@@ -47,7 +47,9 @@ Entwicklerbefehle: siehe [CLAUDE.md](CLAUDE.md). Betrieb: [docs/operations](docs
 
 ## Lizenz
 
-Noch nicht festgelegt (siehe [PROVENANCE](docs/legal/PROVENANCE.md) §4). Bis dahin alle Rechte vorbehalten.
+[GNU AGPL v3 oder später](LICENSE) (`AGPL-3.0-or-later`, [ADR-004](docs/adr/ADR-004-license-agpl.md)).
+Wer eine veränderte Fassung als Netzwerkdienst betreibt, muss deren Quellcode den Nutzern
+zugänglich machen (AGPL §13); die UI verlinkt dafür die Quelle unter *System*.
 
 ## Rechtlicher Hinweis
 

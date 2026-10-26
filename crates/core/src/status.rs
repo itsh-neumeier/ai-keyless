@@ -39,6 +39,8 @@ pub struct SystemStatus {
     pub version: &'static str,
     /// Immer `true`: AI-Keyless ist ein inoffizielles, unabhängiges Projekt.
     pub unofficial: bool,
+    /// Bezugsquelle des Quellcodes dieser Instanz (AGPL §13).
+    pub source_url: &'static str,
     pub database: DatabaseStatus,
     pub devices: Vec<DeviceProfileStatus>,
 }

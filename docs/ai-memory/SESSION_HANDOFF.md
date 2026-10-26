@@ -1,5 +1,21 @@
 # Session-Handoff
 
+## Sitzung 2026-10-26 (Fortsetzung: Interview + Lizenz)
+
+**Erledigt**
+- Interview mit dem Projektverantwortlichen: Lizenz AGPL-3.0-or-later, Risiko Geräteimitation bewusst getragen,
+  keine Testumgebung, Draft-PR erlaubt (Issues nicht), Plattform Linux-VM/x86_64-NAS, GPU NVIDIA < 12 GB / Intel/AMD / Coral,
+  Provider Ollama → OpenAI-kompatibel → OpenAI Cloud → weitere Cloud. FAQ später.
+- `LICENSE` (gnu.org), ADR-004, `docs/legal/RISK-ACCEPTANCE.md`, Lizenzmetadaten (Cargo, package.json, OCI-Label).
+- API-Vertrag um `source_url` erweitert (AGPL §13), UI verlinkt den Quellcode unter System.
+- Backlog: +6 Issues (Provider einzeln, GPU-Profil, Coral), ARM64 → P3.
+
+**Tests:** cargo fmt/clippy sauber, 18 Rust-Tests (inkl. 2 DB) grün; Web lint/check/format, 12 vitest-Tests, Build grün;
+Playwright-Sichtprüfung System-Seite (Link korrekt, keine Konsolenfehler).
+
+**Hinweis:** Die Cloud-Umgebung wurde zwischendurch neu gestartet; Docker-Daemon musste erneut gestartet werden.
+
+
 ## Sitzung 2026-10-26 (Projektstart, AKL-M000 + AKL-M010)
 
 **Erledigt**

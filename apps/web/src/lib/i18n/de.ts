@@ -73,7 +73,10 @@ export const de = {
 	'system.title': 'System',
 	'system.about': 'Über AI-Keyless',
 	'system.license': 'Lizenz',
-	'system.licensePending': 'Noch nicht festgelegt (siehe docs/legal/PROVENANCE.md)',
+	'system.licenseValue': 'GNU AGPL v3 oder später (AGPL-3.0-or-later)',
+	'system.source': 'Quellcode',
+	'system.sourceNote':
+		'Gemäß AGPL §13 steht Nutzern dieser Instanz der vollständige Quellcode zur Verfügung.',
 	'common.unknown': 'unbekannt',
 	'common.notFound': 'Seite nicht gefunden',
 	'common.skipToContent': 'Zum Inhalt springen'

@@ -74,7 +74,10 @@ export const en: Record<MessageKey, string> = {
 	'system.title': 'System',
 	'system.about': 'About AI-Keyless',
 	'system.license': 'License',
-	'system.licensePending': 'Not decided yet (see docs/legal/PROVENANCE.md)',
+	'system.licenseValue': 'GNU AGPL v3 or later (AGPL-3.0-or-later)',
+	'system.source': 'Source code',
+	'system.sourceNote':
+		'As required by AGPL §13, the complete source code is available to users of this instance.',
 	'common.unknown': 'unknown',
 	'common.notFound': 'Page not found',
 	'common.skipToContent': 'Skip to content'

@@ -58,11 +58,12 @@ components:
         lifecycle_evidence: { $ref: '#/components/schemas/EvidenceLevel' }
     SystemStatus:
       type: object
-      required: [service, version, unofficial, database, devices]
+      required: [service, version, unofficial, source_url, database, devices]
       properties:
         service: { type: string }
         version: { type: string }
         unofficial: { const: true }
+        source_url: { type: string, format: uri, description: 'Quellcode dieser Instanz (AGPL §13)' }
         database: { $ref: '#/components/schemas/DatabaseStatus' }
         devices: { type: array, items: { $ref: '#/components/schemas/DeviceProfileStatus' } }
     Readiness:
