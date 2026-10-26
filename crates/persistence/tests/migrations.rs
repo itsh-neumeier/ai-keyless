@@ -11,8 +11,6 @@ use akl_persistence::{
 };
 use chrono::{Duration, Utc};
 
-const LATEST_MIGRATION: i64 = 20261027000001;
-
 #[tokio::test]
 async fn migrations_apply_and_are_idempotent() {
     let Some(url) = test_database_url() else {
@@ -21,7 +19,9 @@ async fn migrations_apply_and_are_idempotent() {
     let db = fresh_schema(&url, "akl_test_migrate").await;
     db.migrate().await.expect("zweite Migration ist No-Op");
     db.ping().await.unwrap();
-    assert_eq!(db.schema_version().await.unwrap(), Some(LATEST_MIGRATION));
+    let latest = akl_persistence::MIGRATOR.iter().map(|m| m.version).max();
+    assert!(latest.is_some_and(|v| v >= 20261027000002));
+    assert_eq!(db.schema_version().await.unwrap(), latest);
     assert!(db.device_states().await.unwrap().is_empty());
     assert_eq!(db.user_count().await.unwrap(), 0);
 }

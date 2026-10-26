@@ -66,7 +66,7 @@ fn user_from_row(
     })
 }
 
-fn is_unique_violation(err: &sqlx::Error) -> bool {
+pub(crate) fn is_unique_violation(err: &sqlx::Error) -> bool {
     err.as_database_error()
         .and_then(|e| e.code())
         .is_some_and(|code| code == "23505")

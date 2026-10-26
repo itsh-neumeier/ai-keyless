@@ -519,7 +519,7 @@
     {
       "id": "AKL-M060-02",
       "ms": "AKL-M060",
-      "status": "open",
+      "status": "done",
       "prio": "P0",
       "deps": [],
       "title": "Provider-Abstraktion (Rollen, Fähigkeiten, Limits) + SSRF-Schutz",
@@ -544,13 +544,13 @@
     {
       "id": "AKL-M060-04",
       "ms": "AKL-M060",
-      "status": "open",
+      "status": "in_progress",
       "prio": "P1",
       "deps": [
         "AKL-M060-01",
         "AKL-M060-02"
       ],
-      "title": "UI KI-Modelle + Verarbeitung",
+      "title": "UI KI-Modelle (fertig) + Verarbeitung (offen, nach Queue)",
       "accept": [
         "Latenz/Fehlerrate aus echten Messungen"
       ]
@@ -558,12 +558,12 @@
     {
       "id": "AKL-M060-05",
       "ms": "AKL-M060",
-      "status": "open",
+      "status": "done",
       "prio": "P0",
       "deps": [
         "AKL-M060-02"
       ],
-      "title": "Provider Ollama (lokal) – erster Vision-Provider",
+      "title": "Provider Ollama (lokal) – erster Vision-Provider (gemessen: Ollama 0.12.6, granite3.2-vision)",
       "accept": [
         "Testaufruf mit synthetischem Bild",
         "Latenz/Fehler gemessen",
@@ -573,12 +573,12 @@
     {
       "id": "AKL-M060-06",
       "ms": "AKL-M060",
-      "status": "open",
+      "status": "in_progress",
       "prio": "P1",
       "deps": [
         "AKL-M060-02"
       ],
-      "title": "Provider OpenAI-kompatibel lokal (vLLM, LM Studio, llama.cpp)",
+      "title": "Provider OpenAI-kompatibel lokal (Mock-Contract fertig; Messung mit echtem Server offen)",
       "accept": [
         "Contract-Test gegen lokalen Mock",
         "Bild-Input-Fähigkeit pro Modell geprüft"

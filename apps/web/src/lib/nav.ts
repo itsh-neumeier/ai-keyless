@@ -66,7 +66,7 @@ export const NAV: readonly NavItem[] = [
 		label: 'nav.models',
 		icon: 'model',
 		milestone: 'AKL-M060',
-		implemented: false,
+		implemented: true,
 		group: 'main'
 	},
 	{

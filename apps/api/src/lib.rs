@@ -4,10 +4,15 @@ pub mod auth;
 pub mod config;
 pub mod crypto;
 mod error;
+mod providers;
 mod routes;
 mod status;
 
-use std::{path::Path, sync::Arc};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+    time::Duration,
+};
 
 use akl_persistence::Database;
 use axum::{
@@ -28,6 +33,12 @@ pub struct AppState {
     pub cookie_secure: bool,
     pub login_limiter: Arc<auth::LoginLimiter>,
     pub compat: Arc<akl_protect_compat::Registry>,
+    /// SSRF-Richtlinie für Provider-URLs.
+    pub provider_policy: akl_providers::NetworkPolicy,
+    /// Gesamtzeitlimit pro Provider-Anfrage (CPU-Inferenz kann dauern).
+    pub provider_timeout: Duration,
+    /// Verzeichnis, aus dem Provider-Secrets per Name gelesen werden.
+    pub secrets_dir: PathBuf,
 }
 
 impl AppState {
@@ -41,6 +52,9 @@ impl AppState {
                 akl_protect_compat::Registry::embedded()
                     .expect("eingebettete Kompatibilitätsprofile"),
             ),
+            provider_policy: akl_providers::NetworkPolicy::default(),
+            provider_timeout: Duration::from_secs(120),
+            secrets_dir: PathBuf::from("/run/secrets"),
         }
     }
 }

@@ -36,6 +36,25 @@ Speicher, Neustart setzt zurück). Alle Anmelde- und Kontoereignisse landen in `
 - Container: nonroot, read-only Root-FS, `cap_drop: ALL`, `no-new-privileges`, Healthcheck
   (`ai-keyless-api healthcheck`).
 
+## KI-Provider (Modelle)
+
+Unter *KI-Modelle* legen Administratoren Provider an (Typ Ollama oder OpenAI-kompatibel), testen
+die Verbindung (Modellliste, keine Inferenz) und führen einen Bildtest mit einem eigenen
+synthetischen Testbild aus (löst eine Inferenz aus). Ergebnisse werden gespeichert.
+
+- **Erreichbarkeit:** Ollama auf dem Docker-Host ist aus dem Container z. B. über die Bridge-
+  Gateway-Adresse (`http://172.17.0.1:11434`) oder die LAN-IP des Hosts erreichbar; Ollama dafür
+  mit `OLLAMA_HOST=0.0.0.0:11434` starten und per Firewall auf das LAN beschränken.
+- **SSRF-Richtlinie:** nur `http`/`https`, keine Zugangsdaten/Query in der URL; immer gesperrt:
+  Link-Local (u. a. `169.254.169.254`), `0.0.0.0`, Multicast, Broadcast. Loopback nur mit
+  `AKL_PROVIDER_ALLOW_LOOPBACK=true`, private Netze per `AKL_PROVIDER_ALLOW_PRIVATE` (Standard:
+  erlaubt), optional Host-Allowlist `AKL_PROVIDER_ALLOWED_HOSTS`. Keine Weiterleitungen,
+  keine System-Proxys, Antworten max. 2 MiB, Zeitlimit `AKL_PROVIDER_TIMEOUT_SECS`.
+- **API-Keys:** nie in der UI oder DB. Datei in das Secret-Verzeichnis legen (Standard
+  `/run/secrets`, `AKL_SECRETS_DIR`; in Compose als Secret mounten) und im Provider nur den
+  Dateinamen angeben.
+- Gemessene Modelle: `docs/compatibility/PROVIDERS.md`.
+
 ## Portainer
 
 Stack aus `deploy/compose/compose.yaml` anlegen, Umgebungsvariablen aus `.env.example` setzen,

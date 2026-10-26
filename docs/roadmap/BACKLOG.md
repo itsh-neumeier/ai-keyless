@@ -76,11 +76,11 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | ID | Titel | Prio | Status | Abhängigkeiten | Abnahmekriterien |
 |---|---|---|---|---|---|
 | AKL-M060-01 | Persistente Job-Queue mit Zuständen, Idempotenz, Backoff, Dead-Letter | P0 | ⬜ offen | AKL-M010-03 | Crash-Recovery-Test<br>uncertain-Zustand |
-| AKL-M060-02 | Provider-Abstraktion (Rollen, Fähigkeiten, Limits) + SSRF-Schutz | P0 | ⬜ offen | – | SSRF-Negativtests<br>Fähigkeiten pro Modell explizit geprüft, nicht angenommen |
+| AKL-M060-02 | Provider-Abstraktion (Rollen, Fähigkeiten, Limits) + SSRF-Schutz | P0 | ✅ erledigt | – | SSRF-Negativtests<br>Fähigkeiten pro Modell explizit geprüft, nicht angenommen |
 | AKL-M060-03 | Rate-/Kostenlimits (Start: 12 Jobs/h global), Medienlimits | P0 | ⬜ offen | AKL-M060-01 | Limit dauerhaft über Neustart |
-| AKL-M060-04 | UI KI-Modelle + Verarbeitung | P1 | ⬜ offen | AKL-M060-01, AKL-M060-02 | Latenz/Fehlerrate aus echten Messungen |
-| AKL-M060-05 | Provider Ollama (lokal) – erster Vision-Provider | P0 | ⬜ offen | AKL-M060-02 | Testaufruf mit synthetischem Bild<br>Latenz/Fehler gemessen<br>keine Bilder verlassen das LAN |
-| AKL-M060-06 | Provider OpenAI-kompatibel lokal (vLLM, LM Studio, llama.cpp) | P1 | ⬜ offen | AKL-M060-02 | Contract-Test gegen lokalen Mock<br>Bild-Input-Fähigkeit pro Modell geprüft |
+| AKL-M060-04 | UI KI-Modelle (fertig) + Verarbeitung (offen, nach Queue) | P1 | 🔄 in Arbeit | AKL-M060-01, AKL-M060-02 | Latenz/Fehlerrate aus echten Messungen |
+| AKL-M060-05 | Provider Ollama (lokal) – erster Vision-Provider (gemessen: Ollama 0.12.6, granite3.2-vision) | P0 | ✅ erledigt | AKL-M060-02 | Testaufruf mit synthetischem Bild<br>Latenz/Fehler gemessen<br>keine Bilder verlassen das LAN |
+| AKL-M060-06 | Provider OpenAI-kompatibel lokal (Mock-Contract fertig; Messung mit echtem Server offen) | P1 | 🔄 in Arbeit | AKL-M060-02 | Contract-Test gegen lokalen Mock<br>Bild-Input-Fähigkeit pro Modell geprüft |
 | AKL-M060-07 | Provider OpenAI Responses (Cloud, Opt-in, store=false) | P2 | ⬜ offen | AKL-M060-02, AKL-M060-03 | Nur nach Kostenfreigabe getestet<br>Opt-in pro Kamera<br>Kostenlimit greift |
 | AKL-M060-08 | Weitere Cloud-Provider – Anbieter noch zu benennen (Q-013) | P3 | ⛔ blockiert | AKL-M060-02 | Anbieter festgelegt<br>eigener Contract-Test |
 

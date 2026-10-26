@@ -31,7 +31,7 @@
 | T4 | R | Nicht nachvollziehbare Änderungen | `audit_log` mit Actor/Korrelation (Einrichtung, An-/Abmeldung, Fehlversuche, Kontoanlage), Zustandsübergänge in `device_state_transitions` | ✓ Auth; Geräte M040 |
 | T5 | I | Secrets in Logs/API/Browser | Secret-Dateien (`*_FILE`), Debug-Redaktion der DB-URL ✓, keine Secrets in API-Antworten, kein Browserstorage für Secrets, gitleaks in CI | teilweise ✓ |
 | T6 | I | Medien gelangen in Logs/Browser/externe APIs | In-Memory-Verarbeitung, minimale Retention, Opt-in pro Kamera und Provider, keine Fremdmedien in CI | geplant M060/M070 |
-| T7 | I/E | SSRF über frei konfigurierbare Provider-/Controller-URLs | Allowlist, Auflösung + Prüfung der Ziel-IP (Link-Local/Metadaten blocken), Redirects nicht automatisch folgen, nur http(s) | geplant M060 |
+| T7 | I/E | SSRF über frei konfigurierbare Provider-/Controller-URLs | Provider: nur http(s), keine Zugangsdaten/Query in URLs, Link-Local/Metadaten/0.0.0.0/Multicast/Broadcast immer gesperrt (auch IPv4-gemappt), Loopback nur per Opt-in, private Netze konfigurierbar, optionale Host-Allowlist, DNS einmal auflösen und auf geprüfte Adressen pinnen, keine Redirects, keine System-Proxys, Größen-/Zeitlimits; nur Admins dürfen Provider anlegen/testen | ✓ Provider (M060-02); Controller-URLs M040 |
 | T8 | D | Kosten-/Lastexplosion durch Ereignisflut | Start-Limit 12 Jobs/h, Queue-Grenzen, Timeouts, Backoff, Kostenlimits | geplant M060 |
 | T9 | D | Polling-Sturm durch UI | SSE mit Server-seitiger Änderungsprüfung ✓ | ✓ |
 | T10 | E | Container-Ausbruch / Rechteausweitung | distroless, nonroot, `read_only`, `cap_drop: ALL`, `no-new-privileges` ✓ | ✓ (amd64 getestet) |

@@ -15,7 +15,7 @@ use futures::Stream;
 use crate::{
     AppState,
     auth::{self, CurrentUser},
-    status,
+    providers, status,
 };
 
 /// Intervall, in dem der Server den Status prüft. Clients erhalten nur
@@ -36,6 +36,22 @@ pub fn api() -> Router<AppState> {
             get(auth::list_users).post(auth::create_user),
         )
         .route("/api/v1/compat/profiles", get(compat_profiles))
+        .route(
+            "/api/v1/providers",
+            get(providers::list).post(providers::create),
+        )
+        .route(
+            "/api/v1/providers/{id}",
+            axum::routing::delete(providers::delete),
+        )
+        .route(
+            "/api/v1/providers/{id}/test",
+            post(providers::test_connection),
+        )
+        .route(
+            "/api/v1/providers/{id}/test-vision",
+            post(providers::test_vision),
+        )
         .route("/api/v1/system/status", get(system_status))
         .route("/api/v1/system/status/stream", get(system_status_stream))
         // Unbekannte API-Pfade nie an den SPA-Fallback weiterreichen.

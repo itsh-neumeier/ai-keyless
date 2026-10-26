@@ -45,10 +45,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let router = app(
-        AppState::new(db, config.cookie_secure),
-        config.web_dir.as_deref(),
-    );
+    let mut state = AppState::new(db, config.cookie_secure);
+    state.provider_policy = akl_providers::NetworkPolicy {
+        allow_loopback: config.provider_allow_loopback,
+        allow_private: config.provider_allow_private,
+        allowed_hosts: config.provider_allowed_hosts.clone(),
+    };
+    state.provider_timeout = Duration::from_secs(config.provider_timeout_secs);
+    state.secrets_dir = config.secrets_dir.clone();
+    let router = app(state, config.web_dir.as_deref());
     let listener = tokio::net::TcpListener::bind(config.bind).await?;
     tracing::info!(addr = %config.bind, "lauscht");
     axum::serve(listener, router)

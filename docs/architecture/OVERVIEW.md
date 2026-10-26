@@ -32,7 +32,7 @@
 | `crates/protect-compat` | Versionsprofile (`profiles/*.json`, eingebettet und beim Laden validiert), Fähigkeitsfreigabe nach Evidenz, konservativer Modus; später Protokolladapter | core | Profile ✓ (M030-01), Adapter M030/M040 |
 | `crates/device-lifecycle` | Discovery, Adoption, Identität, Keepalive | core, protect-compat, persistence | M040 |
 | `crates/event-engine` | Persistente Queue, Jobs, Idempotenz, Limits, Callbacks | core, persistence, providers | M060 |
-| `crates/providers` | Modell-Provider-Abstraktion, SSRF-Schutz | core | M060 |
+| `crates/providers` | Ollama/OpenAI-kompatibel, SSRF-Richtlinie (`policy.rs`), synthetisches Testbild | – | ✓ M060-02/05 |
 | `crates/observability` | Metriken, Health-Aggregation | core | M060/M080 |
 
 Regel: Abhängigkeiten zeigen nur „nach innen“ (zu `core`). `core` kennt weder HTTP noch DB.

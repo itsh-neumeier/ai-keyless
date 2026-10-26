@@ -1,6 +1,7 @@
 //! PostgreSQL-Zugriff und versionierte SQLx-Migrationen.
 
 pub mod auth;
+pub mod providers;
 #[cfg(feature = "testing")]
 pub mod testing;
 

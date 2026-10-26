@@ -25,7 +25,7 @@ Hauptbereich                      Admin
 ├─ Kameras          (M050)
 ├─ Erkennungen      (M070)
 ├─ Suche            (M090)
-├─ KI-Modelle       (M060)
+├─ KI-Modelle       (Provider, Tests ✓ M060)
 ├─ Verarbeitung     (M060)
 └─ Alarmierung      (M100)
 ```
@@ -91,6 +91,7 @@ Tailwind-Utilities: `bg-surface`, `text-muted`, `border-line`, `bg-ok-soft text-
 | TextField (Label, Hinweis, `aria-describedby`) | `TextField.svelte` | ✓ |
 | FormError (`role=alert`) | `FormError.svelte` | ✓ |
 | Einrichtungs-/Anmeldemaske | `AuthScreen.svelte` | ✓ |
+| ConfirmButton (zweistufige Bestätigung) | `ConfirmButton.svelte` | ✓ (bis Dialog) |
 | Benutzerverwaltung | `UsersSection.svelte` | ✓ |
 | Select, Switch, Tabs, Drawer, Dialog, Toast, Menu, DataTable, CameraTile | – | M020-03 |
 

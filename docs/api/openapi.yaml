@@ -122,6 +122,62 @@ paths:
                                     evidence: { $ref: '#/components/schemas/EvidenceLevel' }
                                     note: { type: string }
         '401': { $ref: '#/components/responses/Error' }
+  /api/v1/providers:
+    get:
+      summary: Provider inkl. letzter Testergebnisse (jede Rolle)
+      responses:
+        '200': { description: Liste, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Provider' } } } } }
+        '401': { $ref: '#/components/responses/Error' }
+    post:
+      summary: Provider anlegen (Admin, CSRF)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, kind, base_url]
+              properties:
+                name: { type: string, maxLength: 64 }
+                kind: { type: string, enum: [ollama, openai_compatible] }
+                base_url: { type: string, format: uri }
+                api_key_secret: { type: [string, 'null'], description: Dateiname im Secret-Verzeichnis }
+                default_model: { type: [string, 'null'] }
+      responses:
+        '201': { description: angelegt, content: { application/json: { schema: { $ref: '#/components/schemas/Provider' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/providers/{id}:
+    delete:
+      summary: Provider löschen (Admin, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '204': { description: gelöscht }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/providers/{id}/test:
+    post:
+      summary: Verbindungstest (Modellliste, keine Inferenz; Admin, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '200':
+          description: Testergebnis (ok=false bei Providerfehlern)
+          content: { application/json: { schema: { type: object, required: [ok, latency_ms, models, error_code], properties: { ok: { type: boolean }, latency_ms: { type: [integer, 'null'] }, models: { type: array, items: { type: string } }, error_code: { type: [string, 'null'] } } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/providers/{id}/test-vision:
+    post:
+      summary: Bildtest mit synthetischem Testbild (löst Inferenz aus; Admin, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { model: { type: [string, 'null'] } } } } } }
+      responses:
+        '200':
+          description: Testergebnis
+          content: { application/json: { schema: { type: object, required: [ok, model, latency_ms, text, matched, error_code], properties: { ok: { type: boolean }, model: { type: string }, latency_ms: { type: [integer, 'null'] }, text: { type: [string, 'null'] }, matched: { type: [boolean, 'null'] }, error_code: { type: [string, 'null'] } } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
   /api/v1/system/status:
     get:
       summary: Belegter Systemstatus (jede Rolle)
@@ -157,6 +213,31 @@ components:
       type: object
       required: [id, username, role, disabled]
       properties: { id: { type: string, format: uuid }, username: { type: string }, role: { $ref: '#/components/schemas/Role' }, disabled: { type: boolean } }
+    ProviderTest:
+      type: object
+      required: [kind, ok, tested_at]
+      properties:
+        kind: { type: string, enum: [connection, vision] }
+        ok: { type: boolean }
+        latency_ms: { type: [integer, 'null'] }
+        error_code: { type: [string, 'null'] }
+        model: { type: [string, 'null'] }
+        result_text: { type: [string, 'null'], maxLength: 500 }
+        matched: { type: [boolean, 'null'] }
+        tested_at: { type: string, format: date-time }
+    Provider:
+      type: object
+      required: [id, name, kind, base_url, api_key_secret, default_model, enabled, created_at, tests]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        kind: { type: string, enum: [ollama, openai_compatible] }
+        base_url: { type: string }
+        api_key_secret: { type: [string, 'null'], description: 'Nur der Dateiname, nie der Schlüssel' }
+        default_model: { type: [string, 'null'] }
+        enabled: { type: boolean }
+        created_at: { type: string, format: date-time }
+        tests: { type: array, items: { $ref: '#/components/schemas/ProviderTest' } }
     Session:
       type: object
       required: [user, csrf_token]
