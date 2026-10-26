@@ -1,0 +1,73 @@
+openapi: 3.1.0
+info:
+  title: AI-Keyless Management API
+  version: 0.1.0
+  description: >
+    Inoffizielles, unabhängiges Projekt. Quelle der Typen: crates/core/src/status.rs.
+    Bis zur Generierung (AKL-M010-07) manuell synchron halten.
+paths:
+  /healthz:
+    get:
+      summary: Liveness
+      responses:
+        '200':
+          description: Prozess lebt
+          content:
+            application/json:
+              schema: { type: object, properties: { status: { const: ok } }, required: [status] }
+  /readyz:
+    get:
+      summary: Readiness (DB erreichbar und migriert oder nicht konfiguriert)
+      responses:
+        '200': { description: bereit, content: { application/json: { schema: { $ref: '#/components/schemas/Readiness' } } } }
+        '503': { description: nicht bereit, content: { application/json: { schema: { $ref: '#/components/schemas/Readiness' } } } }
+  /api/v1/system/status:
+    get:
+      summary: Belegter Systemstatus
+      responses:
+        '200': { description: Status, content: { application/json: { schema: { $ref: '#/components/schemas/SystemStatus' } } } }
+  /api/v1/system/status/stream:
+    get:
+      summary: Systemstatus als Server-Sent Events (Ereignis `status`, nur bei Änderung)
+      responses:
+        '200': { description: SSE-Stream, content: { text/event-stream: { schema: { type: string } } } }
+components:
+  schemas:
+    EvidenceLevel:
+      type: string
+      enum: [planned, implemented, synthetic_verified, native_verified, unsupported, needs_evidence]
+    DeviceProfileKind: { type: string, enum: [ai_key, ai_port] }
+    DeviceState:
+      type: string
+      enum: [unconfigured, discovered, pending_adoption, adopted, online, reconnecting, offline, error, disabled]
+    ComponentStatus: { type: string, enum: [ok, degraded, unavailable, not_configured] }
+    DatabaseStatus:
+      type: object
+      required: [status, schema_version]
+      properties:
+        status: { $ref: '#/components/schemas/ComponentStatus' }
+        schema_version: { type: [integer, 'null'], format: int64 }
+    DeviceProfileStatus:
+      type: object
+      required: [profile, state, lifecycle_evidence]
+      properties:
+        profile: { $ref: '#/components/schemas/DeviceProfileKind' }
+        state:
+          description: null = unbekannt bzw. kein Profil angelegt
+          oneOf: [{ $ref: '#/components/schemas/DeviceState' }, { type: 'null' }]
+        lifecycle_evidence: { $ref: '#/components/schemas/EvidenceLevel' }
+    SystemStatus:
+      type: object
+      required: [service, version, unofficial, database, devices]
+      properties:
+        service: { type: string }
+        version: { type: string }
+        unofficial: { const: true }
+        database: { $ref: '#/components/schemas/DatabaseStatus' }
+        devices: { type: array, items: { $ref: '#/components/schemas/DeviceProfileStatus' } }
+    Readiness:
+      type: object
+      required: [ready, database]
+      properties:
+        ready: { type: boolean }
+        database: { $ref: '#/components/schemas/DatabaseStatus' }

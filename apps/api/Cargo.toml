@@ -1,0 +1,31 @@
+[package]
+name = "akl-api"
+description = "AI-Keyless Management-API (Axum)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "ai-keyless-api"
+path = "src/main.rs"
+
+[dependencies]
+akl-core.workspace = true
+akl-persistence.workspace = true
+axum.workspace = true
+futures.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+http-body-util.workspace = true
+tower.workspace = true
+
+[lints]
+workspace = true

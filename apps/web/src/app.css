@@ -1,0 +1,108 @@
+@import 'tailwindcss';
+
+/*
+ * AI-Keyless UI – Design-Tokens (siehe docs/ux/UI-DESIGN-SYSTEM.md).
+ * Eigene Werte; keine übernommenen Herstellerdateien oder -farben.
+ */
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root,
+[data-theme='light'] {
+	--akl-bg: #f4f5f7;
+	--akl-surface: #ffffff;
+	--akl-surface-2: #f0f1f4;
+	--akl-surface-hover: #e9ebef;
+	--akl-border: #e1e3e8;
+	--akl-border-strong: #cdd1d8;
+	--akl-text: #1b1d22;
+	--akl-text-muted: #636874;
+	--akl-text-faint: #8c919c;
+	--akl-accent: #2f6fe4;
+	--akl-accent-soft: #e5eeff;
+	--akl-ok: #1f9d55;
+	--akl-ok-soft: #e3f6eb;
+	--akl-warn: #b7791f;
+	--akl-warn-soft: #fbf1df;
+	--akl-danger: #d64545;
+	--akl-danger-soft: #fbe6e6;
+	--akl-neutral-soft: #eceef2;
+	--akl-focus: #2f6fe4;
+	--akl-shadow: 0 1px 2px rgb(16 18 24 / 0.06), 0 4px 16px rgb(16 18 24 / 0.06);
+}
+
+[data-theme='dark'] {
+	--akl-bg: #0f1013;
+	--akl-surface: #17191d;
+	--akl-surface-2: #1d2025;
+	--akl-surface-hover: #23262c;
+	--akl-border: #262a31;
+	--akl-border-strong: #343944;
+	--akl-text: #e7e9ee;
+	--akl-text-muted: #9aa0ab;
+	--akl-text-faint: #6c727d;
+	--akl-accent: #5b9cff;
+	--akl-accent-soft: #1a2740;
+	--akl-ok: #3ccf7a;
+	--akl-ok-soft: #13291e;
+	--akl-warn: #f0b252;
+	--akl-warn-soft: #2e2414;
+	--akl-danger: #ff6b6b;
+	--akl-danger-soft: #331a1c;
+	--akl-neutral-soft: #22252b;
+	--akl-focus: #7fb2ff;
+	--akl-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+}
+
+@theme inline {
+	--color-bg: var(--akl-bg);
+	--color-surface: var(--akl-surface);
+	--color-surface-2: var(--akl-surface-2);
+	--color-surface-hover: var(--akl-surface-hover);
+	--color-line: var(--akl-border);
+	--color-line-strong: var(--akl-border-strong);
+	--color-fg: var(--akl-text);
+	--color-muted: var(--akl-text-muted);
+	--color-faint: var(--akl-text-faint);
+	--color-accent: var(--akl-accent);
+	--color-accent-soft: var(--akl-accent-soft);
+	--color-ok: var(--akl-ok);
+	--color-ok-soft: var(--akl-ok-soft);
+	--color-warn: var(--akl-warn);
+	--color-warn-soft: var(--akl-warn-soft);
+	--color-danger: var(--akl-danger);
+	--color-danger-soft: var(--akl-danger-soft);
+	--color-neutral-soft: var(--akl-neutral-soft);
+	--shadow-card: var(--akl-shadow);
+	--font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+	--font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+}
+
+html {
+	background: var(--akl-bg);
+	color: var(--akl-text);
+	font-size: 14px;
+	-webkit-font-smoothing: antialiased;
+}
+
+body {
+	margin: 0;
+	min-height: 100dvh;
+	background: var(--akl-bg);
+	font-family: var(--font-sans);
+}
+
+:focus-visible {
+	outline: 2px solid var(--akl-focus);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}

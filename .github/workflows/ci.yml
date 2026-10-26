@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rust:
+    name: Rust (fmt, clippy, test, Migrationen)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: akl
+          POSTGRES_PASSWORD: akl-ci-only
+          POSTGRES_DB: akl
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U akl -d akl"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      AKL_TEST_DATABASE_URL: postgres://akl:akl-ci-only@127.0.0.1:5432/akl
+      AKL_REQUIRE_DB_TESTS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - run: cargo test --workspace --locked
+
+  web:
+    name: Web (format, lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: apps/web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run format:check
+      - run: pnpm run lint
+      - run: pnpm run check
+      - run: pnpm test
+      - run: pnpm run build
+
+  security:
+    name: Abhängigkeiten & Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Secret-Scan (gitleaks)
+        run: |
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.28.0 \
+            git /repo --redact --no-banner --exit-code 1
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Rust-Advisories (cargo-audit)
+        run: |
+          cargo install cargo-audit --locked --quiet
+          cargo audit
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: apps/web/package.json
+      - name: npm-Advisories (Produktionsabhängigkeiten)
+        working-directory: apps/web
+        run: pnpm audit --prod --audit-level high
+
+  container:
+    name: Container-Build & Compose-Smoke-Test (amd64)
+    runs-on: ubuntu-latest
+    needs: [rust, web]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image bauen (wird nicht veröffentlicht)
+        run: docker build -f deploy/docker/Dockerfile -t ai-keyless:dev .
+      - name: Compose-Smoke-Test
+        run: scripts/smoke-compose.sh

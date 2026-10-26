@@ -1,0 +1,19 @@
+[package]
+name = "akl-persistence"
+description = "AI-Keyless Persistenz: SQLx/PostgreSQL, versionierte Migrationen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+akl-core.workspace = true
+sqlx.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+
+[lints]
+workspace = true

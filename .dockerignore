@@ -1,0 +1,11 @@
+target
+**/node_modules
+apps/web/build
+apps/web/.svelte-kit
+.git
+docs
+tests
+*.md
+.env
+.env.*
+deploy/compose/secrets

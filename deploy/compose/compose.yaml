@@ -1,0 +1,62 @@
+# AI-Keyless – lokaler/NAS-Stack (Portainer-kompatibel).
+# Start:  docker compose -f deploy/compose/compose.yaml --env-file deploy/compose/.env up -d
+#
+# Hinweis Netzmodus: Für spätere LAN-Discovery/Adoption (AKL-M040/M080) ist
+# Bridge-Netz voraussichtlich NICHT ausreichend (host/macvlan bewerten,
+# siehe docs/operations/NETWORKING.md). Die Admin-UI selbst funktioniert im Bridge-Netz.
+
+name: ai-keyless
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: akl
+      POSTGRES_DB: akl
+      POSTGRES_PASSWORD_FILE: /run/secrets/akl_db_password
+    secrets: [akl_db_password]
+    volumes:
+      - akl-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U akl -d akl"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+  api:
+    image: ${AKL_IMAGE:-ai-keyless:dev}
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      AKL_BIND: 0.0.0.0:8090
+      AKL_DATABASE_URL_FILE: /run/secrets/akl_database_url
+      RUST_LOG: ${AKL_RUST_LOG:-info}
+    secrets: [akl_database_url]
+    ports:
+      # Standardmäßig nur lokal erreichbar; für LAN-Zugriff AKL_ADMIN_BIND anpassen.
+      - "${AKL_ADMIN_BIND:-127.0.0.1}:${AKL_ADMIN_PORT:-8090}:8090"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: ["/tmp:size=16m"]
+    networks: [internal, default]
+
+secrets:
+  akl_db_password:
+    file: ${AKL_SECRETS_DIR:-./secrets}/db_password
+  akl_database_url:
+    file: ${AKL_SECRETS_DIR:-./secrets}/database_url
+
+volumes:
+  akl-db:
+
+networks:
+  internal:
+    internal: true
