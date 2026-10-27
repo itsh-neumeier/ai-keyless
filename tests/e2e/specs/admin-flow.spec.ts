@@ -162,3 +162,51 @@ test('Passwort ändern: altes Passwort nötig, danach gilt nur das neue', async 
 	await expect(page.getByRole('alert')).toBeVisible();
 	await login(page, ADMIN.user, NEW);
 });
+
+test('Geräteprofile: Identität, Deaktivieren, Kill-Switch, Verlauf', async ({ page }) => {
+	// Passwort wurde im vorherigen Test geändert.
+	await login(page, ADMIN.user, 'e2e-neues-admin-passwort');
+	await page.goto('/devices');
+	const section = page.locator('section', {
+		has: page.getByRole('heading', { name: 'Geräteprofile', exact: true })
+	});
+	await expect(section).toContainText('Noch kein Geräteprofil angelegt.');
+	await expect(section).toContainText('Kill-Switch aus');
+
+	await section.locator('#dev-kind').selectOption('ai_key');
+	await page.fill('#dev-name', 'E2E-Key');
+	await section.getByRole('button', { name: 'Profil anlegen' }).click();
+	const item = section.locator('li', { hasText: 'E2E-Key' });
+	await expect(item).toContainText('Nicht konfiguriert');
+	// Nur der öffentliche Fingerprint wird angezeigt.
+	await expect(item.locator('span.font-mono')).toHaveText(/^([0-9A-F]{2}:){31}[0-9A-F]{2}$/);
+
+	// Zweites aktives AI-Key-Profil wird abgelehnt (ADR-003).
+	await page.fill('#dev-name', 'Zweiter');
+	await section.getByRole('button', { name: 'Profil anlegen' }).click();
+	await expect(section.getByRole('alert')).toContainText('bereits ein aktives AI-Key-Profil');
+
+	await item.getByRole('button', { name: 'Deaktivieren' }).click();
+	await item.getByRole('button', { name: 'Wirklich deaktivieren' }).click();
+	await expect(item).toContainText('Deaktiviert');
+
+	await section.getByRole('button', { name: 'Kill-Switch aktivieren' }).click();
+	await section.getByRole('button', { name: 'Alle Profile deaktivieren' }).click();
+	// Nicht per Text prüfen: „Kill-Switch aktivieren“ enthält „Kill-Switch aktiv“.
+	await expect(section.getByRole('button', { name: 'Kill-Switch lösen' })).toBeVisible();
+	await item.getByRole('button', { name: 'Reaktivieren' }).click();
+	await expect(item.getByRole('alert')).toContainText('Kill-Switch aktiv');
+
+	await section.getByRole('button', { name: 'Kill-Switch lösen' }).click();
+	await section.getByRole('button', { name: 'Wirklich lösen' }).click();
+	await expect(section).toContainText('Kill-Switch aus');
+	await item.getByRole('button', { name: 'Reaktivieren' }).click();
+	await expect(item).toContainText('Nicht konfiguriert');
+
+	await item.getByRole('button', { name: 'Verlauf' }).click();
+	const log = item.locator('table');
+	await expect(log).toContainText('manuell deaktiviert');
+	await expect(log).toContainText('manuell reaktiviert');
+	await expect(log).toContainText('user:e2e-admin');
+	await noHorizontalOverflow(page);
+});
