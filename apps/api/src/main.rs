@@ -74,7 +74,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             tracing::warn!("Kill-Switch per AKL_DEVICE_KILL_SWITCH erzwungen");
             tokio::spawn(enforce_kill_switch(lifecycle.clone()));
         }
+        if let Some(emulation) = &config.device_emulation {
+            tracing::warn!(
+                "Geräte-Emulation aktiv (AKL_DEVICE_EMULATION) – synthetisch verifiziert, nicht nativ"
+            );
+            let cfg = akl_device_lifecycle::runtime::EmulationConfig {
+                discovery_bind: emulation.discovery_bind,
+                adoption_bind: emulation.adoption_bind,
+                controller: emulation.controller,
+                control: Default::default(),
+                adoption_timeout: Duration::from_secs(10),
+                poll_interval: Duration::from_secs(5),
+            };
+            tokio::spawn(akl_device_lifecycle::runtime::supervise(
+                lifecycle.clone(),
+                cfg,
+            ));
+        }
         state.lifecycle = Some(lifecycle);
+    } else if config.device_emulation.is_some() {
+        tracing::error!(
+            "AKL_DEVICE_EMULATION gesetzt, aber Datenbank oder AKL_DEVICE_DIR fehlt – Emulation aus"
+        );
     }
     if let Some(db) = state.db.clone() {
         tracing::info!(

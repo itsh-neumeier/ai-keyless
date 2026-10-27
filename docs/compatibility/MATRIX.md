@@ -18,6 +18,7 @@ ein echtes UniFi-Protect-System getestet.
 | Verarbeitungs-Queue (Idempotenz, Leases, Backoff, Limit, `uncertain`) | `synthetic_verified` | `crates/persistence/tests/jobs.rs`, `apps/api/tests/jobs_flow.rs`; echter Worker-Lauf mit Ollama 0.12.6 + granite3.2-vision (2026-10-27) |
 | Modell-Provider | siehe `PROVIDERS.md` | |
 | PostgreSQL-Migrationen | `synthetic_verified` | `crates/persistence/tests/migrations.rs` gegen postgres:17-alpine (2026-10-26) |
+| Geräte-Emulation im Dienst (opt-in `AKL_DEVICE_EMULATION`, Supervisor je aktivem `ai_key`-Profil) | `synthetic_verified` | `crates/device-lifecycle/tests/runtime.rs` (echte PG 17, 2026-10-27): Profil wird gefunden, Probe → `discovered`, Adoption → `online`, Kill-Switch schließt UDP- und TLS-Endpunkt; Konfiguration `apps/api/src/config.rs` (Tests) |
 | Gerätezustandsautomat | `synthetic_verified` | `crates/core/src/device.rs`; Lifecycle-Service `crates/device-lifecycle/tests/service.rs` (echte PG 17) |
 | Container linux/amd64 | `synthetic_verified` | Image-Build + Smoke-Test 2026-10-26 |
 | Container linux/arm64 | `planned` | AKL-M080-03 (nachrangig, keine Zielplattform) |

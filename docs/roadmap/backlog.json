@@ -476,6 +476,21 @@
       ]
     },
     {
+      "id": "AKL-M040-07",
+      "ms": "AKL-M040",
+      "status": "in_progress",
+      "prio": "P0",
+      "deps": [
+        "AKL-M040-04"
+      ],
+      "title": "Geräte-Emulation im Dienst verdrahten (opt-in AKL_DEVICE_EMULATION, Controller-Pin per Konfiguration)",
+      "accept": [
+        "standardmäßig aus",
+        "ohne bestätigten Controller keine Adoption",
+        "Kill-Switch beendet alle Endpunkte"
+      ]
+    },
+    {
       "id": "AKL-M050-01",
       "ms": "AKL-M050",
       "status": "open",
