@@ -62,6 +62,6 @@ Neues Modul, Vorschlag `crates/device-lifecycle/src/discovery.rs`.
 ## Danach: TP-001 (native Abnahme, AKL-M040-05)
 
 Erst nach M040-03/04 und mit **eigener Freigabe** je Lauf. Vorbedingungen aus dieser Sitzung:
-Protect-Update auf 7.3.70 (entschieden, noch nicht eingespielt – aktuell 7.2.105), Netzmodus host oder
+Protect-Update auf 7.3.70 **erledigt 2026-10-27** (UniFi OS 6.0.11, Kameras FW 5.5.43), Netzmodus host oder
 macvlan im LAN 192.168.10.0/24, UNVR-Konfigurationsbackup vorher. Rückweg (Gerät entfernen) ist Pflicht.
 Siehe `docs/testing/plans/TP-001-ai_key-adoption.md`.

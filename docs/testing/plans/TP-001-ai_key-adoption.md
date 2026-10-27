@@ -6,15 +6,15 @@
 | Backlog-Issue | AKL-M040-05 |
 | Ziel-Fähigkeiten | `discovery`, `adoption`, `keepalive` (Profil `ai_key`) |
 | Erwartete Evidenzstufe danach | `native_verified` oder `unsupported` für die getestete Version |
-| Status | **Entwurf – blockiert** (AKL-M040-01…04 nicht implementiert; Protect-Update auf 7.3.70 ausstehend) |
-| Zielumgebung | UNVR 192.168.10.181, Produktivsystem mit 8 × G5 Turret Ultra (FW 5.5.31). Stand TP-000: UniFi OS 5.1.33, Protect 7.2.105; **vor TP-001 Update auf Protect 7.3.70**, exakte Versionen danach erneut ablesen |
+| Status | **Entwurf – blockiert** (AKL-M040-03/04 nicht implementiert). Vorbedingung Protect-Update erfüllt. |
+| Zielumgebung | UNVR 192.168.10.181, **UniFi OS 6.0.11, Protect 7.3.70** (abgelesen 2026-10-27 nach dem Update, als „aktuell“ markiert), 8 × G5 Turret Ultra (FW **5.5.43**), Produktivbetrieb |
 | Freigabe | — |
 
 ## Hypothesen (aus Berichten Dritter, nicht unsere Evidenz)
 
 - Protect findet ein AI-Key-Gerät per UDP-Discovery im selben L2-Segment (Q-006).
 - Die Adoption läuft über HTTPS (berichtet: Port 8080) mit Zertifikats-Pinning; danach rotiert
-  Protect Zugangsdaten (berichtet für 7.3.56). Ob die Zielversion 7.2.105 AI-Key-Geräte anbietet, ist unbekannt.
+  Protect Zugangsdaten (berichtet für 7.3.56). Zielversion ist jetzt 7.3.70; ob sie AI-Key-Geräte anbietet, ist unbekannt (`needs_evidence`).
 - Ein Kontrollkanal (berichtet: „UCP4“ über WebSocket) hält das Gerät online (Q-007).
 
 ## Mindestumgebung
