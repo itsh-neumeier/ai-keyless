@@ -12,6 +12,26 @@
   TP-001 im Produktivnetz mit Auflagen; Kaltstart: keep_alive + Warm-up im Lab **und** konfigurierbares Provider-Zeitlimit.
 - Nächste Schritte: Kaltstart-Umsetzung, dann #2 (Netzwerkmodi, Plan im Issue-Kommentar), dann #3/#4.
 
+**Fortsetzung (gleiche Sitzung) – offene PRs, alle Draft, Merge nach Freigabe:**
+
+| PR | Inhalt | Tests |
+|---|---|---|
+| #39 | TP-000-Nachweis, Entscheidungen, AI-Memory | Doku |
+| #40 | AKL-M080-06: `OLLAMA_KEEP_ALIVE=-1`, `lab.ps1 warm`, Lab-Zeitlimit 300 s | Lab-PC: warm → „Red“, UNTIL Forever |
+| #41 | AKL-M080-01: `akl-netprobe` im Image, `scripts/netlab.sh`, `lab.ps1 netlab`, CI-Schritt, `NETWORKING.md` | Lab-PC 3× + CI grün |
+| #42 | AKL-M040-01 (#3): `crates/device-lifecycle` Identität, `AKL_DEVICE_DIR`, Volume `akl-devices` | 9 Unit-Tests, Workspace grün |
+| #43 | AKL-M040-02 (#4): Lifecycle-Service, Transition-Log, Kill-Switch, `/api/v1/devices` – **Basis #42** | DB-Tests gegen PostgreSQL 17 grün |
+
+- Netzwerk-Ergebnis: host/macvlan ✓; bridge ungeeignet (Docker Desktop kein Broadcast; Linux nur über `docker-proxy`
+  mit Gateway 172.18.0.1 als Absender). Echtes LAN unter Docker Desktop: `needs_evidence` (Issue #2 Schritt 3, eigene Freigabe).
+- Entwicklung auf dem PC: kein lokales Rust; `cargo` läuft in `rust:1.97-slim-bookworm` mit Volumes `akl-cargo-target`/`akl-cargo-registry`,
+  DB-Tests gegen Wegwerf-`postgres:17-alpine` im Docker-Netz `akl-test` (`AKL_TEST_DATABASE_URL=postgres://akl:test@akl-testdb:5432/akl`).
+  Python 3.13 per winget installiert.
+- Auto-Mode blockiert `git push --force*` und `gh issue create` → Folge-Issue „Backup der Geräteidentitäten“ steht nur im PR-Text von #42.
+- Lab-Stack: API zuletzt mit `main`-Overlay neu erstellt → Zeitlimit wieder 120 s, bis #40 gemergt ist; Ollama hält das Modell weiter (keep_alive).
+- Nächstes: Reviews/Merges #39–#43; dann AKL-M030-03 (Fixtures) bzw. AKL-M040-03 (Discovery gegen Simulator, braucht #41-Ergebnis);
+  TP-001 erst nach Protect-Update 7.3.70 und eigener Freigabe.
+
 ## Sitzung 2026-10-27 (Windows-Lab)
 
 - PR #37 gemergt (Windows-Lab-Doku, `.gitattributes`, TLS-Pinning, `akl-protect-sim`, TP-000 freigegeben).
