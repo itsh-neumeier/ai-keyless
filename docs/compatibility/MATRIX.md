@@ -18,7 +18,7 @@ ein echtes UniFi-Protect-System getestet.
 | Verarbeitungs-Queue (Idempotenz, Leases, Backoff, Limit, `uncertain`) | `synthetic_verified` | `crates/persistence/tests/jobs.rs`, `apps/api/tests/jobs_flow.rs`; echter Worker-Lauf mit Ollama 0.12.6 + granite3.2-vision (2026-10-27) |
 | Modell-Provider | siehe `PROVIDERS.md` | |
 | PostgreSQL-Migrationen | `synthetic_verified` | `crates/persistence/tests/migrations.rs` gegen postgres:17-alpine (2026-10-26) |
-| Gerätezustandsautomat | `implemented` (Unit-Tests) | `crates/core/src/device.rs` – noch ohne Lifecycle-Anbindung |
+| Gerätezustandsautomat | `synthetic_verified` | `crates/core/src/device.rs`; Lifecycle-Service `crates/device-lifecycle/tests/service.rs` (echte PG 17) |
 | Container linux/amd64 | `synthetic_verified` | Image-Build + Smoke-Test 2026-10-26 |
 | Container linux/arm64 | `planned` | AKL-M080-03 (nachrangig, keine Zielplattform) |
 | Backup/Restore inkl. Wiederherstellungsprobe | `synthetic_verified` | `scripts/restore-test.sh` (2026-10-27, lokal; CI) |
@@ -28,7 +28,7 @@ ein echtes UniFi-Protect-System getestet.
 
 | Funktion | Protect-Version | Kamera | Stufe | Anmerkung |
 |---|---|---|---|---|
-| UDP/LAN-Discovery | – | – | `planned` | Referenz berichtet für 7.3.56 (→ `needs_evidence`) |
+| UDP/LAN-Discovery: Antwort auf Suchanfrage | – (nur `akl-protect-sim`) | – | `synthetic_verified` | AI-Keyless 0.1.0, 2026-10-27: `crates/device-lifecycle/tests/discovery.rs` (echte PG 17) – v1/v2-Probe beantwortet, fremde/fehlerhafte Pakete ohne Antwort und ohne Zustandswechsel, Kill-Switch/deaktiviert ⇒ stumm, Rate-Limit je Absender. Gegenüber Protect `needs_evidence` (DISC-H07, TP-001); im Profil-JSON daher unverändert |
 | Adoption / Identität / Zertifikate | – | – | `planned` | AKL-M040 |
 | Kontrollkanal (UCP4/WebSocket) | – | – | `needs_evidence` | Vertrag unbekannt |
 | Keepalive / Reconnect | – | – | `planned` | |
