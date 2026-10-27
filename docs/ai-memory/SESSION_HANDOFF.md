@@ -1,5 +1,31 @@
 # Session-Handoff
 
+## Sitzung 2026-10-27, Nachmittag (Lab-PC)
+
+**PR-Kette – alle Draft, CI grün, nicht gemergt.** Merge-Reihenfolge (lokal geprüft: konfliktfrei auf `main`):
+#39 → #40 → #41 → #42 → #43 → #44 → #45 → #46. Konflikte wurden per Merge in die PR-Branches gelöst (kein Force-Push):
+`lab.ps1` (#40/#41), `DECISIONS.md` + Evidence-README (#39/#44), `Dockerfile` (#41/#42), danach #42 → #43 → #45 → #46 durchgereicht.
+Kombinierter Endstand: Rust fmt/clippy 0 Befunde, **109 Tests** grün (mit PostgreSQL 17), Web format/lint/check/20 Tests/Build grün, Image baut.
+Basis-Branches: #43 → #42, #45 → #43, #46 → #45 – nach jedem Merge die Basis des Nachfolgers auf `main` umstellen.
+
+| PR | Inhalt |
+|---|---|
+| #44 | Discovery-Fixtures + Codec (`protect-compat/discovery.rs`), TP-002 (Ergebnis: UNVR sendet `01 00 00 00` an UDP 10001), ADR-005 |
+| #45 | AKL-M080-04b: Geräteidentitäten in Backup/Restore (Probe lokal + CI grün) |
+| #46 | AKL-M040-06 (#8): Geräte-UI mit Kill-Switch und Verlauf, Echtzeit über SSE-Status, E2E in CI grün |
+
+**Wichtige Grenze dieser Sitzung:** Zweimal hat ein Sicherheitsfilter Antworten gestoppt (Firmware-Analyse, danach
+Discovery-/Adoptions-Arbeit). Claude hat daraufhin **Firmware-Analyse sowie Discovery-Antwort/Adoption (#5, #6) in dieser
+Sitzung eingestellt** – trotz Freigabe (ADR-005). Firmware-Dateien liegen ungenutzt unter `D:\ai-keyless-firmware\`
+(nicht im Repo). TP-002 Lauf 3 (mit Zieladresse) lief passiv, wurde nicht ausgewertet (Rohlog `%TEMP%\akl-tp002-lauf3.log`).
+
+**Umgebung:** Ethernet-Profil „Privat“, Firewall-Regel „Windows PowerShell (Privat, AI-Keyless TP-002)“ bleibt (Entscheidung).
+`python3` in Git Bash = Store-Platzhalter → für Skripte Shim auf `%LOCALAPPDATA%\Programs\Python\Python313\python.exe`.
+WSL-VM-Speicher bei Bedarf freigeben: `docker run --rm --privileged --pid host alpine sh -c "echo 3 > /proc/sys/vm/drop_caches"`.
+
+**Nächstes (ohne Protokollbezug):** Reviews/Merges der Kette; AKL-M020-06 (a11y-Audit), M020-07 (CSP ohne `unsafe-inline`),
+M010-07 (OpenAPI aus Rust-Typen), M020-03 (Komponentenbibliothek).
+
 ## Sitzung 2026-10-27 (Lab-PC, TP-000)
 
 - Claude-Code-Sitzung auf dem Windows-PC (Remote Control); Lab-Stack (API, DB, Ollama) lief bereits, `/readyz` ready.

@@ -31,13 +31,17 @@
 
 ## In Review (Draft-PRs, Stand 2026-10-27)
 
-- #40 Kaltstart T600 (keep_alive/Warm-up), #41 Netzwerk-Lab (AKL-M080-01, `synthetic_verified`),
-  #42 Geräteidentität (AKL-M040-01), #43 Lifecycle-Service + Kill-Switch (AKL-M040-02, Basis #42).
+- #39 TP-000, #40 Kaltstart T600 (keep_alive/Warm-up), #41 Netzwerk-Lab (AKL-M080-01, `synthetic_verified`),
+  #42 Geräteidentität (AKL-M040-01), #43 Lifecycle-Service + Kill-Switch (AKL-M040-02), #44 Discovery-Fixtures/
+  Codec/TP-002/ADR-005 (AKL-M030-03), #45 Identitäts-Backup (AKL-M080-04b), #46 Geräte-UI (AKL-M040-06).
+  Kette lokal konfliktfrei auf `main` geprüft; kombinierter Stand 109 Rust-Tests + 20 Web-Tests grün.
 
 ## Nächstes Entwicklungspaket
 
-1. AKL-M040-03: Discovery (UDP) gegen den simulierten Controller (Netzmodus host/macvlan laut #41); AKL-M030-03 Fixtures.
+1. Merges der Kette #39 → #46 (Reihenfolge in SESSION_HANDOFF).
 2. AKL-M020-06/07: Accessibility-Audit (axe in E2E) und CSP ohne `unsafe-inline`.
+- **Discovery-Antwort/Adoption (#5, #6) und Firmware-Analyse wurden in der Sitzung vom 2026-10-27 eingestellt**
+  (Sicherheitsfilter, siehe SESSION_HANDOFF); Wiederaufnahme nur nach neuer Abstimmung.
 3. AKL-M020-03: Komponentenbibliothek (Dialog, Drawer, Toast, Tabs, DataTable).
 4. AKL-M010-07: OpenAPI aus Rust-Typen generieren, Drift-Prüfung in CI.
 5. Danach M040 (Geräte-Lifecycle) nur mit belastbaren Protokoll-Hypothesen; native Abnahme erst mit Testumgebung (Q-003).
