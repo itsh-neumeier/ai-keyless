@@ -114,3 +114,23 @@ impl Drop for SimController {
         self.task.abort();
     }
 }
+
+/// Sendet eine Discovery-Suchanfrage als Unicast an `target` (wie TP-002 von
+/// der UNVR beobachtet) und wartet höchstens `timeout` auf eine Antwort.
+/// Liefert die rohen Antwortbytes oder `None` bei Zeitüberschreitung.
+pub async fn discovery_probe(
+    target: SocketAddr,
+    probe: &[u8],
+    timeout: Duration,
+) -> std::io::Result<Option<Vec<u8>>> {
+    let socket = tokio::net::UdpSocket::bind(("127.0.0.1", 0)).await?;
+    socket.send_to(probe, target).await?;
+    let mut buf = vec![0u8; akl_protect_compat::discovery::MAX_PACKET + 1];
+    match tokio::time::timeout(timeout, socket.recv_from(&mut buf)).await {
+        Err(_) => Ok(None),
+        Ok(Err(err)) => Err(err),
+        Ok(Ok((len, from))) if from == target => Ok(Some(buf[..len].to_vec())),
+        // Antwort von fremder Adresse zählt nicht.
+        Ok(Ok(_)) => Ok(None),
+    }
+}
