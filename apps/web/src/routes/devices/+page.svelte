@@ -2,6 +2,7 @@
 	import { ApiError, api } from '#lib/api/client.ts';
 	import type { CompatProfiles } from '#lib/api/compat.ts';
 	import { systemStatus } from '#lib/api/status.svelte.ts';
+	import DeviceProfiles from '#lib/components/DeviceProfiles.svelte';
 	import FormError from '#lib/components/FormError.svelte';
 	import StatusChip from '#lib/components/StatusChip.svelte';
 	import { deviceTone, evidenceTone } from '#lib/components/tone.ts';
@@ -33,6 +34,7 @@
 </p>
 
 <div class="flex flex-col gap-6">
+	<DeviceProfiles />
 	{#if compat === null && !error}
 		{#each [0, 1] as i (i)}
 			<div class="h-40 animate-pulse rounded-xl bg-surface" aria-hidden="true"></div>
