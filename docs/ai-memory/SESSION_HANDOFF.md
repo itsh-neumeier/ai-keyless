@@ -13,7 +13,9 @@
 - Tests: Workspace fmt/clippy grün; `akl-api` + `akl-device-lifecycle` alle grün mit PG 17, neu `tests/runtime.rs`
   (Ende-zu-Ende Probe → Adoption → online → Kill-Switch schließt Endpunkte) und Konfigurationstest.
 - Offen: Identitäts-Backup enthält das Controller-Token (in Betriebsdoku vermerkt, Entscheidung offen),
-  API/UI „Bindung entfernen“, Credential-Rotation, Lab-Compose für host/macvlan, danach TP-001 mit Freigabe.
+  Credential-Rotation, UI-Knopf „Bindung entfernen“ (API `POST /api/v1/devices/{id}/forget-controller` existiert),
+  Lab-Compose für host/macvlan, danach TP-001 mit Freigabe je Lauf.
+- Merge #51/#52 auch mit Vorab-Freigabe des Nutzers erneut von der Rechteprüfung blockiert; #53 (M040-07) als Draft offen.
 
 ## Sitzung 2026-10-27, spät (Lab-PC) – AKL-M040-03/04 synthetisch umgesetzt
 

@@ -75,6 +75,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             tokio::spawn(enforce_kill_switch(lifecycle.clone()));
         }
         if let Some(emulation) = &config.device_emulation {
+            state.emulation = akl_api::EmulationStatus {
+                enabled: true,
+                controller: emulation.controller.map(Into::into),
+            };
             tracing::warn!(
                 "Geräte-Emulation aktiv (AKL_DEVICE_EMULATION) – synthetisch verifiziert, nicht nativ"
             );

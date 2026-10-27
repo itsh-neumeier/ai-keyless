@@ -49,6 +49,33 @@ pub struct AppState {
     pub jobs_per_hour: i64,
     /// Weckt den Worker, sobald ein Job eingereiht wurde.
     pub job_signal: Arc<tokio::sync::Notify>,
+    /// Konfigurierte Geräte-Emulation (nur zur Anzeige; gestartet in `main`).
+    pub emulation: EmulationStatus,
+}
+
+/// Öffentlicher Stand der Geräte-Emulation (AKL-M040-07), ohne Geheimnisse.
+#[derive(Debug, Clone, Default, serde::Serialize)]
+pub struct EmulationStatus {
+    pub enabled: bool,
+    /// Vom Admin bestätigter Controller (IP, Port, Fingerprint), falls konfiguriert.
+    pub controller: Option<ControllerInfo>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct ControllerInfo {
+    pub ip: std::net::IpAddr,
+    pub port: u16,
+    pub fingerprint: String,
+}
+
+impl From<akl_device_lifecycle::adoption::ControllerTrust> for ControllerInfo {
+    fn from(t: akl_device_lifecycle::adoption::ControllerTrust) -> Self {
+        Self {
+            ip: t.ip,
+            port: t.port,
+            fingerprint: t.fingerprint.to_string(),
+        }
+    }
 }
 
 impl AppState {
@@ -68,6 +95,7 @@ impl AppState {
             lifecycle: None,
             jobs_per_hour: DEFAULT_JOBS_PER_HOUR,
             job_signal: Arc::default(),
+            emulation: EmulationStatus::default(),
         }
     }
 }

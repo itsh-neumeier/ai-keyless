@@ -3,7 +3,9 @@
 //!
 //! Protokollgetriebene Übergänge (Discovery, Adoption, …) gibt es hier bewusst
 //! nicht; die API kann nur den sicheren Rückweg (`disabled`) und dessen
-//! Aufhebung (`unconfigured`) auslösen.
+//! Aufhebung (`unconfigured`) auslösen. Eine gespeicherte Controller-Bindung
+//! wird nur mit ihren öffentlichen Teilen gezeigt (nie das Token) und lässt
+//! sich bei deaktiviertem Profil entfernen (Rückweg „Gerät entfernen“).
 
 use akl_core::{DeviceProfileKind, DeviceState, Role};
 use akl_device_lifecycle::service::{KillSwitchStatus, Lifecycle, LifecycleError};
@@ -19,7 +21,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    AppState,
+    AppState, ControllerInfo, EmulationStatus,
     auth::CurrentUser,
     error::{ApiError, ApiJson},
     providers::correlation,
@@ -33,11 +35,14 @@ pub struct DeviceView {
     profile: DeviceProfileRecord,
     /// SHA-256 des Gerätezertifikats (öffentlich), `None` ohne Identität.
     fingerprint: Option<String>,
+    /// Gespeicherte Adoption (öffentliche Teile), `None` ohne Bindung.
+    controller: Option<ControllerInfo>,
 }
 
 #[derive(Serialize)]
 pub struct DeviceList {
     kill_switch: KillSwitchStatus,
+    emulation: EmulationStatus,
     profiles: Vec<DeviceView>,
 }
 
@@ -94,9 +99,15 @@ impl From<LifecycleError> for ApiError {
 
 fn view(lc: &Lifecycle, profile: DeviceProfileRecord) -> Result<DeviceView, ApiError> {
     let fingerprint = lc.fingerprint(&profile)?.map(|f| f.to_string());
+    let controller = lc
+        .identities()
+        .load_binding(profile.id)
+        .map_err(LifecycleError::from)?
+        .map(|b| b.trust.into());
     Ok(DeviceView {
         profile,
         fingerprint,
+        controller,
     })
 }
 
@@ -114,6 +125,7 @@ pub async fn list(
         .collect::<Result<_, _>>()?;
     Ok(Json(DeviceList {
         kill_switch: lc.kill_switch().await?,
+        emulation: state.emulation.clone(),
         profiles,
     }))
 }
@@ -155,6 +167,7 @@ pub async fn create(
         Json(DeviceView {
             profile,
             fingerprint: Some(fingerprint.to_string()),
+            controller: None,
         }),
     )
         .into_response())
@@ -254,6 +267,48 @@ pub async fn enable(
         action: "device.enabled",
     };
     change(&state, &headers, &user, id, c).await
+}
+
+/// Entfernt die Controller-Bindung (Token und vertrauten Controller). Nur bei
+/// deaktiviertem Profil, damit kein Kontrollkanal mehr darauf zugreift.
+pub async fn forget_controller(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    user: CurrentUser,
+    Path(id): Path<Uuid>,
+) -> Result<Json<DeviceView>, ApiError> {
+    user.require(Role::Admin)?;
+    let lc = lifecycle(&state)?;
+    let profile = lc
+        .db()
+        .get_device_profile(id)
+        .await?
+        .ok_or(LifecycleError::Transition(TransitionError::NotFound))?;
+    if profile.state != DeviceState::Disabled {
+        return Err(ApiError::new(
+            StatusCode::CONFLICT,
+            "must_be_disabled",
+            "Bindung nur bei deaktiviertem Profil entfernbar",
+        ));
+    }
+    let had_binding = lc
+        .identities()
+        .load_binding(id)
+        .map_err(LifecycleError::from)?
+        .is_some();
+    lc.identities()
+        .forget_binding(id)
+        .map_err(LifecycleError::from)?;
+    lc.db()
+        .audit(
+            &user.user.username,
+            "device.controller_forgotten",
+            Some(&id.to_string()),
+            serde_json::json!({ "had_binding": had_binding }),
+            correlation(&headers),
+        )
+        .await?;
+    Ok(Json(view(lc, profile)?))
 }
 
 pub async fn transitions(

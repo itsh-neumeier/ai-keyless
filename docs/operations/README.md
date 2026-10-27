@@ -158,6 +158,11 @@ der Adoption als `controller.token` (0600) neben der Identität und ist damit Te
 Identitäts-Backups. Das Netz muss host oder macvlan sein (`NETWORKING.md`); im Bridge-Netz erreicht die
 Discovery den Container nicht. Kill-Switch oder deaktiviertes Profil beenden alle drei Dienste.
 
+`GET /api/v1/devices` zeigt den Emulationsstatus (`emulation`) und je Profil die gespeicherte Bindung
+(`controller`: IP, Port, Fingerprint – nie das Token). **Gerät entfernen:** Profil deaktivieren
+(`POST /api/v1/devices/{id}/disable`), dann `POST /api/v1/devices/{id}/forget-controller` (nur Admin,
+nur bei `disabled`, auditiert); anschließend das Gerät auch in Protect entfernen.
+
 ## Upgrade / Rollback
 
 Migrationen laufen beim Start automatisch und sind additiv geplant. Vor jedem Upgrade Backup
