@@ -83,6 +83,26 @@ paths:
         '403': { $ref: '#/components/responses/Error' }
         '409': { $ref: '#/components/responses/Error' }
         '422': { $ref: '#/components/responses/Error' }
+  /api/v1/users/{id}:
+    patch:
+      summary: Konto aktivieren/deaktivieren (Admin, CSRF; nicht das eigene, nicht den letzten aktiven Admin; beendet Sitzungen)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [disabled], properties: { disabled: { type: boolean } } } } } }
+      responses:
+        '200': { description: geändert, content: { application/json: { schema: { $ref: '#/components/schemas/User' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/password:
+    post:
+      summary: Eigenes Passwort ändern (CSRF; beendet alle anderen Sitzungen; gedrosselt)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [current_password, new_password], properties: { current_password: { type: string }, new_password: { type: string, minLength: 12, maxLength: 256 } } } } } }
+      responses:
+        '204': { description: geändert }
+        '400': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
   /api/v1/compat/profiles:
     get:
       summary: Versionierte Kompatibilitätsprofile mit Evidenzstufen (jede Rolle)
@@ -242,6 +262,7 @@ components:
         Fehler. Codes u. a.: unauthenticated, forbidden, csrf_failed, origin_rejected,
         invalid_credentials, too_many_attempts, invalid_setup_token, setup_completed,
         invalid_username, invalid_password, username_taken, invalid_request,
+        invalid_current_password, cannot_modify_self, last_admin, invalid_transition,
         database_unavailable, not_found, internal
       content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
   schemas:

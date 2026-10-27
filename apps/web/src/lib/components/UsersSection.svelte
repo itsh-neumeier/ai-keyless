@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ApiError, api } from '#lib/api/client.ts';
-	import type { Role, UserView } from '#lib/auth/auth.svelte.ts';
+	import { auth, type Role, type UserView } from '#lib/auth/auth.svelte.ts';
+	import ConfirmButton from './ConfirmButton.svelte';
 	import { errorText, t, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import Button from './Button.svelte';
 	import FormError from './FormError.svelte';
@@ -24,6 +25,24 @@
 			loadError = null;
 		} catch (err) {
 			loadError = errorText(err instanceof ApiError ? err.code : 'unknown');
+		}
+	}
+
+	let toggling = $state<Record<string, boolean>>({});
+
+	async function toggle(user: UserView) {
+		toggling[user.id] = true;
+		formError = notice = null;
+		try {
+			await api(`/api/v1/users/${user.id}`, {
+				method: 'PATCH',
+				body: { disabled: !user.disabled }
+			});
+			await load();
+		} catch (err) {
+			formError = errorText(err instanceof ApiError ? err.code : 'unknown');
+		} finally {
+			toggling[user.id] = false;
 		}
 	}
 
@@ -64,12 +83,13 @@
 					<th scope="col" class="px-4 py-2 font-medium">{t('auth.username')}</th>
 					<th scope="col" class="px-4 py-2 font-medium">{t('users.role')}</th>
 					<th scope="col" class="px-4 py-2 font-medium">{t('users.status')}</th>
+					<th scope="col" class="px-4 py-2"><span class="sr-only">{t('users.actions')}</span></th>
 				</tr>
 			</thead>
 			<tbody>
 				{#if users === null && !loadError}
 					<tr class="border-t border-line">
-						<td colspan="3" class="px-4 py-3">
+						<td colspan="4" class="px-4 py-3">
 							<div class="h-4 w-1/2 animate-pulse rounded bg-surface-2" aria-hidden="true"></div>
 						</td>
 					</tr>
@@ -83,6 +103,19 @@
 								tone={user.disabled ? 'neutral' : 'ok'}
 								label={user.disabled ? t('users.disabled') : t('users.active')}
 							/>
+						</td>
+						<td class="px-4 py-1.5 text-right">
+							{#if user.id !== auth.user?.id}
+								<ConfirmButton
+									variant="ghost"
+									busy={toggling[user.id]}
+									confirmLabel={user.disabled
+										? t('users.enableConfirm')
+										: t('users.disableConfirm')}
+									onconfirm={() => toggle(user)}
+									>{user.disabled ? t('users.enable') : t('users.disable')}</ConfirmButton
+								>
+							{/if}
 						</td>
 					</tr>
 				{/each}

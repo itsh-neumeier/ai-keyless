@@ -55,7 +55,7 @@ test('Rollen: Betrachter sieht keine Verwaltungsfunktionen', async ({ page }) =>
 	await page.goto('/settings');
 	await page.fill('#new-username', VIEWER.user);
 	await page.fill('#new-password', VIEWER.pass);
-	await page.click('form button[type=submit]');
+	await page.getByRole('button', { name: 'Benutzer anlegen' }).click();
 	await expect(page.getByText('Benutzer angelegt.')).toBeVisible();
 	await page.getByRole('button', { name: 'Abmelden' }).click();
 
@@ -70,6 +70,24 @@ test('Rollen: Betrachter sieht keine Verwaltungsfunktionen', async ({ page }) =>
 	await expect(page.getByRole('heading', { name: 'Benutzer' })).toHaveCount(0);
 	await page.goto('/models');
 	await expect(page.getByRole('heading', { name: 'Provider anlegen' })).toHaveCount(0);
+	await page.getByRole('button', { name: 'Abmelden' }).click();
+
+	// Admin deaktiviert den Betrachter → Anmeldung scheitert.
+	await login(page, ADMIN.user, ADMIN.pass);
+	await page.goto('/settings');
+	const row = page.locator('tr', { hasText: VIEWER.user });
+	await row.getByRole('button', { name: 'Deaktivieren' }).click();
+	await row.getByRole('button', { name: 'Konto deaktivieren' }).click();
+	await expect(row).toContainText('Deaktiviert');
+	// Das eigene Konto bietet keine Deaktivierung an.
+	await expect(
+		page.locator('tr', { hasText: ADMIN.user }).getByRole('button', { name: 'Deaktivieren' })
+	).toHaveCount(0);
+	await page.getByRole('button', { name: 'Abmelden' }).click();
+	await page.fill('#username', VIEWER.user);
+	await page.fill('#password', VIEWER.pass);
+	await page.click('button[type=submit]');
+	await expect(page.getByRole('alert')).toContainText('Benutzername oder Passwort falsch');
 });
 
 test('Provider: Sperre, Verbindung, Bildtest und Verarbeitung über die Queue', async ({
@@ -82,13 +100,13 @@ test('Provider: Sperre, Verbindung, Bildtest und Verarbeitung über die Queue', 
 
 		await page.fill('#p-name', 'Metadaten');
 		await page.fill('#p-url', 'http://169.254.169.254');
-		await page.click('form button[type=submit]');
+		await page.getByRole('button', { name: 'Provider anlegen' }).click();
 		await expect(page.getByRole('alert')).toContainText('gesperrt');
 
 		await page.fill('#p-name', 'Mock-Ollama');
 		await page.fill('#p-url', `http://${providerHost}:${mock.port}`);
 		await page.fill('#p-model', 'mock-vision:1b');
-		await page.click('form button[type=submit]');
+		await page.getByRole('button', { name: 'Provider anlegen' }).click();
 
 		await page.getByRole('button', { name: 'Verbindung testen' }).click();
 		await expect(page.getByText('Erreichbar', { exact: true })).toBeVisible();
@@ -121,4 +139,26 @@ test('Responsiv: keine horizontale Seitenscrollbar auf dem Smartphone', async ({
 		await page.waitForTimeout(500);
 		await noHorizontalOverflow(page);
 	}
+});
+
+test('Passwort ändern: altes Passwort nötig, danach gilt nur das neue', async ({ page }) => {
+	const NEW = 'e2e-neues-admin-passwort';
+	await login(page, ADMIN.user, ADMIN.pass);
+	await page.goto('/settings');
+	await page.fill('#pw-current', 'falsch-falsch-falsch');
+	await page.fill('#pw-new', NEW);
+	await page.fill('#pw-repeat', NEW);
+	await page.getByRole('button', { name: 'Passwort ändern' }).click();
+	await expect(page.getByRole('alert')).toContainText('aktuelle Passwort ist falsch');
+
+	await page.fill('#pw-current', ADMIN.pass);
+	await page.getByRole('button', { name: 'Passwort ändern' }).click();
+	await expect(page.getByText('Passwort geändert.')).toBeVisible();
+	await page.getByRole('button', { name: 'Abmelden' }).click();
+
+	await page.fill('#username', ADMIN.user);
+	await page.fill('#password', ADMIN.pass);
+	await page.click('button[type=submit]');
+	await expect(page.getByRole('alert')).toBeVisible();
+	await login(page, ADMIN.user, NEW);
 });

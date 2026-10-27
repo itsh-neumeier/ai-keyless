@@ -35,6 +35,11 @@ pub fn api() -> Router<AppState> {
             "/api/v1/users",
             get(auth::list_users).post(auth::create_user),
         )
+        .route(
+            "/api/v1/users/{id}",
+            axum::routing::patch(auth::update_user),
+        )
+        .route("/api/v1/auth/password", post(auth::change_password))
         .route("/api/v1/compat/profiles", get(compat_profiles))
         .route(
             "/api/v1/providers",

@@ -32,6 +32,14 @@ pub enum SetupOutcome {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DisableOutcome {
+    Updated(User),
+    NotFound,
+    /// Das letzte aktive Admin-Konto darf nicht deaktiviert werden.
+    LastAdmin,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CreateUserOutcome {
     Created(User),
     UsernameTaken,
@@ -197,6 +205,76 @@ impl Database {
                 .rows_affected()
                 == 1,
         )
+    }
+
+    /// Aktiviert/deaktiviert ein Konto. Beim Deaktivieren werden alle Sitzungen
+    /// sofort beendet; das letzte aktive Admin-Konto bleibt geschützt.
+    pub async fn set_user_disabled_by_id(
+        &self,
+        id: Uuid,
+        disabled: bool,
+    ) -> Result<DisableOutcome, PersistenceError> {
+        let mut tx = self.pool().begin().await?;
+        sqlx::query("LOCK TABLE users IN SHARE ROW EXCLUSIVE MODE")
+            .execute(&mut *tx)
+            .await?;
+        let role: Option<String> = sqlx::query_scalar("SELECT role FROM users WHERE id = $1")
+            .bind(id)
+            .fetch_optional(&mut *tx)
+            .await?;
+        let Some(role) = role else {
+            return Ok(DisableOutcome::NotFound);
+        };
+        if disabled && role == "admin" {
+            let other_admins: i64 = sqlx::query_scalar(
+                "SELECT count(*) FROM users WHERE role = 'admin' AND NOT disabled AND id <> $1",
+            )
+            .bind(id)
+            .fetch_one(&mut *tx)
+            .await?;
+            if other_admins == 0 {
+                return Ok(DisableOutcome::LastAdmin);
+            }
+        }
+        let row: UserRow = sqlx::query_as(
+            "UPDATE users SET disabled = $2, updated_at = now() WHERE id = $1 \
+             RETURNING id, username, role, disabled, created_at",
+        )
+        .bind(id)
+        .bind(disabled)
+        .fetch_one(&mut *tx)
+        .await?;
+        if disabled {
+            sqlx::query("DELETE FROM sessions WHERE user_id = $1")
+                .bind(id)
+                .execute(&mut *tx)
+                .await?;
+        }
+        tx.commit().await?;
+        Ok(DisableOutcome::Updated(user_from_row(row)?))
+    }
+
+    /// Setzt einen neuen Passwort-Hash und beendet alle anderen Sitzungen des Kontos.
+    pub async fn change_password(
+        &self,
+        user_id: Uuid,
+        password_hash: &str,
+        keep_session_hash: &str,
+    ) -> Result<u64, PersistenceError> {
+        let mut tx = self.pool().begin().await?;
+        sqlx::query("UPDATE users SET password_hash = $2, updated_at = now() WHERE id = $1")
+            .bind(user_id)
+            .bind(password_hash)
+            .execute(&mut *tx)
+            .await?;
+        let ended = sqlx::query("DELETE FROM sessions WHERE user_id = $1 AND token_hash <> $2")
+            .bind(user_id)
+            .bind(keep_session_hash)
+            .execute(&mut *tx)
+            .await?
+            .rows_affected();
+        tx.commit().await?;
+        Ok(ended)
     }
 
     pub async fn list_users(&self) -> Result<Vec<User>, PersistenceError> {

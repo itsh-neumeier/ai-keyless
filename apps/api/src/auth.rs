@@ -13,11 +13,11 @@ use akl_core::{
 };
 use akl_persistence::{
     Database,
-    auth::{CreateUserOutcome, SessionRecord, SetupOutcome, User},
+    auth::{CreateUserOutcome, DisableOutcome, SessionRecord, SetupOutcome, User},
 };
 use axum::{
     Json,
-    extract::{FromRequestParts, Request, State},
+    extract::{FromRequestParts, Path, Request, State},
     http::{HeaderMap, HeaderValue, Method, StatusCode, header, request::Parts},
     middleware::Next,
     response::{IntoResponse, Response},
@@ -554,6 +554,124 @@ pub async fn create_user(
             "Benutzername bereits vergeben",
         )),
     }
+}
+
+#[derive(Deserialize)]
+pub struct UpdateUserRequest {
+    disabled: bool,
+}
+
+/// Konto aktivieren/deaktivieren (Admin). Nicht für das eigene Konto; das
+/// letzte aktive Admin-Konto bleibt geschützt. Deaktivieren beendet Sitzungen.
+pub async fn update_user(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    current: CurrentUser,
+    Path(id): Path<Uuid>,
+    ApiJson(req): ApiJson<UpdateUserRequest>,
+) -> Result<Json<UserView>, ApiError> {
+    current.require(Role::Admin)?;
+    if current.user.id == id {
+        return Err(ApiError::new(
+            StatusCode::CONFLICT,
+            "cannot_modify_self",
+            "Das eigene Konto kann nicht deaktiviert werden",
+        ));
+    }
+    let db = state.db.as_ref().ok_or_else(ApiError::database_required)?;
+    match db.set_user_disabled_by_id(id, req.disabled).await? {
+        DisableOutcome::NotFound => Err(ApiError::new(
+            StatusCode::NOT_FOUND,
+            "not_found",
+            "Benutzer nicht gefunden",
+        )),
+        DisableOutcome::LastAdmin => Err(ApiError::new(
+            StatusCode::CONFLICT,
+            "last_admin",
+            "Das letzte aktive Administrator-Konto kann nicht deaktiviert werden",
+        )),
+        DisableOutcome::Updated(user) => {
+            let action = if user.disabled {
+                "user.disabled"
+            } else {
+                "user.enabled"
+            };
+            db.audit(
+                &current.user.username,
+                action,
+                Some(&user.username),
+                serde_json::json!({}),
+                correlation_id(&headers).as_deref(),
+            )
+            .await?;
+            Ok(Json(UserView::from(&user)))
+        }
+    }
+}
+
+#[derive(Deserialize)]
+pub struct ChangePasswordRequest {
+    current_password: String,
+    new_password: String,
+}
+
+/// Eigenes Passwort ändern. Erfordert das aktuelle Passwort (mit derselben
+/// Drosselung wie die Anmeldung) und beendet alle anderen Sitzungen.
+pub async fn change_password(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    current: CurrentUser,
+    ApiJson(req): ApiJson<ChangePasswordRequest>,
+) -> Result<StatusCode, ApiError> {
+    let db = state.db.as_ref().ok_or_else(ApiError::database_required)?;
+    let username = current.user.username.clone();
+    if state.login_limiter.check(&username).is_some() {
+        return Err(ApiError::new(
+            StatusCode::TOO_MANY_REQUESTS,
+            "too_many_attempts",
+            "Zu viele Fehlversuche – bitte später erneut versuchen",
+        ));
+    }
+    validate_password(&req.new_password).map_err(credential_error)?;
+    let (_, phc) = db
+        .find_credentials(&username)
+        .await?
+        .ok_or_else(ApiError::unauthenticated)?;
+    let current_password = req.current_password;
+    let valid =
+        tokio::task::spawn_blocking(move || crypto::verify_password(&current_password, &phc))
+            .await
+            .map_err(|_| ApiError::internal())?;
+    if !valid {
+        state.login_limiter.fail(&username);
+        db.audit(
+            &username,
+            "auth.password_change_failed",
+            None,
+            serde_json::json!({}),
+            correlation_id(&headers).as_deref(),
+        )
+        .await?;
+        return Err(ApiError::new(
+            StatusCode::BAD_REQUEST,
+            "invalid_current_password",
+            "Aktuelles Passwort falsch",
+        ));
+    }
+    state.login_limiter.reset(&username);
+    let hash = hash_password_blocking(req.new_password).await?;
+    let ended = db
+        .change_password(current.user.id, &hash, &current.token_hash)
+        .await?;
+    db.audit(
+        &username,
+        "auth.password_changed",
+        None,
+        serde_json::json!({ "other_sessions_ended": ended }),
+        correlation_id(&headers).as_deref(),
+    )
+    .await?;
+    Ok(StatusCode::NO_CONTENT)
 }
 
 #[cfg(test)]

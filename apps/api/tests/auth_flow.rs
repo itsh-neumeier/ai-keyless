@@ -300,3 +300,223 @@ async fn disabled_account_cannot_log_in() {
 async fn sqlx_disable(db: &Database, username: &str) {
     db.set_user_disabled(username, true).await.unwrap();
 }
+
+#[tokio::test]
+async fn disabling_accounts_and_last_admin_protection() {
+    let Some(url) = test_database_url() else {
+        return;
+    };
+    let db = fresh_schema(&url, "akl_api_disable").await;
+    let mut admin = Client::new(db.clone());
+    setup_admin(&db, &mut admin).await;
+    let admin_id = admin.send("GET", "/api/v1/auth/session", None).await.body["user"]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+
+    // Sich selbst deaktivieren ist verboten.
+    let r = admin
+        .send(
+            "PATCH",
+            &format!("/api/v1/users/{admin_id}"),
+            Some(json!({"disabled": true})),
+        )
+        .await;
+    assert_eq!(
+        (r.status, r.body["error"]["code"].as_str()),
+        (409, Some("cannot_modify_self"))
+    );
+
+    // Zweiter Admin + Operator.
+    let mut ids = Vec::new();
+    for (name, role) in [("admin2", "admin"), ("operator1", "operator")] {
+        let r = admin
+            .send(
+                "POST",
+                "/api/v1/users",
+                Some(json!({"username": name, "password": "ein-langes-passwort", "role": role})),
+            )
+            .await;
+        ids.push(r.body["id"].as_str().unwrap().to_owned());
+    }
+    let mut op = Client::new(db.clone());
+    let r = op
+        .send(
+            "POST",
+            "/api/v1/auth/login",
+            Some(json!({"username": "operator1", "password": "ein-langes-passwort"})),
+        )
+        .await;
+    op.adopt(&r);
+    assert_eq!(
+        op.send("GET", "/api/v1/system/status", None).await.status,
+        200
+    );
+
+    // Operator darf keine Konten ändern.
+    let r = op
+        .send(
+            "PATCH",
+            &format!("/api/v1/users/{admin_id}"),
+            Some(json!({"disabled": true})),
+        )
+        .await;
+    assert_eq!(r.status, 403);
+
+    // Deaktivieren beendet die Sitzung sofort; Anmeldung danach unmöglich.
+    let r = admin
+        .send(
+            "PATCH",
+            &format!("/api/v1/users/{}", ids[1]),
+            Some(json!({"disabled": true})),
+        )
+        .await;
+    assert_eq!((r.status, r.body["disabled"].as_bool()), (200, Some(true)));
+    assert_eq!(
+        op.send("GET", "/api/v1/system/status", None).await.status,
+        401
+    );
+    let r = op
+        .send(
+            "POST",
+            "/api/v1/auth/login",
+            Some(json!({"username": "operator1", "password": "ein-langes-passwort"})),
+        )
+        .await;
+    assert_eq!(r.status, 401);
+
+    // Reaktivieren ermöglicht die Anmeldung wieder.
+    admin
+        .send(
+            "PATCH",
+            &format!("/api/v1/users/{}", ids[1]),
+            Some(json!({"disabled": false})),
+        )
+        .await;
+    let r = op
+        .send(
+            "POST",
+            "/api/v1/auth/login",
+            Some(json!({"username": "operator1", "password": "ein-langes-passwort"})),
+        )
+        .await;
+    assert_eq!(r.status, 200);
+
+    // Letzter aktiver Admin: admin2 deaktiviert admin; danach ist admin2 der
+    // letzte aktive Admin und darf nicht deaktiviert werden.
+    let mut admin2 = Client::new(db.clone());
+    let r = admin2
+        .send(
+            "POST",
+            "/api/v1/auth/login",
+            Some(json!({"username": "admin2", "password": "ein-langes-passwort"})),
+        )
+        .await;
+    admin2.adopt(&r);
+    let r = admin2
+        .send(
+            "PATCH",
+            &format!("/api/v1/users/{admin_id}"),
+            Some(json!({"disabled": true})),
+        )
+        .await;
+    assert_eq!(r.status, 200);
+    // Direkter Repository-Test: admin2 ist jetzt der letzte aktive Admin.
+    let admin2_id: uuid::Uuid = ids[0].parse().unwrap();
+    assert!(matches!(
+        db.set_user_disabled_by_id(admin2_id, true).await.unwrap(),
+        akl_persistence::auth::DisableOutcome::LastAdmin
+    ));
+
+    let r = admin2
+        .send(
+            "PATCH",
+            "/api/v1/users/00000000-0000-4000-8000-000000000000",
+            Some(json!({"disabled": true})),
+        )
+        .await;
+    assert_eq!(r.status, 404);
+}
+
+#[tokio::test]
+async fn changing_password_requires_current_and_ends_other_sessions() {
+    let Some(url) = test_database_url() else {
+        return;
+    };
+    let db = fresh_schema(&url, "akl_api_password").await;
+    let mut a = Client::new(db.clone());
+    setup_admin(&db, &mut a).await;
+    let mut b = Client::new(db.clone());
+    let r = b
+        .send(
+            "POST",
+            "/api/v1/auth/login",
+            Some(json!({"username": "admin", "password": ADMIN_PW})),
+        )
+        .await;
+    b.adopt(&r);
+
+    let r = a
+        .send("POST", "/api/v1/auth/password", Some(json!({"current_password": "falsch-falsch-falsch", "new_password": "neues-langes-passwort"})))
+        .await;
+    assert_eq!(
+        (r.status, r.body["error"]["code"].as_str()),
+        (400, Some("invalid_current_password"))
+    );
+    let r = a
+        .send(
+            "POST",
+            "/api/v1/auth/password",
+            Some(json!({"current_password": ADMIN_PW, "new_password": "kurz"})),
+        )
+        .await;
+    assert_eq!(r.body["error"]["code"], "invalid_password");
+
+    // Ohne CSRF-Token abgelehnt.
+    let csrf = a.csrf.take();
+    let r = a
+        .send(
+            "POST",
+            "/api/v1/auth/password",
+            Some(json!({"current_password": ADMIN_PW, "new_password": "neues-langes-passwort"})),
+        )
+        .await;
+    assert_eq!(r.status, 403);
+    a.csrf = csrf;
+
+    let r = a
+        .send(
+            "POST",
+            "/api/v1/auth/password",
+            Some(json!({"current_password": ADMIN_PW, "new_password": "neues-langes-passwort"})),
+        )
+        .await;
+    assert_eq!(r.status, 204, "{}", r.body);
+    // Eigene Sitzung bleibt, die andere ist beendet.
+    assert_eq!(
+        a.send("GET", "/api/v1/system/status", None).await.status,
+        200
+    );
+    assert_eq!(
+        b.send("GET", "/api/v1/system/status", None).await.status,
+        401
+    );
+
+    let mut c = Client::new(db.clone());
+    let old = c
+        .send(
+            "POST",
+            "/api/v1/auth/login",
+            Some(json!({"username": "admin", "password": ADMIN_PW})),
+        )
+        .await;
+    assert_eq!(old.status, 401);
+    let new = c
+        .send(
+            "POST",
+            "/api/v1/auth/login",
+            Some(json!({"username": "admin", "password": "neues-langes-passwort"})),
+        )
+        .await;
+    assert_eq!(new.status, 200);
+}

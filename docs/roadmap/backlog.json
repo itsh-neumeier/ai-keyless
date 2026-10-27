@@ -278,12 +278,12 @@
     {
       "id": "AKL-M020-04",
       "ms": "AKL-M020",
-      "status": "in_progress",
+      "status": "done",
       "prio": "P1",
       "deps": [
         "AKL-M020-02"
       ],
-      "title": "Login-/Setup-Screens und Nutzerverwaltung (Screens fertig; Deaktivieren/Passwort ändern offen)",
+      "title": "Login-/Setup-Screens, Nutzerverwaltung, Konten deaktivieren, Passwort ändern",
       "accept": [
         "E2E mit Playwright"
       ]
