@@ -1,5 +1,25 @@
 # Session-Handoff
 
+## Sitzung 2026-10-27, spät (Lab-PC) – AKL-M040-03/04 synthetisch umgesetzt
+
+- Grundlage: `docs/roadmap/HANDOFF-AKL-M040-03-04.md`. Zwei gestapelte Branches, **nicht gepusht, kein PR**
+  (Freigabe nötig): `feat/AKL-M040-03-discovery-responder` → `feat/AKL-M040-04-adoption`.
+- **M040-03** `crates/device-lifecycle/src/discovery.rs`: Responder antwortet nur auf v1/v2-Probe, Unicast nur an lokale
+  Absender, 1 Antwort/s je Absender; erste Antwort `unconfigured → discovered`; Kill-Switch/`disabled` ⇒ stumm.
+  Feldwerte neutral (`AKL-SYNTH`), MAC/Konfigurationsstatus nur wenn gesetzt (Kodierung offen, DISC-H07).
+- **M040-04** `adoption.rs` + `control.rs`: TLS-Endpunkt mit eigenem Zertifikat (Port 8080 nur Konstante), nur vom
+  vertrauten Controller (IP + Pin); gepinnte Rückverbindung **vor** Token-Speicherung; Token als `controller.token`
+  (0600) im Identitätsverzeichnis. Kontrollkanal mit Keepalive, `reconnecting/offline`, Neustart-Readback,
+  Pin-Wechsel ⇒ `error`. Zeilenformat (JSON-Zeilen) ist **synthetischer Platzhalter**, nicht UCP4.
+- `akl-protect-sim`: `SimCert` (Neustart mit gleichem Fingerprint), Verbindungen enden mit dem Sim, `send_line_pinned`,
+  `discovery_probe`.
+- Tests: Workspace fmt/clippy `-D warnings` grün, alle Tests grün mit PG 17 (`AKL_REQUIRE_DB_TESTS=1`); neu 5+4
+  Discovery- und 7 Adoptionstests, 5 Wiederholungen ohne Ausreißer. Gebaut im Container `rust:1-bookworm`
+  (keine Rust-Toolchain auf dem Windows-Host).
+- **Offen:** Verdrahtung in `akl-api` (opt-in, Konfiguration Controller-Pin), Credential-Rotation (M040-04-Titel),
+  API/UI zum Entfernen der Bindung (`forget_binding` existiert), Identitäts-Backup enthält jetzt auch das Token
+  (prüfen, ob gewollt). Danach TP-001 mit eigener Freigabe.
+
 ## Sitzung 2026-10-27, Abend (Lab-PC) – Merges + Übergabe
 
 - **#39–#48 alle nach `main` gemergt** (Merge-Commits, keine Squashes); `main`-CI danach grün

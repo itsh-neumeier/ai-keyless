@@ -118,7 +118,7 @@ impl IdentityStore {
         Ok(Self { root })
     }
 
-    fn dir(&self, profile_id: Uuid) -> PathBuf {
+    pub(crate) fn dir(&self, profile_id: Uuid) -> PathBuf {
         self.root.join(profile_id.to_string())
     }
 
@@ -270,7 +270,7 @@ fn pem_body(pem: &str, label: &str) -> Option<Vec<u8>> {
     base64::engine::general_purpose::STANDARD.decode(b64).ok()
 }
 
-fn write_file(path: &Path, data: &[u8], private: bool) -> io::Result<()> {
+pub(crate) fn write_file(path: &Path, data: &[u8], private: bool) -> io::Result<()> {
     let mut options = fs::OpenOptions::new();
     options.write(true).create_new(true);
     #[cfg(unix)]
@@ -296,7 +296,7 @@ fn restrict_dir(dir: &Path) -> io::Result<()> {
     Ok(())
 }
 
-fn sync_dir(dir: &Path) -> io::Result<()> {
+pub(crate) fn sync_dir(dir: &Path) -> io::Result<()> {
     #[cfg(unix)]
     fs::File::open(dir)?.sync_all()?;
     #[cfg(not(unix))]

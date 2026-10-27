@@ -1,6 +1,6 @@
 # Projektstand
 
-> Zuletzt aktualisiert: 2026-10-27 · Branch `claude/tp000-unvr-recon`
+> Zuletzt aktualisiert: 2026-10-27 (spät) · Branch `feat/AKL-M040-04-adoption`
 
 ## Aktive Meilensteine
 
@@ -19,7 +19,7 @@
 - UI-Bereiche mit echten Daten: Übersicht, Geräte (Profile + Kompatibilitätsmatrix), KI-Modelle, Verarbeitung, System, Einstellungen (inkl. Benutzer).
 - Verarbeitungs-Queue mit Worker; einziger Job-Typ bisher `vision_probe`.
 - Modell-Provider real gemessen: Ollama 0.12.6 + granite3.2-vision (CPU) erkennt das synthetische Testbild; moondream liefert leere Antworten (`docs/compatibility/PROVIDERS.md`).
-- **Keinerlei Protect-Kommunikation implementiert. Keine `native_verified`-Aussage.**
+- **Geräte-Emulation nur synthetisch** (AKL-M040-03/04, Branches `feat/AKL-M040-03-discovery-responder` → `feat/AKL-M040-04-adoption`, noch nicht gemergt): Discovery-Antwort, Adoption, Keepalive/Reconnect `synthetic_verified` gegen `akl-protect-sim`; **noch nicht in `akl-api` verdrahtet**, nie gegen echte Protect gelaufen. Keine `native_verified`-Aussage.
 - Testumgebung (Stand 2026-10-27 nach Update): UNVR, **UniFi OS 6.0.11, Protect 7.3.70**, 8 × G5 Turret Ultra (FW 5.5.43), Produktivbetrieb; Lab-PC mit T600 (Ollama, 20/41 Schichten GPU, Kaltstart >120 s, warm ~0,5 s) und Coral (in WSL/Container sichtbar, ungetestet).
 
 ## Rahmenbedingungen (Interview 2026-10-26)
@@ -35,15 +35,13 @@
   #43 Lifecycle-Service + Kill-Switch (AKL-M040-02), #44 Discovery-Fixtures/Codec/TP-002/ADR-005 (AKL-M030-03),
   #45 Identitäts-Backup (AKL-M080-04b), #46 Geräte-UI (AKL-M040-06), #47 a11y-Audit (AKL-M020-06),
   #48 CSP ohne `unsafe-inline` (AKL-M020-07).
-- **Offen und blockiert: Geräte-Emulation gegenüber Protect** (Discovery-Antwort AKL-M040-03, Adoption
-  AKL-M040-04). Noch kein Responder. Übergabe: `docs/roadmap/HANDOFF-AKL-M040-03-04.md`.
 
 ## Nächstes Entwicklungspaket
 
 1. Merges der Kette #39 → #46 (Reihenfolge in SESSION_HANDOFF).
 2. AKL-M020-06/07: Accessibility-Audit (axe in E2E) und CSP ohne `unsafe-inline`.
-- **Discovery-Antwort/Adoption (#5, #6) und Firmware-Analyse wurden in der Sitzung vom 2026-10-27 eingestellt**
-  (Sicherheitsfilter, siehe SESSION_HANDOFF); Wiederaufnahme nur nach neuer Abstimmung.
+- **Discovery-Antwort/Adoption (#5, #6) synthetisch umgesetzt (Spätsitzung 2026-10-27)**; Firmware-Analyse weiter eingestellt.
+  Nächster Schritt dazu: Verdrahtung in `akl-api` (opt-in per Konfiguration, AKL_DISCOVERY_BIND/Controller-Pin), dann TP-001 mit Freigabe.
 3. AKL-M020-03: Komponentenbibliothek (Dialog, Drawer, Toast, Tabs, DataTable).
 4. AKL-M010-07: OpenAPI aus Rust-Typen generieren, Drift-Prüfung in CI.
 5. Danach M040 (Geräte-Lifecycle) nur mit belastbaren Protokoll-Hypothesen; native Abnahme erst mit Testumgebung (Q-003).
