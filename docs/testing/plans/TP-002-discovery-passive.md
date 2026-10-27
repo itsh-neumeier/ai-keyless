@@ -6,7 +6,7 @@
 | Backlog-Issue | AKL-M030-03 (#10), Vorbereitung AKL-M040-03 (#5) |
 | Ziel | Prüfen, ob und wie die UNVR Discovery-Anfragen ins LAN sendet; Hypothesen DISC-H01…H04 (`tests/contracts/discovery/hypotheses.json`) bestätigen oder widerlegen |
 | Erwartete Evidenzstufe danach | Für die **Anfrageseite** der beobachteten Version: bestätigt/widerlegt (Beobachtung, kein Fähigkeitsnachweis). Kein `native_verified` für AI-Keyless (es antwortet nicht). |
-| Status | **freigegeben**, Lauf 1 gestartet 2026-10-27 |
+| Status | **durchgeführt 2026-10-27** (Läufe 1, 2a, 2b) → `docs/compatibility/evidence/2026-10-27-tp002-discovery-passiv.md`; Folgelauf mit protokolliertem Auslöser und Zieladresse offen |
 | Freigabe (Name, Datum) | Projektverantwortlicher, 2026-10-27 (Chat: „Freigabe hast du“) |
 
 ## Umgebung

@@ -24,6 +24,9 @@ struct Fixture {
     evidence: EvidenceLevel,
     #[serde(default)]
     bytes_hex: Option<String>,
+    /// Verweis auf eine eigene Beobachtung: `evidence/<datei>.md: …`.
+    #[serde(default)]
+    observed: Option<String>,
 }
 
 fn fixtures() -> Vec<Fixture> {
@@ -63,6 +66,15 @@ fn every_fixture_has_source_and_honest_evidence() {
             "{}: native_verified ohne Nachweis",
             f.id
         );
+        // Beobachtungen müssen auf eine vorhandene Nachweisdatei verweisen.
+        if let Some(obs) = &f.observed {
+            let file = obs.split(':').next().unwrap();
+            assert!(file.starts_with("evidence/"), "{}: {obs}", f.id);
+            let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../../docs/compatibility")
+                .join(file);
+            assert!(path.is_file(), "{}: {} fehlt", f.id, path.display());
+        }
         // Nur selbst konstruierte Beispiele dürfen synthetisch verifiziert sein.
         if f.evidence == EvidenceLevel::SyntheticVerified {
             assert!(f.source.starts_with("eigene Konstruktion"), "{}", f.id);

@@ -70,9 +70,11 @@ Aussagen sind `needs_evidence`, bis ein eigener Testplan sie bestätigt (TP-002)
 | Nmap-Skript `ubiquiti-discovery.nse`, https://svn.nmap.org/nmap/scripts/ubiquiti-discovery.nse (Autor laut Datei: Tom Sellers) | 2026-10-27 | Nmap Public Source License („Same as Nmap“) – **kein Code übernommen** | UDP 10001; Anfragen v1 `01 00 00 00`, v2 `02 08 00 00`; Antwortkopf Version/Kommando/Länge (2 Byte BE); TLV Typ 1 Byte, Länge 2 Byte BE; Typbedeutungen (0x01, 0x02, 0x03, 0x0a–0x0d, 0x0f, 0x14–0x17) |
 | Wireshark Display-Filter-Referenz „ubdp“, https://www.wireshark.org/docs/dfref/u/ubdp.html | 2026-10-27 | öffentliche Dokumentation | Feldbezeichnungen und -typen des Ubiquiti Discovery Protocol (Wireshark 3.0.0–4.6.9) |
 
-**Bewusst nicht genutzt:** Hersteller-Firmware (z. B. ein am 2026-10-27 genannter Download-Link
-`fw-update.ui.com/…` zur AI-Key-Firmware). Nicht heruntergeladen, nicht geöffnet, nicht analysiert
-(ADR-002: keine Firmware, Schlüssel, Modelle oder Hersteller-Assets).
+## 4b. Hersteller-Firmware (statische Analyse, ADR-005)
+
+| Quelle | Abgerufen | Status | Nutzung |
+|---|---|---|---|
+| AI-Key-Firmware vom Update-Server des Herstellers, `https://fw-update.ui.com/api/firmware/f966bb8d-3c4f-438a-91aa-788be18911f1/data` (Link vom Projektverantwortlichen, 2026-10-27) | 2026-10-27 | proprietär; nur lokal unter `D:\ai-keyless-firmware\`, **nicht** im Repository | Statische Analyse; Erkenntnisse in eigenen Worten in `docs/compatibility/FIRMWARE-NOTES.md` (mit Version und SHA-256). Keine Schlüssel, kein Code, keine Dateien übernommen. |
 
 ## 5. Drittabhängigkeiten
 

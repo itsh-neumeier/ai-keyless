@@ -19,8 +19,11 @@ Kompatibilitätsmodus). **Nicht** von Ubiquiti. Projektsprache Deutsch; Code-Bez
   UI-Zustände. Unbekannt bleibt `null`/„unbekannt“. Jede Fähigkeitsaussage trägt eine
   Evidenzstufe (`planned`, `implemented`, `synthetic_verified`, `native_verified`,
   `unsupported`, `needs_evidence`) und eine Version. HTTP 200 ≠ native Persistenz.
-- **Clean Room (ADR-002):** Kein Code aus `Olli0103/unifi-ai-key-emulator` (keine Lizenz) oder
-  anderen unlizenzierten Quellen; keine Firmware, Schlüssel, Modelle, Hersteller-Assets.
+- **Clean Room (ADR-002, ADR-005):** Kein Code aus `Olli0103/unifi-ai-key-emulator` (keine Lizenz)
+  oder anderen unlizenzierten Quellen; keine Schlüssel, Zugangsdaten, Modelle, Hersteller-Assets.
+  Öffentlich angebotene AI-Key-Firmware darf **statisch analysiert** werden (ADR-005): nur
+  außerhalb des Repos (`D:\ai-keyless-firmware\`), Erkenntnisse in eigenen Worten mit
+  Version/SHA-256, nie Firmware-Teile oder Schlüssel ins Repo.
   Neue Quellen vor Nutzung in `docs/legal/PROVENANCE.md` eintragen.
 - **Profile strikt getrennt (ADR-003):** `ai_key` ≠ `ai_port`.
 - **Autonomiegrenze – Freigabe nötig vor:** kostenpflichtigen Modellaufrufen, echten

@@ -25,3 +25,4 @@
 | 2026-10-27 | Testumgebung UNVR 192.168.10.181; Live-Tests erfolgen in einer Claude-Sitzung auf dem PC des Projektverantwortlichen bzw. mit AI-Keyless im LAN (Cloud-Container erreicht das Heimnetz nicht; Adoption braucht das Gerät im LAN) | UNVR muss das Gerät erreichen (UDP-Discovery, eingehende Verbindung) | OPEN_QUESTIONS Q-003 |
 | 2026-10-27 | Kein UniFi Protect in Docker (kein offizielles Image; inoffizielle enthalten proprietäre Firmware) → simulierter Controller als Testumgebung | ADR-002 | AKL-M030-02 |
 | 2026-10-27 | GitHub-Issues sind führend; Agent darf im Repo agieren (Freigabe Projektverantwortlicher) | Interview | – |
+| 2026-10-27 | Statische Analyse öffentlich angebotener AI-Key-Firmware erlaubt (ADR-005); keine Schlüssel/Firmware-Teile ins Repo; Repo bleibt öffentlich, Risiko trägt der Projektverantwortliche | Discovery/Adoption sonst nicht ermittelbar; Homelab-Nutzung | ADR-005, RISK-ACCEPTANCE |

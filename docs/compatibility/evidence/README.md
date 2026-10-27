@@ -11,4 +11,5 @@ Readback-Methode, redigierte Logs, Ergebnis je Fähigkeit, offene Risiken.
 Ein Profileintrag mit `native_verified` muss im Feld `note` auf seine Datei hier verweisen
 (`evidence/<datei>.md`); andernfalls lehnt `crates/protect-compat` die Profile beim Laden ab.
 
-**Stand 2026-10-27: keine Nachweise vorhanden** (keine Testumgebung, Q-003).
+**Stand 2026-10-27: keine `native_verified`-Nachweise vorhanden.** Beobachtungen der Controller-Seite:
+[`2026-10-27-tp002-discovery-passiv.md`](2026-10-27-tp002-discovery-passiv.md) (TP-002).

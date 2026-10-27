@@ -1,6 +1,6 @@
 # ADR-002: Lizenz- und Clean-Room-Strategie
 
-- **Status:** Akzeptiert · **Datum:** 2026-10-26 · **Meilenstein:** AKL-M000
+- **Status:** Akzeptiert, Punkt 3 (Firmware-Images) teilweise ersetzt durch **ADR-005** (2026-10-27) · **Datum:** 2026-10-26 · **Meilenstein:** AKL-M000
 
 ## Kontext
 
