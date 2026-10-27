@@ -46,6 +46,8 @@ services:
       AKL_PROVIDER_TIMEOUT_SECS: ${AKL_PROVIDER_TIMEOUT_SECS:-120}
       # Globales, dauerhaftes Startlimit der Verarbeitungs-Queue (Sicherheitsvorgabe)
       AKL_JOBS_PER_HOUR: ${AKL_JOBS_PER_HOUR:-12}
+      # Notaus: true deaktiviert alle Geräteprofile und ist per API nicht abschaltbar.
+      AKL_DEVICE_KILL_SWITCH: ${AKL_DEVICE_KILL_SWITCH:-false}
     secrets: [akl_database_url]
     ports:
       # Standardmäßig nur lokal erreichbar; für LAN-Zugriff AKL_ADMIN_BIND anpassen.

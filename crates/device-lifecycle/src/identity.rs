@@ -135,6 +135,16 @@ impl IdentityStore {
         read_identity(&dir, profile_id, kind).map(Some)
     }
 
+    /// Entfernt eine Identität. Nur für das Zurückrollen einer gerade
+    /// fehlgeschlagenen Profilanlage gedacht – eine adoptierte Identität zu
+    /// löschen erzwingt eine Neu-Adoption.
+    pub fn remove(&self, profile_id: Uuid) -> Result<(), IdentityError> {
+        match fs::remove_dir_all(self.dir(profile_id)) {
+            Err(err) if err.kind() != io::ErrorKind::NotFound => Err(err.into()),
+            _ => Ok(()),
+        }
+    }
+
     /// Lädt die Identität oder erzeugt sie beim ersten Aufruf.
     pub fn load_or_create(
         &self,

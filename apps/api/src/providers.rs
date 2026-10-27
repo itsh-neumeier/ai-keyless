@@ -42,7 +42,7 @@ fn valid_secret_name(name: &str) -> bool {
             .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_' || b == b'-')
 }
 
-fn correlation(headers: &HeaderMap) -> Option<&str> {
+pub(crate) fn correlation(headers: &HeaderMap) -> Option<&str> {
     headers.get("x-request-id").and_then(|v| v.to_str().ok())
 }
 

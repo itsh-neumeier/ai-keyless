@@ -142,6 +142,77 @@ paths:
                                     evidence: { $ref: '#/components/schemas/EvidenceLevel' }
                                     note: { type: string }
         '401': { $ref: '#/components/responses/Error' }
+  /api/v1/devices:
+    get:
+      summary: Geräteprofile mit Zertifikats-Fingerprint und Kill-Switch-Status (jede Rolle)
+      responses:
+        '200':
+          description: Liste
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kill_switch: { $ref: '#/components/schemas/KillSwitch' }
+                  profiles: { type: array, items: { $ref: '#/components/schemas/DeviceProfile' } }
+        '401': { $ref: '#/components/responses/Error' }
+        '503': { $ref: '#/components/responses/Error' }
+    post:
+      summary: Profil + Identität anlegen, Zustand unconfigured (Admin, CSRF)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, display_name]
+              properties:
+                kind: { type: string, enum: [ai_key, ai_port] }
+                display_name: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '201': { description: angelegt, content: { application/json: { schema: { $ref: '#/components/schemas/DeviceProfile' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { description: 'ai_key_exists | kill_switch_active', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/devices/{id}/disable:
+    post:
+      summary: Sicherer Rückweg → disabled (Admin, CSRF; Body optional {reason})
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '200': { description: deaktiviert, content: { application/json: { schema: { $ref: '#/components/schemas/DeviceProfile' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { description: invalid_transition, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /api/v1/devices/{id}/enable:
+    post:
+      summary: disabled → unconfigured (Admin, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '200': { description: reaktiviert, content: { application/json: { schema: { $ref: '#/components/schemas/DeviceProfile' } } } }
+        '409': { description: 'state_changed | kill_switch_active | ai_key_exists', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /api/v1/devices/{id}/transitions:
+    get:
+      summary: Letzte 50 Zustandsübergänge, neueste zuerst (jede Rolle)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Protokoll }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/devices/kill-switch:
+    get:
+      summary: Kill-Switch-Status (jede Rolle)
+      responses:
+        '200': { description: Status, content: { application/json: { schema: { $ref: '#/components/schemas/KillSwitch' } } } }
+    put:
+      summary: Kill-Switch schalten; Einschalten deaktiviert alle Profile (Admin, CSRF)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [active], properties: { active: { type: boolean } } }
+      responses:
+        '200': { description: geschaltet }
+        '409': { description: kill_switch_forced, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
   /api/v1/providers:
     get:
       summary: Provider inkl. letzter Testergebnisse (jede Rolle)
@@ -266,6 +337,23 @@ components:
         database_unavailable, not_found, internal
       content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
   schemas:
+    DeviceProfile:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [ai_key, ai_port] }
+        state: { type: string, enum: [unconfigured, discovered, pending_adoption, adopted, online, reconnecting, offline, error, disabled] }
+        display_name: { type: string }
+        fingerprint: { type: [string, 'null'], description: 'SHA-256 des Gerätezertifikats (AB:CD:…); privater Schlüssel wird nie ausgegeben' }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    KillSwitch:
+      type: object
+      properties:
+        active: { type: boolean }
+        forced: { type: boolean, description: per AKL_DEVICE_KILL_SWITCH erzwungen }
+        changed_at: { type: [string, 'null'], format: date-time }
+        changed_by: { type: [string, 'null'] }
     Error:
       type: object
       required: [error]

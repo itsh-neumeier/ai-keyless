@@ -23,6 +23,8 @@ pub struct Config {
     pub secrets_dir: PathBuf,
     /// Identitätsverzeichnis der Geräteprofile (privat, beschreibbar).
     pub device_dir: Option<PathBuf>,
+    /// Erzwingt den Geräte-Kill-Switch (`AKL_DEVICE_KILL_SWITCH`).
+    pub device_kill_switch: bool,
     pub jobs_per_hour: i64,
 }
 
@@ -43,6 +45,7 @@ impl std::fmt::Debug for Config {
             .field("provider_timeout_secs", &self.provider_timeout_secs)
             .field("secrets_dir", &self.secrets_dir)
             .field("device_dir", &self.device_dir)
+            .field("device_kill_switch", &self.device_kill_switch)
             .field("jobs_per_hour", &self.jobs_per_hour)
             .finish()
     }
@@ -125,6 +128,7 @@ impl Config {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("/run/secrets")),
             device_dir: get("AKL_DEVICE_DIR").map(PathBuf::from),
+            device_kill_switch: flag(&get, "AKL_DEVICE_KILL_SWITCH", false)?,
             jobs_per_hour: match get("AKL_JOBS_PER_HOUR") {
                 None => crate::DEFAULT_JOBS_PER_HOUR,
                 Some(v) => v.parse().ok().filter(|n| (0..=100_000).contains(n)).ok_or(

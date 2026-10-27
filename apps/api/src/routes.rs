@@ -15,7 +15,7 @@ use futures::Stream;
 use crate::{
     AppState,
     auth::{self, CurrentUser},
-    jobs, providers, status,
+    devices, jobs, providers, status,
 };
 
 /// Intervall, in dem der Server den Status prüft. Clients erhalten nur
@@ -60,6 +60,17 @@ pub fn api() -> Router<AppState> {
         .route(
             "/api/v1/providers/{id}/probe-job",
             post(providers::enqueue_probe),
+        )
+        .route("/api/v1/devices", get(devices::list).post(devices::create))
+        .route(
+            "/api/v1/devices/kill-switch",
+            get(devices::kill_switch).put(devices::set_kill_switch),
+        )
+        .route("/api/v1/devices/{id}/disable", post(devices::disable))
+        .route("/api/v1/devices/{id}/enable", post(devices::enable))
+        .route(
+            "/api/v1/devices/{id}/transitions",
+            get(devices::transitions),
         )
         .route("/api/v1/jobs", get(jobs::list))
         .route("/api/v1/jobs/stats", get(jobs::stats))
