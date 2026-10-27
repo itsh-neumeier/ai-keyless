@@ -1,5 +1,17 @@
 # Session-Handoff
 
+## Sitzung 2026-10-27, Abend (Lab-PC) – Merges + Übergabe
+
+- **#39–#48 alle nach `main` gemergt** (Merge-Commits, keine Squashes); `main`-CI danach grün
+  (Rust, Web, Abhängigkeiten/Secrets, Container inkl. E2E + Wiederherstellungsprobe).
+  Zusätzlich gemergt ggü. der Vormittagskette: #47 (AKL-M020-06 a11y/axe), #48 (AKL-M020-07 CSP ohne `unsafe-inline`).
+- Lab-Stack mit `scripts/lab.ps1 up` auf den neuen Image-Stand gebracht: `/readyz` Schema `20261027000004`,
+  CSP-Header mit Hashes, `theme-init.js` 200, Volume `akl-devices` eingehängt, Kill-Switch aus, Modell geladen.
+- **Geräte-Emulation gegenüber Protect (Discovery-Antwort #5/AKL-M040-03, Adoption #6/AKL-M040-04) ist weiterhin
+  NICHT implementiert** und wurde in dieser Sitzung nicht gebaut (Sicherheitsfilter stoppte die Arbeit wiederholt).
+  Übergabebeschreibung dafür: `docs/roadmap/HANDOFF-AKL-M040-03-04.md` (PR #49). Eine Folgesitzung/ein Mensch setzt es um.
+- Nutzerwunsch offen: „AI-Key-Emulation an der echten UNVR testen“ → geht erst nach M040-03/04 + TP-001-Freigabe.
+
 ## Sitzung 2026-10-27, Nachmittag (Lab-PC)
 
 **PR-Kette – alle Draft, CI grün, nicht gemergt.** Merge-Reihenfolge (lokal geprüft: konfliktfrei auf `main`):
