@@ -1,0 +1,58 @@
+{
+  "contract": "discovery",
+  "note": "Hypothesen aus öffentlichen Beschreibungen (PROVENANCE 4a) und Berichten Dritter. Keine eigene Beobachtung. Bestätigung nur über einen freigegebenen Testplan (TP-002).",
+  "fixtures": [
+    {
+      "id": "DISC-H01",
+      "kind": "fact",
+      "statement": "Discovery nutzt UDP-Port 10001.",
+      "source": "Nmap ubiquiti-discovery.nse (PROVENANCE 4a)",
+      "evidence": "needs_evidence"
+    },
+    {
+      "id": "DISC-H02",
+      "kind": "probe",
+      "statement": "Suchanfrage Version 1 ohne Nutzdaten.",
+      "bytes_hex": "01000000",
+      "source": "Nmap ubiquiti-discovery.nse (PROVENANCE 4a)",
+      "evidence": "needs_evidence"
+    },
+    {
+      "id": "DISC-H03",
+      "kind": "probe",
+      "statement": "Suchanfrage Version 2 ohne Nutzdaten.",
+      "bytes_hex": "02080000",
+      "source": "Nmap ubiquiti-discovery.nse (PROVENANCE 4a)",
+      "evidence": "needs_evidence"
+    },
+    {
+      "id": "DISC-H04",
+      "kind": "fact",
+      "statement": "Antwortkopf: Version (1 Byte), Kommando (1 Byte), Länge (2 Byte Big-Endian) = Anzahl der folgenden TLV-Bytes; v1-Antwort mit Kommando 0x00, v2 mit 0x06/0x09/0x0b.",
+      "source": "Nmap ubiquiti-discovery.nse (PROVENANCE 4a)",
+      "evidence": "needs_evidence"
+    },
+    {
+      "id": "DISC-H05",
+      "kind": "fact",
+      "statement": "TLV: Typ (1 Byte), Länge (2 Byte Big-Endian), Wert. Typen u. a. 0x01 MAC, 0x02 MAC+IP, 0x03 Firmware, 0x0b Hostname, 0x0c Produkt, 0x14 Modell (v1), 0x15 Modell (v2), 0x16 Version, 0x17 Konfigurationsstatus.",
+      "source": "Nmap ubiquiti-discovery.nse; Wireshark dfref ubdp (PROVENANCE 4a)",
+      "evidence": "needs_evidence"
+    },
+    {
+      "id": "DISC-H06",
+      "kind": "reply",
+      "statement": "Synthetische v1-Antwort mit künstlichen Werten (Hostname akl-test, Modell SYNTH) nach DISC-H04/H05 – nur zum Test des Codecs, kein echtes Gerät.",
+      "bytes_hex": "010000130b0008616b6c2d7465737414000553594e5448",
+      "source": "eigene Konstruktion nach DISC-H04/H05",
+      "evidence": "synthetic_verified"
+    },
+    {
+      "id": "DISC-H07",
+      "kind": "open",
+      "statement": "Ob Protect AI-Key-Geräte über dieses Protokoll sucht (berichtet: read-only v1 queries) und welche Felder/Werte (Modell, Produkt, Konfigurationsstatus) es für ein AI-Key-Gerät erwartet, ist unbekannt.",
+      "source": "docs/compatibility/REFERENCE-ANALYSIS.md (Bericht Dritter)",
+      "evidence": "needs_evidence"
+    }
+  ]
+}

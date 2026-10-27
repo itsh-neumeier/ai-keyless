@@ -58,6 +58,18 @@ Volltext in `LICENSE` (offizielle Fassung von https://www.gnu.org/licenses/agpl-
 abgerufen 2026-10-26, SHA-256 `0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0`).
 Rechtliche Risikoentscheidung zur Geräteimitation: `docs/legal/RISK-ACCEPTANCE.md`.
 
+## 4a. Öffentliche Protokollbeschreibungen (nur Fakten)
+
+Genutzt werden ausschließlich **Fakten** (Portnummer, Bytefolgen, Feldbedeutungen). Es wird kein
+Code, keine Struktur und kein Ausdruck übernommen; die Implementierung in
+`crates/protect-compat/src/discovery.rs` ist eigenständig geschrieben. Alle daraus abgeleiteten
+Aussagen sind `needs_evidence`, bis ein eigener Testplan sie bestätigt (TP-002).
+
+| Quelle | Abgerufen | Lizenz/Status | Genutzte Fakten |
+|---|---|---|---|
+| Nmap-Skript `ubiquiti-discovery.nse`, https://svn.nmap.org/nmap/scripts/ubiquiti-discovery.nse (Autor laut Datei: Tom Sellers) | 2026-10-27 | Nmap Public Source License („Same as Nmap“) – **kein Code übernommen** | UDP 10001; Anfragen v1 `01 00 00 00`, v2 `02 08 00 00`; Antwortkopf Version/Kommando/Länge (2 Byte BE); TLV Typ 1 Byte, Länge 2 Byte BE; Typbedeutungen (0x01, 0x02, 0x03, 0x0a–0x0d, 0x0f, 0x14–0x17) |
+| Wireshark Display-Filter-Referenz „ubdp“, https://www.wireshark.org/docs/dfref/u/ubdp.html | 2026-10-27 | öffentliche Dokumentation | Feldbezeichnungen und -typen des Ubiquiti Discovery Protocol (Wireshark 3.0.0–4.6.9) |
+
 ## 5. Drittabhängigkeiten
 
 Alle Laufzeit- und Build-Abhängigkeiten stammen aus öffentlichen Registries (crates.io, npm,
@@ -82,3 +94,4 @@ Design-Tokens wurden für dieses Projekt neu erstellt. Keine Hersteller-Icons, -
 |---|---|
 | 2026-10-26 | Erstfassung (AKL-M000) |
 | 2026-10-26 | Lizenz AGPL-3.0-or-later festgelegt; Risikoentscheidung ergänzt |
+| 2026-10-27 | Abschnitt 4a: öffentliche Protokollbeschreibungen zur Discovery (Nmap, Wireshark) als Faktenquellen |
