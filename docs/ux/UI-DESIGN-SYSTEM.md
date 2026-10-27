@@ -65,9 +65,15 @@ Kamera-/Ereigniskacheln 16:9 mit Status-Overlay, Tabs in Detailseiten, Suchfeld 
 | `--akl-surface-2` | `#1d2025` | `#f0f1f4` | Eingabefelder, Skeletons |
 | `--akl-border` | `#262a31` | `#e1e3e8` | Trenner |
 | `--akl-text` | `#e7e9ee` | `#1b1d22` | Primärtext |
-| `--akl-text-muted` | `#9aa0ab` | `#636874` | Sekundärtext |
-| `--akl-accent` | `#5b9cff` | `#2f6fe4` | Aktiv, Links, Fokus |
-| `--akl-ok` / `--akl-warn` / `--akl-danger` | `#3ccf7a` / `#f0b252` / `#ff6b6b` | `#1f9d55` / `#b7791f` / `#d64545` | Status |
+| `--akl-text-muted` | `#aab0bb` | `#4b505b` | Sekundärtext |
+| `--akl-text-faint` | `#8d939e` | `#5f6571` | Hinweise, Tabellenköpfe |
+| `--akl-accent` | `#5b9cff` | `#2459c7` | Aktiv, Links, primäre Buttons |
+| `--akl-on-accent` | `#0b1426` | `#ffffff` | Text auf `accent` (Buttons) |
+| `--akl-focus` | `#7fb2ff` | `#2f6fe4` | Fokusring |
+| `--akl-ok` / `--akl-warn` / `--akl-danger` | `#3ccf7a` / `#f0b252` / `#ff6b6b` | `#137a3f` / `#8a5a0c` / `#b8302f` | Status (auch auf `*-soft`) |
+
+Alle Text-Tokens erreichen ≥ 4,5:1 auf `bg`, `surface`, `surface-2`, `surface-hover` und – bei Status/Akzent –
+auf der jeweiligen `*-soft`-Fläche (berechnet 2026-10-27, AKL-M020-06).
 
 Tailwind-Utilities: `bg-surface`, `text-muted`, `border-line`, `bg-ok-soft text-ok` usw.
 (`@theme inline` in `app.css`). **Keine Hex-Werte in Komponenten.**
@@ -113,8 +119,10 @@ Regel: Wenn die Live-Verbindung fehlt, werden zuvor empfangene Gerätezustände 
 - i18n: `de` (primär), `en` vollständig; Test erzwingt Schlüsselgleichheit. Neue Sprache = neues Wörterbuch.
 - Tastatur: Skip-Link, sichtbarer Fokusring (`:focus-visible`), `aria-current` in der Navigation,
   `aria-expanded` am Einklapp-Button, Tabellen mit `scope`, `prefers-reduced-motion` respektiert.
-- Kontrast: Text-Tokens ≥ 4.5:1 auf Surface (Dark `#e7e9ee` auf `#17191d`, Light `#1b1d22` auf `#fff`);
-  Audit mit Werkzeug in M020 (AKL-M020-06).
+- Kontrast und WCAG 2.1 A/AA: automatisches Audit mit axe (`@axe-core/playwright`) in der E2E-Suite – alle
+  Seiten und der Anmeldebildschirm, jeweils Dark und Light; **jeder** Verstoß lässt die CI scheitern
+  (AKL-M020-06). Ergebnis 2026-10-27: 0 Verstöße. Manuelle Prüfung (Screenreader, Tastaturpfade) ergänzt das,
+  ersetzt sie aber nicht.
 - Responsiv: keine horizontale Seiten-Scrollbar (E2E-Test bei 390 px für alle Seiten); breite Tabellen scrollen in ihrem Container. Der Container ist immer `relative overflow-x-auto`, sonst entkommen absolut positionierte Elemente (z. B. `sr-only`-Beschriftungen) dem Clipping und verbreitern die Seite.
 
 ## 8. Demo-/Mock-Modus
