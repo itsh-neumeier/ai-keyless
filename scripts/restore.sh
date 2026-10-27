@@ -20,6 +20,15 @@ SCHEMA=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['schema
 ACTUAL=$(sha256sum "$DUMP" | cut -d' ' -f1)
 [[ "$EXPECTED" == "$ACTUAL" ]] || { echo "Prüfsumme stimmt nicht – Abbruch" >&2; exit 3; }
 
+# Geräteidentitäten (ab Sicherungen mit devices_sha256; ältere haben keine).
+DEVICES_TAR=${DUMP%.dump}.devices.tar
+DEVICES_EXPECTED=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('devices_sha256') or '')" "$META")
+if [[ -n "$DEVICES_EXPECTED" ]]; then
+  [[ -r "$DEVICES_TAR" ]] || { echo "Identitätssicherung fehlt: $DEVICES_TAR" >&2; exit 2; }
+  [[ "$(sha256sum "$DEVICES_TAR" | cut -d' ' -f1)" == "$DEVICES_EXPECTED" ]] ||
+    { echo "Prüfsumme der Identitätssicherung stimmt nicht – Abbruch" >&2; exit 3; }
+fi
+
 "${COMPOSE[@]}" stop api >/dev/null
 "${COMPOSE[@]}" up -d --wait db >/dev/null
 "${COMPOSE[@]}" exec -T db psql -U akl -d postgres -qc \
@@ -27,6 +36,11 @@ ACTUAL=$(sha256sum "$DUMP" | cut -d' ' -f1)
 "${COMPOSE[@]}" exec -T db dropdb -U akl --if-exists akl
 "${COMPOSE[@]}" exec -T db createdb -U akl akl
 "${COMPOSE[@]}" exec -T db pg_restore -U akl -d akl --no-owner --exit-on-error <"$DUMP"
+if [[ -n "$DEVICES_EXPECTED" ]]; then
+  # Volume leeren und mit Originalrechten/-eigentümern füllen (API ist gestoppt).
+  docker run --rm -i -v "${PROJECT}_akl-devices:/devices" alpine:3.20 sh -c \
+    'find /devices -mindepth 1 -delete && tar -C /devices --numeric-owner -xpf -' <"$DEVICES_TAR"
+fi
 "${COMPOSE[@]}" up -d --wait api >/dev/null
 
 for _ in $(seq 1 30); do
