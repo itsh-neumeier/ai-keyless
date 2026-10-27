@@ -60,6 +60,18 @@ docker compose -f deploy/compose/compose.yaml -f deploy/compose/compose.lab.yaml
 Danach *Verbindung testen*, im Auswahlfeld `granite3.2-vision-4k:latest` wählen und *Bildtest*. Ob 4096 Token
 für reale Kamerabilder reichen, ist offen (`needs_evidence`).
 
+**Kaltstart vermeiden (Entscheidung 2026-10-27):** Der erste Bildaufruf nach dem Laden dauerte mit
+`granite3.2-vision-4k` 131,7 s und lag damit über dem Standard-Zeitlimit von 120 s. Das Lab-Overlay
+hält das Modell daher dauerhaft geladen (`OLLAMA_KEEP_ALIVE=-1`, belegt ~3,5 GB, davon ~73 % im VRAM)
+und setzt das Provider-Zeitlimit auf 300 s (`AKL_LAB_PROVIDER_TIMEOUT_SECS`). Nach jedem Start
+des Stacks einmal vorwärmen (Bildaufruf mit dem synthetischen Testbild, kalt ~1,5 min):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\lab.ps1 warm -Model granite3.2-vision-4k
+```
+
+Im Provider dasselbe Modell eintragen; Ollama hält nur ein Modell gleichzeitig (`OLLAMA_MAX_LOADED_MODELS=1`).
+
 ## 4. Claude-Code-Sitzung auf dem PC
 
 In PowerShell:
