@@ -10,6 +10,7 @@
     up      Secrets anlegen (falls fehlend), Image bauen, Stack starten
     token   Einmaliges Setup-Token ausgeben (erste Anmeldung)
     model   Vision-Modell in Ollama laden (Standard: granite3.2-vision)
+    warm    Modell mit dem synthetischen Testbild vorwaermen und geladen halten
     netlab  Synthetisches Netzwerk-Lab (host/bridge/macvlan) in der Docker-VM
     status  Container-Status anzeigen
     logs    Logs der API verfolgen
@@ -21,7 +22,7 @@
 #>
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('up', 'token', 'model', 'netlab', 'status', 'logs', 'down')]
+    [ValidateSet('up', 'token', 'model', 'warm', 'netlab', 'status', 'logs', 'down')]
     [string]$Command = 'up',
     [string]$Model = 'granite3.2-vision',
     [switch]$NoBuild,
@@ -89,6 +90,15 @@ switch ($Command) {
     'model' {
         if ($NoGpu) { throw 'Ohne Lab-Overlay gibt es keinen Ollama-Container.' }
         Compose exec ollama ollama pull $Model
+    }
+    'warm' {
+        if ($NoGpu) { throw 'Ohne Lab-Overlay gibt es keinen Ollama-Container.' }
+        # Ein Bildaufruf, nicht nur Laden: auch der erste Bildaufruf nach dem
+        # Laden war auf der T600 langsam (27 s). Kalt dauert das 1-2 Minuten.
+        Compose cp crates\providers\assets\synthetic-red-64.png ollama:/tmp/akl-warmup.png
+        Write-Host "Waerme $Model vor (kalt 1-2 Minuten) ..."
+        Compose exec -T ollama ollama run --keepalive -1m $Model 'Which single color fills this image? Answer with one English word. /tmp/akl-warmup.png'
+        Compose exec -T ollama ollama ps
     }
     'netlab' {
         # scripts/netlab.sh braucht root, ip und nsenter im Netz-/PID-Namespace
