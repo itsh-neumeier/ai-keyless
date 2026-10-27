@@ -17,13 +17,13 @@ services:
       # Ein Modell gleichzeitig im VRAM (T600: 4 GB).
       OLLAMA_MAX_LOADED_MODELS: "1"
       OLLAMA_NUM_PARALLEL: "1"
-      # Kontext begrenzen: Ollama wählte auf der T600 16384 Token; der KV-Cache
-      # dafür passte nicht mehr in 4 GB VRAM → Modell lief zu 100 % auf der CPU
-      # (gemessen 2026-10-27, ~27 s je Bildtest). Flash-Attention + q8_0-Cache
-      # halbieren den KV-Speicher zusätzlich.
-      OLLAMA_CONTEXT_LENGTH: "${AKL_OLLAMA_CONTEXT:-8192}"
-      OLLAMA_FLASH_ATTENTION: "1"
-      OLLAMA_KV_CACHE_TYPE: q8_0
+      # Standardkontext für Modelle ohne eigene Vorgabe. Achtung: Modelle mit
+      # num_ctx im Modelfile (z. B. granite3.2-vision: 16384) überschreiben das.
+      # Gemessen 2026-10-27 auf der T600 (2,7 GiB frei): 16384 Token → nur 18/41
+      # Schichten auf der GPU; mit Flash-Attention + q8_0-KV lief der Bildtest
+      # in die 120-s-Zeitgrenze (ohne beides ~27 s). Beides daher nicht gesetzt;
+      # kleineren Kontext per Modellvariante setzen (docs/operations/LAB-SETUP.md).
+      OLLAMA_CONTEXT_LENGTH: "${AKL_OLLAMA_CONTEXT:-4096}"
     volumes:
       - akl-ollama:/root/.ollama
     deploy:

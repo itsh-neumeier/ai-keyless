@@ -49,8 +49,16 @@ In AI-Keyless → *KI-Modelle*: Provider „Ollama T600“, Typ Ollama, URL `htt
 Standardmodell `granite3.2-vision:latest` → *Verbindung testen* → *Bildtest*. Ergebnis und Latenz
 in `docs/compatibility/PROVIDERS.md` eintragen (Zeile „NVIDIA T600“).
 
-`granite3.2-vision` (2B, ~2,4 GB) passt in 4 GB VRAM. Größere Modelle (z. B. 7B-Vision) passen nicht
-vollständig in die T600 und laufen teilweise auf der CPU – messen statt annehmen (AKL-M080-06).
+**VRAM der T600 (gemessen 2026-10-27):** Von 4 GB sind neben dem Windows-Desktop nur ~2,7 GiB frei.
+`granite3.2-vision` setzt im Modelfile `num_ctx 16384`; damit landen nur 18 von 41 Schichten auf der GPU
+(Bildtest ~27 s). `OLLAMA_CONTEXT_LENGTH` greift dagegen nicht. Kleineren Kontext über eine Modellvariante:
+
+```powershell
+docker compose -f deploy/compose/compose.yaml -f deploy/compose/compose.lab.yaml exec ollama sh -c "printf 'FROM granite3.2-vision\nPARAMETER num_ctx 4096\n' > /tmp/Modelfile && ollama create granite3.2-vision-4k -f /tmp/Modelfile"
+```
+
+Danach *Verbindung testen*, im Auswahlfeld `granite3.2-vision-4k:latest` wählen und *Bildtest*. Ob 4096 Token
+für reale Kamerabilder reichen, ist offen (`needs_evidence`).
 
 ## 4. Claude-Code-Sitzung auf dem PC
 
