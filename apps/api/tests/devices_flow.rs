@@ -170,3 +170,109 @@ async fn device_profiles_kill_switch_and_audit() {
     );
     std::fs::remove_dir_all(dir).unwrap();
 }
+
+#[tokio::test]
+async fn controller_binding_is_shown_without_token_and_can_be_forgotten() {
+    use akl_device_lifecycle::adoption::{ControllerBinding, ControllerTrust, Secret};
+    use akl_protect_compat::tls::Fingerprint;
+
+    let Some(url) = test_database_url() else {
+        return;
+    };
+    let db = fresh_schema(&url, "akl_api_devices_binding").await;
+    let dir = std::env::temp_dir().join(format!("akl-devices-{}", uuid::Uuid::new_v4()));
+    let mut bare = Client::new(db.clone());
+    setup_admin(&db, &mut bare).await;
+
+    let store = IdentityStore::open(&dir).unwrap();
+    let mut state = AppState::new(Some(db.clone()), false);
+    state.lifecycle = Some(Lifecycle::new(db.clone(), store.clone(), false));
+    let mut admin = Client::with_state(state);
+    let r = admin
+        .send(
+            "POST",
+            "/api/v1/auth/login",
+            Some(json!({"username": "Admin", "password": ADMIN_PW})),
+        )
+        .await;
+    admin.adopt(&r);
+
+    let r = admin.send("GET", "/api/v1/devices", None).await;
+    assert_eq!(
+        r.body["emulation"],
+        json!({"enabled": false, "controller": null})
+    );
+
+    let r = admin
+        .send(
+            "POST",
+            "/api/v1/devices",
+            Some(json!({"kind": "ai_key", "display_name": "Key"})),
+        )
+        .await;
+    let id = r.body["id"].as_str().unwrap().to_owned();
+    assert_eq!(r.body["controller"], serde_json::Value::Null);
+
+    // Bindung wie nach einer Adoption (synthetischer Wert).
+    let trust = ControllerTrust {
+        ip: "192.0.2.10".parse().unwrap(),
+        port: 7442,
+        fingerprint: Fingerprint::of(b"controller"),
+    };
+    store
+        .save_binding(
+            id.parse().unwrap(),
+            &ControllerBinding {
+                trust,
+                token: Secret::new("geheimes-test-token"),
+            },
+        )
+        .unwrap();
+    let r = admin.send("GET", "/api/v1/devices", None).await;
+    let controller = &r.body["profiles"][0]["controller"];
+    assert_eq!(controller["ip"], "192.0.2.10");
+    assert_eq!(controller["port"], 7442);
+    assert_eq!(controller["fingerprint"], trust.fingerprint.to_string());
+    assert!(!r.body.to_string().contains("geheimes-test-token"));
+
+    // Nur bei deaktiviertem Profil entfernbar.
+    let path = format!("/api/v1/devices/{id}/forget-controller");
+    let r = admin.send("POST", &path, None).await;
+    assert_eq!(
+        (r.status, r.body["error"]["code"].as_str()),
+        (409, Some("must_be_disabled"))
+    );
+    admin
+        .send("POST", &format!("/api/v1/devices/{id}/disable"), None)
+        .await;
+    let r = admin.send("POST", &path, None).await;
+    assert_eq!(r.status, 200, "{}", r.body);
+    assert_eq!(r.body["controller"], serde_json::Value::Null);
+    assert!(store.load_binding(id.parse().unwrap()).unwrap().is_none());
+    let r = admin
+        .send(
+            "POST",
+            "/api/v1/devices/00000000-0000-0000-0000-000000000000/forget-controller",
+            None,
+        )
+        .await;
+    assert_eq!(r.status, 404);
+
+    let actions: Vec<String> = db
+        .audit_actions()
+        .await
+        .unwrap()
+        .into_iter()
+        .map(|(_, a)| a)
+        .filter(|a| a.starts_with("device."))
+        .collect();
+    assert_eq!(
+        actions,
+        [
+            "device.created",
+            "device.disabled",
+            "device.controller_forgotten"
+        ]
+    );
+    std::fs::remove_dir_all(dir).unwrap();
+}

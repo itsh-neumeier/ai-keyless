@@ -1,6 +1,12 @@
 //! Konfiguration ausschließlich über Umgebungsvariablen und Secret-Dateien.
 
-use std::{net::SocketAddr, path::PathBuf};
+use std::{
+    net::{IpAddr, SocketAddr},
+    path::PathBuf,
+};
+
+use akl_device_lifecycle::adoption::{ADOPTION_PORT, ControllerTrust};
+use akl_protect_compat::discovery::DISCOVERY_PORT;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ConfigError {
@@ -25,7 +31,18 @@ pub struct Config {
     pub device_dir: Option<PathBuf>,
     /// Erzwingt den Geräte-Kill-Switch (`AKL_DEVICE_KILL_SWITCH`).
     pub device_kill_switch: bool,
+    /// Geräte-Emulation (`AKL_DEVICE_EMULATION`), standardmäßig aus.
+    pub device_emulation: Option<DeviceEmulation>,
     pub jobs_per_hour: i64,
+}
+
+/// Opt-in-Einstellungen der Geräte-Emulation (AKL-M040-07).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DeviceEmulation {
+    pub discovery_bind: SocketAddr,
+    pub adoption_bind: SocketAddr,
+    /// Nur vollständig (IP, Port, Fingerprint) oder gar nicht.
+    pub controller: Option<ControllerTrust>,
 }
 
 impl std::fmt::Debug for Config {
@@ -46,12 +63,85 @@ impl std::fmt::Debug for Config {
             .field("secrets_dir", &self.secrets_dir)
             .field("device_dir", &self.device_dir)
             .field("device_kill_switch", &self.device_kill_switch)
+            .field("device_emulation", &self.device_emulation)
             .field("jobs_per_hour", &self.jobs_per_hour)
             .finish()
     }
 }
 
 pub const DEFAULT_BIND: &str = "0.0.0.0:8090";
+
+fn addr(
+    get: &impl Fn(&str) -> Option<String>,
+    name: &'static str,
+    default: SocketAddr,
+) -> Result<SocketAddr, ConfigError> {
+    get(name).map_or(Ok(default), |v| {
+        v.parse()
+            .map_err(|e: std::net::AddrParseError| ConfigError::Invalid {
+                name,
+                reason: e.to_string(),
+            })
+    })
+}
+
+fn device_emulation(
+    get: &impl Fn(&str) -> Option<String>,
+) -> Result<Option<DeviceEmulation>, ConfigError> {
+    if !flag(get, "AKL_DEVICE_EMULATION", false)? {
+        return Ok(None);
+    }
+    // Compose reicht nicht gesetzte Variablen als leere Strings durch.
+    let get = |name: &str| get(name).filter(|v| !v.trim().is_empty());
+    let invalid = |name, reason: String| ConfigError::Invalid { name, reason };
+    let ip = get("AKL_CONTROLLER_IP")
+        .map(|v| {
+            v.parse::<IpAddr>()
+                .map_err(|e| invalid("AKL_CONTROLLER_IP", e.to_string()))
+        })
+        .transpose()?;
+    let port = get("AKL_CONTROLLER_PORT")
+        .map(|v| {
+            v.parse::<u16>().ok().filter(|p| *p > 0).ok_or_else(|| {
+                invalid(
+                    "AKL_CONTROLLER_PORT",
+                    format!("1–65535 erwartet, erhalten: {v}"),
+                )
+            })
+        })
+        .transpose()?;
+    let fingerprint = get("AKL_CONTROLLER_FINGERPRINT")
+        .map(|v| {
+            v.parse().map_err(|_| {
+                invalid(
+                    "AKL_CONTROLLER_FINGERPRINT",
+                    "SHA-256 (64 Hex-Zeichen) erwartet".into(),
+                )
+            })
+        })
+        .transpose()?;
+    // Halbe Controller-Angaben sind ein Konfigurationsfehler, kein stilles Weglassen.
+    let controller = match (ip, port, fingerprint) {
+        (Some(ip), Some(port), Some(fingerprint)) => Some(ControllerTrust {
+            ip,
+            port,
+            fingerprint,
+        }),
+        (None, None, None) => None,
+        _ => {
+            return Err(invalid(
+                "AKL_CONTROLLER_*",
+                "IP, Port und Fingerprint nur gemeinsam angeben".into(),
+            ));
+        }
+    };
+    let any = |port| SocketAddr::new(IpAddr::from([0, 0, 0, 0]), port);
+    Ok(Some(DeviceEmulation {
+        discovery_bind: addr(&get, "AKL_DISCOVERY_BIND", any(DISCOVERY_PORT))?,
+        adoption_bind: addr(&get, "AKL_ADOPTION_BIND", any(ADOPTION_PORT))?,
+        controller,
+    }))
+}
 
 fn flag(
     get: &impl Fn(&str) -> Option<String>,
@@ -129,6 +219,7 @@ impl Config {
                 .unwrap_or_else(|| PathBuf::from("/run/secrets")),
             device_dir: get("AKL_DEVICE_DIR").map(PathBuf::from),
             device_kill_switch: flag(&get, "AKL_DEVICE_KILL_SWITCH", false)?,
+            device_emulation: device_emulation(&get)?,
             jobs_per_hour: match get("AKL_JOBS_PER_HOUR") {
                 None => crate::DEFAULT_JOBS_PER_HOUR,
                 Some(v) => v.parse().ok().filter(|n| (0..=100_000).contains(n)).ok_or(
@@ -184,6 +275,64 @@ mod tests {
         assert_eq!(cfg(&[]).unwrap().jobs_per_hour, 12);
         assert_eq!(cfg(&[("AKL_JOBS_PER_HOUR", "0")]).unwrap().jobs_per_hour, 0);
         assert!(cfg(&[("AKL_JOBS_PER_HOUR", "-1")]).is_err());
+    }
+
+    #[test]
+    fn device_emulation_is_opt_in_and_controller_complete() {
+        assert_eq!(cfg(&[]).unwrap().device_emulation, None);
+        // Controller-Angaben ohne Opt-in bleiben wirkungslos.
+        assert_eq!(
+            cfg(&[("AKL_CONTROLLER_IP", "192.168.10.181")])
+                .unwrap()
+                .device_emulation,
+            None
+        );
+        let only_discovery = cfg(&[("AKL_DEVICE_EMULATION", "true")])
+            .unwrap()
+            .device_emulation
+            .unwrap();
+        assert_eq!(only_discovery.discovery_bind.to_string(), "0.0.0.0:10001");
+        assert_eq!(only_discovery.adoption_bind.to_string(), "0.0.0.0:8080");
+        assert_eq!(only_discovery.controller, None);
+        // Leere Werte (Compose-Vorgabe) gelten als nicht gesetzt.
+        let compose = cfg(&[
+            ("AKL_DEVICE_EMULATION", "true"),
+            ("AKL_CONTROLLER_IP", ""),
+            ("AKL_CONTROLLER_PORT", ""),
+            ("AKL_CONTROLLER_FINGERPRINT", ""),
+        ])
+        .unwrap()
+        .device_emulation
+        .unwrap();
+        assert_eq!(compose.controller, None);
+
+        let fp = "AB".repeat(32);
+        let full = cfg(&[
+            ("AKL_DEVICE_EMULATION", "true"),
+            ("AKL_CONTROLLER_IP", "192.168.10.181"),
+            ("AKL_CONTROLLER_PORT", "7442"),
+            ("AKL_CONTROLLER_FINGERPRINT", &fp),
+            ("AKL_DISCOVERY_BIND", "192.168.10.50:10001"),
+        ])
+        .unwrap()
+        .device_emulation
+        .unwrap();
+        let trust = full.controller.unwrap();
+        assert_eq!(trust.ip.to_string(), "192.168.10.181");
+        assert_eq!(trust.port, 7442);
+        assert_eq!(full.discovery_bind.to_string(), "192.168.10.50:10001");
+
+        for bad in [
+            vec![("AKL_CONTROLLER_IP", "192.168.10.181")],
+            vec![("AKL_CONTROLLER_IP", "unvr.lan")],
+            vec![("AKL_CONTROLLER_PORT", "0")],
+            vec![("AKL_CONTROLLER_FINGERPRINT", "AB:CD")],
+            vec![("AKL_DISCOVERY_BIND", "10001")],
+        ] {
+            let mut vars = vec![("AKL_DEVICE_EMULATION", "true")];
+            vars.extend(bad.iter().copied());
+            assert!(cfg(&vars).is_err(), "{bad:?}");
+        }
     }
 
     #[test]

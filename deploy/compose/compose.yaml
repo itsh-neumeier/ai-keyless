@@ -48,6 +48,13 @@ services:
       AKL_JOBS_PER_HOUR: ${AKL_JOBS_PER_HOUR:-12}
       # Notaus: true deaktiviert alle Geräteprofile und ist per API nicht abschaltbar.
       AKL_DEVICE_KILL_SWITCH: ${AKL_DEVICE_KILL_SWITCH:-false}
+      # Geräte-Emulation (nur synthetisch verifiziert), standardmäßig aus. Braucht Netzmodus
+      # host oder macvlan (docs/operations/NETWORKING.md) – im Bridge-Netz nicht erreichbar.
+      AKL_DEVICE_EMULATION: ${AKL_DEVICE_EMULATION:-false}
+      # Vom Admin bestätigter Controller: alle drei oder keiner (ohne ⇒ nur Discovery).
+      AKL_CONTROLLER_IP: ${AKL_CONTROLLER_IP:-}
+      AKL_CONTROLLER_PORT: ${AKL_CONTROLLER_PORT:-}
+      AKL_CONTROLLER_FINGERPRINT: ${AKL_CONTROLLER_FINGERPRINT:-}
     secrets: [akl_database_url]
     ports:
       # Standardmäßig nur lokal erreichbar; für LAN-Zugriff AKL_ADMIN_BIND anpassen.

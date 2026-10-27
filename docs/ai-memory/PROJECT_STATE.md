@@ -1,6 +1,6 @@
 # Projektstand
 
-> Zuletzt aktualisiert: 2026-10-27 (spät) · Branch `feat/AKL-M040-04-adoption`
+> Zuletzt aktualisiert: 2026-10-27 (Nacht) · Branch `feat/AKL-M040-07-api-wiring`
 
 ## Aktive Meilensteine
 
@@ -19,7 +19,7 @@
 - UI-Bereiche mit echten Daten: Übersicht, Geräte (Profile + Kompatibilitätsmatrix), KI-Modelle, Verarbeitung, System, Einstellungen (inkl. Benutzer).
 - Verarbeitungs-Queue mit Worker; einziger Job-Typ bisher `vision_probe`.
 - Modell-Provider real gemessen: Ollama 0.12.6 + granite3.2-vision (CPU) erkennt das synthetische Testbild; moondream liefert leere Antworten (`docs/compatibility/PROVIDERS.md`).
-- **Geräte-Emulation nur synthetisch** (AKL-M040-03/04, Branches `feat/AKL-M040-03-discovery-responder` → `feat/AKL-M040-04-adoption`, noch nicht gemergt): Discovery-Antwort, Adoption, Keepalive/Reconnect `synthetic_verified` gegen `akl-protect-sim`; **noch nicht in `akl-api` verdrahtet**, nie gegen echte Protect gelaufen. Keine `native_verified`-Aussage.
+- **Geräte-Emulation nur synthetisch** (AKL-M040-03/04, Branches `feat/AKL-M040-03-discovery-responder` → `feat/AKL-M040-04-adoption`, noch nicht gemergt): Discovery-Antwort, Adoption, Keepalive/Reconnect `synthetic_verified` gegen `akl-protect-sim`; PRs #51/#52 (CI grün, Merge offen); opt-in-Verdrahtung in `akl-api` auf `feat/AKL-M040-07-api-wiring` (`AKL_DEVICE_EMULATION`, Standard aus); nie gegen echte Protect gelaufen. Keine `native_verified`-Aussage.
 - Testumgebung (Stand 2026-10-27 nach Update): UNVR, **UniFi OS 6.0.11, Protect 7.3.70**, 8 × G5 Turret Ultra (FW 5.5.43), Produktivbetrieb; Lab-PC mit T600 (Ollama, 20/41 Schichten GPU, Kaltstart >120 s, warm ~0,5 s) und Coral (in WSL/Container sichtbar, ungetestet).
 
 ## Rahmenbedingungen (Interview 2026-10-26)
@@ -41,7 +41,7 @@
 1. Merges der Kette #39 → #46 (Reihenfolge in SESSION_HANDOFF).
 2. AKL-M020-06/07: Accessibility-Audit (axe in E2E) und CSP ohne `unsafe-inline`.
 - **Discovery-Antwort/Adoption (#5, #6) synthetisch umgesetzt (Spätsitzung 2026-10-27)**; Firmware-Analyse weiter eingestellt.
-  Nächster Schritt dazu: Verdrahtung in `akl-api` (opt-in per Konfiguration, AKL_DISCOVERY_BIND/Controller-Pin), dann TP-001 mit Freigabe.
+  Verdrahtung (AKL-M040-07) gebaut; nächster Schritt: Merges #51 → #52 → M040-07, Lab-Compose host/macvlan, dann TP-001 mit Freigabe.
 3. AKL-M020-03: Komponentenbibliothek (Dialog, Drawer, Toast, Tabs, DataTable).
 4. AKL-M010-07: OpenAPI aus Rust-Typen generieren, Drift-Prüfung in CI.
 5. Danach M040 (Geräte-Lifecycle) nur mit belastbaren Protokoll-Hypothesen; native Abnahme erst mit Testumgebung (Q-003).

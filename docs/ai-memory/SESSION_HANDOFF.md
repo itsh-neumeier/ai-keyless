@@ -1,5 +1,22 @@
 # Session-Handoff
 
+## Sitzung 2026-10-27, Nacht (Lab-PC) – PRs #51/#52, API-Anbindung AKL-M040-07
+
+- #51 (M040-03) und #52 (M040-04, gestapelt) als Draft geöffnet, CI auf beiden vollständig grün.
+  **Merge vom Nutzer freigegeben, aber von der Rechteprüfung („Merge ohne Review“) blockiert** – Merge macht der
+  Projektverantwortliche selbst (oder erlaubt die Aktion). Danach Basis von #52 auf `main` umstellen.
+- Neuer Branch `feat/AKL-M040-07-api-wiring` (auf #52): `crates/device-lifecycle/src/runtime.rs` (Supervisor für das
+  aktive `ai_key`-Profil, startet/stoppt Discovery, Adoptions-Endpunkt, Kontrollkanal), Konfiguration in
+  `apps/api/src/config.rs` (`AKL_DEVICE_EMULATION`, `AKL_DISCOVERY_BIND`, `AKL_ADOPTION_BIND`,
+  `AKL_CONTROLLER_{IP,PORT,FINGERPRINT}`; leere Werte = nicht gesetzt), Start in `main.rs`, Compose-Variablen,
+  Betriebsdoku. Standard **aus**; ohne bestätigten Controller nur Discovery.
+- Tests: Workspace fmt/clippy grün; `akl-api` + `akl-device-lifecycle` alle grün mit PG 17, neu `tests/runtime.rs`
+  (Ende-zu-Ende Probe → Adoption → online → Kill-Switch schließt Endpunkte) und Konfigurationstest.
+- Offen: Identitäts-Backup enthält das Controller-Token (in Betriebsdoku vermerkt, Entscheidung offen),
+  Credential-Rotation, UI-Knopf „Bindung entfernen“ (API `POST /api/v1/devices/{id}/forget-controller` existiert),
+  Lab-Compose für host/macvlan, danach TP-001 mit Freigabe je Lauf.
+- Merge #51/#52 auch mit Vorab-Freigabe des Nutzers erneut von der Rechteprüfung blockiert; #53 (M040-07) als Draft offen.
+
 ## Sitzung 2026-10-27, spät (Lab-PC) – AKL-M040-03/04 synthetisch umgesetzt
 
 - Grundlage: `docs/roadmap/HANDOFF-AKL-M040-03-04.md`. Zwei gestapelte Branches, **nicht gepusht, kein PR**

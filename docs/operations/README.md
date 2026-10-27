@@ -138,6 +138,31 @@ Profile und blockiert Anlage und Reaktivierung, bis er wieder ausgeschaltet wird
 `AKL_DEVICE_KILL_SWITCH=true` ist er erzwungen und per API nicht abschaltbar (z. B. bei Verdacht auf
 Fehlverhalten gegenüber Protect).
 
+## Geräte-Emulation (`AKL_DEVICE_EMULATION`, standardmäßig aus)
+
+> Nur gegen den Simulator verifiziert (`synthetic_verified`). Gegen echte Protect-Installationen
+> ungetestet – Einsatz dort nur im Rahmen von TP-001 mit Freigabe.
+
+Mit `AKL_DEVICE_EMULATION=true` startet AI-Keyless für das aktive `ai_key`-Profil:
+
+| Dienst | Standard-Bind | Variable | Voraussetzung |
+|---|---|---|---|
+| Discovery-Antwort (UDP) | `0.0.0.0:10001` | `AKL_DISCOVERY_BIND` | – |
+| Adoptions-Endpunkt (TLS, eigenes Gerätezertifikat) | `0.0.0.0:8080` | `AKL_ADOPTION_BIND` | Controller konfiguriert |
+| Kontrollkanal zum Controller (gepinnt) | – | – | Controller konfiguriert, Profil adoptiert |
+
+Controller-Vertrauen: `AKL_CONTROLLER_IP`, `AKL_CONTROLLER_PORT`, `AKL_CONTROLLER_FINGERPRINT`
+(SHA-256 des Controller-Zertifikats, vorher vom Admin geprüft). Nur alle drei gemeinsam; fehlen sie,
+läuft nur Discovery und **kein** Endpunkt nimmt Zugangsdaten an. Das Token des Controllers liegt nach
+der Adoption als `controller.token` (0600) neben der Identität und ist damit Teil des
+Identitäts-Backups. Das Netz muss host oder macvlan sein (`NETWORKING.md`); im Bridge-Netz erreicht die
+Discovery den Container nicht. Kill-Switch oder deaktiviertes Profil beenden alle drei Dienste.
+
+`GET /api/v1/devices` zeigt den Emulationsstatus (`emulation`) und je Profil die gespeicherte Bindung
+(`controller`: IP, Port, Fingerprint – nie das Token). **Gerät entfernen:** Profil deaktivieren
+(`POST /api/v1/devices/{id}/disable`), dann `POST /api/v1/devices/{id}/forget-controller` (nur Admin,
+nur bei `disabled`, auditiert); anschließend das Gerät auch in Protect entfernen.
+
 ## Upgrade / Rollback
 
 Migrationen laufen beim Start automatisch und sind additiv geplant. Vor jedem Upgrade Backup

@@ -69,6 +69,10 @@ pub fn api() -> Router<AppState> {
         .route("/api/v1/devices/{id}/disable", post(devices::disable))
         .route("/api/v1/devices/{id}/enable", post(devices::enable))
         .route(
+            "/api/v1/devices/{id}/forget-controller",
+            post(devices::forget_controller),
+        )
+        .route(
             "/api/v1/devices/{id}/transitions",
             get(devices::transitions),
         )
