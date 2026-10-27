@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["apps/api", "crates/core", "crates/persistence", "crates/protect-compat", "crates/providers", "crates/protect-sim"]
+members = ["apps/api", "crates/core", "crates/persistence", "crates/protect-compat", "crates/providers", "crates/protect-sim", "crates/netprobe"]
 
 [workspace.package]
 version = "0.1.0"

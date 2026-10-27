@@ -1,5 +1,13 @@
 # Session-Handoff
 
+## Sitzung 2026-10-27 (Windows-Lab)
+
+- PR #37 gemergt (Windows-Lab-Doku, `.gitattributes`, TLS-Pinning, `akl-protect-sim`, TP-000 freigegeben).
+- Neu: `scripts/lab.ps1` (up/token/model/status/logs/down) – reines PowerShell, ASCII-only für PS 5.1.
+  **Nicht ausgeführt** (kein PowerShell in der Cloud-Umgebung); Erstlauf durch den Projektverantwortlichen auf dem PC steht aus.
+- `LAB-SETUP.md` auf PowerShell umgestellt (Anlass: `\`-Fortsetzung und `.sh`-Skripte schlugen in PowerShell fehl).
+- Nächste Cloud-Aufgaben: #2 Netzwerk-Lab, #9/#10 Simulator/Fixtures, #3/#4 Geräteidentität/-lebenszyklus.
+
 ## Sitzung 2026-10-26/27 (Abarbeitung Backlog)
 
 **Erledigt (alle auf `claude/ai-keyless-unifi-protect-w0ntn0`, PR #1)**
