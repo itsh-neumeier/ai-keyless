@@ -11,7 +11,7 @@
 | Q-007 | Kontrollkanal-Vertrag (berichtet: „UCP4“ über WebSocket) | Black-Box-Test | M040-04 |
 | Q-008 | Caption-Callback-Vertrag und Readback-Pfad je Protect-Version | Black-Box-Test mit Readback | M070 |
 | Q-009 | Nativer Such-Vertrag: legacy CLIP vs. E5 (384 Dim.) | Black-Box-Test | M090 |
-| Q-010 | Netzwerkmodus für NAS (host vs. macvlan) inkl. Portainer. Synthetisch gemessen 2026-10-27 (`NETWORKING.md`): bridge ✗ Broadcast, host/macvlan ✓. Offen: echtes LAN unter Docker Desktop (Lab-PC), Portainer | Messung | M080-01 |
+| Q-010 | Netzwerkmodus für NAS (host vs. macvlan) inkl. Portainer. Synthetisch gemessen 2026-10-27 (`NETWORKING.md`): host/macvlan ✓; bridge ungeeignet (Docker Desktop ✗, Linux nur über docker-proxy mit falscher Absenderadresse). Offen: echtes LAN unter Docker Desktop (Lab-PC), Portainer | Messung | M080-01 |
 | Q-011 | Provider: ✅ Ollama, OpenAI-kompatibel lokal, OpenAI Cloud, weitere Cloud, Coral TPU. **Offen: Kostenrahmen für Cloud-Aufrufe** | Projektverantwortlicher | M060-07 |
 | Q-012 | Herstellerangabe 1.000 vs. 1.800 Detektionen/h | Herstellerdoku/Test | Lastziele M080 |
 | Q-013 | Welche weiteren Cloud-Provider („Andere Cloud“ gewählt, aber nicht benannt)? | Projektverantwortlicher | M060-08 |

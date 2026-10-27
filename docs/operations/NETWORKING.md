@@ -10,15 +10,23 @@ eigene Linux-Bridge `br-akllab` (10.77.0.1/24) als LAN-Switch, „LAN-Gerät“ 
 per veth an der Bridge, macvlan an einer zweiten veth (wie eine Netzwerkkarte am Switch).
 Protokollneutral (eigene Kennung `AKL-NETPROBE`), UDP 47001 / TCP 47002, kein Verkehr außerhalb der Bridge.
 
-Gemessen auf dem Lab-PC (Docker Desktop 29.9.2, WSL2-Kernel 6.18.54.1, Image mit Commit dieses PRs),
-zwei Läufe mit identischem Ergebnis; außerdem in jeder CI-Ausführung (Job „container“, Ergebnis
-in der Job-Zusammenfassung):
+Zwei Umgebungen, Ergebnisse unterscheiden sich **nur im bridge-Modus**:
 
-| Modus | Broadcast 10.77.0.255 | Broadcast 255.255.255.255 | TCP aus dem LAN | Absender laut Container |
-|---|---|---|---|---|
-| host | ✓ | ✓ | ✓ (Host-IP 10.77.0.1) | echte LAN-Adresse 10.77.0.50 |
-| bridge (`-p 47001/udp -p 47002/tcp`) | ✗ | ✗ | ✓ (veröffentlichter Port auf 10.77.0.1) | echte LAN-Adresse 10.77.0.50 |
-| macvlan (eigene IP 10.77.0.130) | ✓ | ✓ | ✓ (eigene IP) | echte LAN-Adresse 10.77.0.50 |
+- **Lab-PC:** Docker Desktop 29.9.2, WSL2-Kernel 6.18.54.1; drei Läufe, identisch.
+- **CI:** GitHub-Runner `ubuntu-latest`, Docker Engine mit Standard-Userland-Proxy; jede CI-Ausführung
+  (Job „container“, Tabelle in der Job-Zusammenfassung).
+
+| Modus | Umgebung | Broadcast .255 / 255.255.255.255 | UDP-Absender laut Container | TCP aus dem LAN | TCP-Absender | docker-proxy |
+|---|---|---|---|---|---|---|
+| host | beide | ✓ / ✓ | 10.77.0.50 (echt) | ✓ (Host-IP 10.77.0.1) | 10.77.0.50 | – |
+| bridge (`-p 47001/udp -p 47002/tcp`) | Docker Desktop | ✗ / ✗ | – | ✓ (veröffentlichter Port) | 10.77.0.50 | 0 Prozesse |
+| bridge (`-p 47001/udp -p 47002/tcp`) | Linux (CI) | ✓ / ✓ | **172.18.0.1** (Bridge-Gateway, nicht das LAN-Gerät) | ✓ (veröffentlichter Port) | 10.77.0.50 | 4 Prozesse |
+| macvlan (eigene IP 10.77.0.130) | beide | ✓ / ✓ | 10.77.0.50 (echt) | ✓ (eigene IP) | 10.77.0.50 | – |
+
+Deutung bridge unter Linux: `docker-proxy` bindet den veröffentlichten UDP-Port auf dem Host
+(`0.0.0.0:47001`), empfängt dort auch Broadcasts und leitet sie als Unicast weiter – der Container sieht
+deshalb den Gateway statt des Absenders. Mit `"userland-proxy": false` (dockerd) entfällt dieser Weg;
+das ist hier nicht gemessen.
 
 Ausführen: Linux `sudo scripts/netlab.sh`; Windows/Docker Desktop `scripts\lab.ps1 netlab`.
 
@@ -26,7 +34,7 @@ Ausführen: Linux `sudo scripts/netlab.sh`; Windows/Docker Desktop `scripts\lab.
 
 | Modus | Admin-UI | LAN-Discovery/Adoption (ab M040) | Bewertung |
 |---|---|---|---|
-| bridge (Standard-Compose) | ✓ (getestet 2026-10-26) | ✗ Broadcasts erreichen den Container nicht (gemessen); Unicast-TCP über veröffentlichte Ports geht | für Discovery **ungeeignet** (`synthetic_verified`) |
+| bridge (Standard-Compose) | ✓ (getestet 2026-10-26) | Broadcast nur über den Userland-Proxy und dann **ohne echte Absenderadresse** (Linux), unter Docker Desktop gar nicht; Unicast-TCP über veröffentlichte Ports geht | für Discovery **ungeeignet**, weil umgebungsabhängig und adressverfälschend (`synthetic_verified`) |
 | host | ✓ | Broadcast + TCP ✓ (gemessen) | **Empfehlung für Linux-Server/NAS** (`synthetic_verified`); Port-Konflikte mit dem Host prüfen |
 | macvlan (eigene LAN-IP) | ✓ | Broadcast + TCP ✓ (gemessen) | **Empfehlung, wenn eine eigene IP nötig ist** (z. B. AI Port, Port 443) (`synthetic_verified`); Host↔Container braucht ein Zusatzinterface (Linux-Eigenschaft, hier nicht gemessen) |
 
