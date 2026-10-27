@@ -12,38 +12,37 @@
 |---|---|---|
 | Docker Desktop | WSL2-Backend aktiv (Einstellungen → General → „Use the WSL 2 based engine“) | `docker version` in PowerShell |
 | NVIDIA T600 | aktueller NVIDIA-Treiber für Windows (bringt WSL2-GPU-Support mit) | `docker run --rm --gpus all nvidia/cuda:12.6.3-base-ubuntu24.04 nvidia-smi` zeigt die T600 |
-| Git for Windows | inkl. **Git Bash** (für die `scripts/*.sh`) | `git --version` |
+| Git for Windows | Standardinstallation (Git Bash wird nicht benötigt) | `git --version` |
 | Claude Code | Claude-Desktop-App oder Claude Code CLI | — |
 | Coral USB | später (AKL-M100-02); unter Windows nur über `usbipd-win` in WSL2 durchreichbar | — |
 
-Zeilenenden: Das Repo erzwingt per `.gitattributes` LF für Skripte. Wurde vor dieser Änderung
-geklont, einmal neu auschecken: `git rm --cached -r . && git reset --hard` (in Git Bash, im Repo).
+Zeilenenden: Das Repo erzwingt per `.gitattributes` LF für `*.sh` und CRLF für `*.ps1`. Wurde vor
+dieser Regel geklont, einmal neu auschecken: `git rm --cached -r . ; git reset --hard` (im Repo).
 
 ## 2. Repository und AI-Keyless starten
 
-In **Git Bash**:
+Alles in **PowerShell** (`scripts/lab.ps1`, keine Git Bash nötig):
 
-```bash
-cd /d/GitHub
-git clone https://github.com/itsh-neumeier/ai-keyless.git   # bzw. vorhandenes Repo: git pull
+```powershell
+cd D:\GitHub
+git clone https://github.com/itsh-neumeier/ai-keyless.git   # bzw. im vorhandenen Repo: git checkout main; git pull
 cd ai-keyless
-cp deploy/compose/.env.example deploy/compose/.env
-scripts/init-secrets.sh                 # erzeugt deploy/compose/secrets/ (nicht in Git)
-scripts/docker-build.sh                 # Image ai-keyless:dev bauen (einige Minuten)
-docker compose -f deploy/compose/compose.yaml -f deploy/compose/compose.lab.yaml \
-  --env-file deploy/compose/.env up -d
-docker compose -f deploy/compose/compose.yaml exec api ai-keyless-api setup-token
+powershell -ExecutionPolicy Bypass -File scripts\lab.ps1 up      # .env + Secrets anlegen, Image bauen, Stack starten
+powershell -ExecutionPolicy Bypass -File scripts\lab.ps1 token   # einmaliges Setup-Token
 ```
 
 Danach im Browser http://127.0.0.1:8090 öffnen, Token eingeben, Admin-Konto anlegen.
 
-PowerShell-Hinweis: Die `docker compose …`-Befehle funktionieren auch in PowerShell; die Zeilenfortsetzung
-ist dort `` ` `` statt `\`. Die `scripts/*.sh` nur in Git Bash ausführen.
+Weitere Befehle: `status`, `logs`, `down` (Daten bleiben in den Volumes). Optionen: `-NoBuild`
+(vorhandenes Image nutzen), `-NoGpu` (ohne Ollama-Overlay). Bereits vorhandene Secrets in
+`deploy\compose\secrets\` werden nie überschrieben.
+
+Der erste Build dauert einige Minuten (Rust-Release-Build im Container).
 
 ## 3. Modell auf der T600 bereitstellen
 
-```bash
-docker compose -f deploy/compose/compose.yaml -f deploy/compose/compose.lab.yaml exec ollama ollama pull granite3.2-vision
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\lab.ps1 model   # Standard: granite3.2-vision; anderes: -Model <name>
 ```
 
 In AI-Keyless → *KI-Modelle*: Provider „Ollama T600“, Typ Ollama, URL `http://ollama:11434`,

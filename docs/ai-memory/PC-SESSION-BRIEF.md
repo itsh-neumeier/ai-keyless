@@ -1,7 +1,7 @@
 # Briefing für die Claude-Code-Sitzung auf dem PC des Projektverantwortlichen
 
 Du arbeitest im Repo **AI-Keyless** unter `D:\GitHub\ai-keyless` auf einem **Windows-PC** (Docker Desktop/WSL2,
-NVIDIA T600, Coral USB) im LAN der UniFi-Konsole (UNVR, 192.168.10.181). Shell-Skripte (`scripts/*.sh`) in Git Bash ausführen.
+NVIDIA T600, Coral USB) im LAN der UniFi-Konsole (UNVR, 192.168.10.181). Lab-Bedienung über `scripts\lab.ps1` (PowerShell); `scripts/*.sh` nur in Git Bash/WSL.
 Diese Sitzung existiert, weil die Cloud-Entwicklungssitzung das Heimnetz nicht erreicht.
 
 ## Pflichtlektüre
