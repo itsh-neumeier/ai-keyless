@@ -6,8 +6,8 @@
 | Backlog-Issue | AKL-M040-05 |
 | Ziel-Fähigkeiten | `discovery`, `adoption`, `keepalive` (Profil `ai_key`) |
 | Erwartete Evidenzstufe danach | `native_verified` oder `unsupported` für die getestete Version |
-| Status | **Entwurf – blockiert** (AKL-M040-01…04 nicht implementiert; Test-VLAN und Update-Zeitpunkt offen, Q-003) |
-| Zielumgebung | UNVR 192.168.10.181, UniFi OS 5.1.33, **Protect 7.2.105** (TP-000, 2026-10-27); Produktivsystem mit 8 × G5 Turret Ultra (FW 5.5.31) |
+| Status | **Entwurf – blockiert** (AKL-M040-01…04 nicht implementiert; Protect-Update auf 7.3.70 ausstehend) |
+| Zielumgebung | UNVR 192.168.10.181, Produktivsystem mit 8 × G5 Turret Ultra (FW 5.5.31). Stand TP-000: UniFi OS 5.1.33, Protect 7.2.105; **vor TP-001 Update auf Protect 7.3.70**, exakte Versionen danach erneut ablesen |
 | Freigabe | — |
 
 ## Hypothesen (aus Berichten Dritter, nicht unsere Evidenz)
@@ -19,8 +19,13 @@
 
 ## Mindestumgebung
 
-Eigene Konsole mit exakt dokumentierter Protect-Version, isoliertes Test-VLAN, AI-Keyless im
-Netzwerkmodus `host` oder `macvlan` (Ergebnis aus AKL-M080-01), keine Produktivkameras nötig.
+Eigene Konsole mit exakt dokumentierter Protect-Version, AI-Keyless im Netzwerkmodus `host` oder
+`macvlan` (Ergebnis aus AKL-M080-01), keine Produktivkameras nötig.
+
+**Entscheidung 2026-10-27:** kein separates Test-VLAN – TP-001 läuft im Produktivnetz 192.168.10.0/24
+(Discovery braucht dasselbe L2-Segment wie die UNVR). Auflagen: keine Änderung an Kameras oder
+Aufnahmeeinstellungen; Rückweg (Schritt 6) ist Pflicht; der Projektverantwortliche erstellt vorher ein
+Konfigurationsbackup der UNVR.
 
 ## Geplante Schritte (nach Implementierung von AKL-M040-01…04)
 

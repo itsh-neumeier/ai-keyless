@@ -7,8 +7,10 @@
   Protect 7.2.105 / UniFi OS 5.1.33 / 8 × G5 Turret Ultra FW 5.5.31 (vom Projektverantwortlichen aus der UI abgelesen).
 - T600-Messung `granite3.2-vision-4k`: 20/41 Schichten GPU, Kaltstart 131,7 s (> API-Limit 120 s), warm 0,49–0,66 s → `PROVIDERS.md`.
 - Coral: `usbipd` hängt `18d1:9302` an WSL, im privilegierten Container sichtbar; kein Modelltest.
-- **Offen für TP-001 (Entscheidung Projektverantwortlicher):** Test-VLAN vs. Produktivnetz; Protect-Update (7.3.70) vor/nach TP-001;
-  ob 7.2.105 AI-Key überhaupt anbietet. Kaltstart-Ursache (Laden aus WSL-Volume?) bzw. API-Zeitlimit prüfen.
+- Diese Sitzung ist ab jetzt Hauptsitzung (Cloud-Sitzung beendet). `gh` 2.103.3 per winget installiert, angemeldet.
+- **Entschieden (DECISIONS):** Protect-Update auf 7.3.70 vor TP-001 (Projektverantwortlicher führt durch, danach Versionen neu ablesen);
+  TP-001 im Produktivnetz mit Auflagen; Kaltstart: keep_alive + Warm-up im Lab **und** konfigurierbares Provider-Zeitlimit.
+- Nächste Schritte: Kaltstart-Umsetzung, dann #2 (Netzwerkmodi, Plan im Issue-Kommentar), dann #3/#4.
 
 ## Sitzung 2026-10-27 (Windows-Lab)
 
