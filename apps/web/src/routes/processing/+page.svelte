@@ -171,7 +171,7 @@
 		</label>
 		<Button variant="secondary" busy={loading} onclick={load}>{t('processing.refresh')}</Button>
 	</div>
-	<div class="overflow-x-auto">
+	<div class="relative overflow-x-auto">
 		<table class="w-full min-w-[760px] text-[13px]">
 			<thead class="text-left text-xs text-faint">
 				<tr>

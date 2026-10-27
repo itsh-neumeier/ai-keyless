@@ -1,0 +1,6 @@
+# Ergänzung nur für E2E-Tests: macht den Host (Mock-Provider) aus dem
+# API-Container unter host.docker.internal erreichbar.
+services:
+  api:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

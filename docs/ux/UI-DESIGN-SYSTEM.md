@@ -115,7 +115,7 @@ Regel: Wenn die Live-Verbindung fehlt, werden zuvor empfangene Gerätezustände 
   `aria-expanded` am Einklapp-Button, Tabellen mit `scope`, `prefers-reduced-motion` respektiert.
 - Kontrast: Text-Tokens ≥ 4.5:1 auf Surface (Dark `#e7e9ee` auf `#17191d`, Light `#1b1d22` auf `#fff`);
   Audit mit Werkzeug in M020 (AKL-M020-06).
-- Responsiv: keine horizontale Seiten-Scrollbar (mit Playwright bei 390 px geprüft); breite Tabellen scrollen in ihrem Container.
+- Responsiv: keine horizontale Seiten-Scrollbar (E2E-Test bei 390 px für alle Seiten); breite Tabellen scrollen in ihrem Container. Der Container ist immer `relative overflow-x-auto`, sonst entkommen absolut positionierte Elemente (z. B. `sr-only`-Beschriftungen) dem Clipping und verbreitern die Seite.
 
 ## 8. Demo-/Mock-Modus
 

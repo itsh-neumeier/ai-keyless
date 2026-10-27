@@ -100,12 +100,15 @@ impl Config {
             cookie_secure: flag(&get, "AKL_COOKIE_SECURE", false)?,
             provider_allow_loopback: flag(&get, "AKL_PROVIDER_ALLOW_LOOPBACK", false)?,
             provider_allow_private: flag(&get, "AKL_PROVIDER_ALLOW_PRIVATE", true)?,
-            provider_allowed_hosts: get("AKL_PROVIDER_ALLOWED_HOSTS").map(|v| {
-                v.split(',')
-                    .map(|h| h.trim().to_ascii_lowercase())
-                    .filter(|h| !h.is_empty())
-                    .collect()
-            }),
+            // Leer (z. B. aus Compose-Vorgabe) bedeutet: keine Einschränkung.
+            provider_allowed_hosts: get("AKL_PROVIDER_ALLOWED_HOSTS")
+                .map(|v| {
+                    v.split(',')
+                        .map(|h| h.trim().to_ascii_lowercase())
+                        .filter(|h| !h.is_empty())
+                        .collect::<Vec<_>>()
+                })
+                .filter(|hosts| !hosts.is_empty()),
             provider_timeout_secs: match get("AKL_PROVIDER_TIMEOUT_SECS") {
                 None => 120,
                 Some(v) => v.parse().ok().filter(|s| (1..=3600).contains(s)).ok_or(

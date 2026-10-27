@@ -42,7 +42,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | AKL-M020-05 | Getrennter Demo-Modus mit Banner | P2 | ⬜ offen | AKL-M020-03 | Demo-Daten im Normalbuild technisch ausgeschlossen (Test) |
 | AKL-M020-06 | Accessibility-Audit (axe) + Kontrastprüfung in CI | P1 | ⬜ offen | AKL-M020-03 | 0 kritische axe-Befunde |
 | AKL-M020-07 | CSP ohne unsafe-inline (Hashes) | P2 | ⬜ offen | – | CSP-Test<br>UI funktioniert |
-| AKL-M020-08 | Playwright-E2E + visuelle Regression in CI | P2 | ⬜ offen | AKL-M010-05 | Screenshots Dark/Light/Mobil |
+| AKL-M020-08 | Playwright-E2E in CI (Setup, Rollen, Provider/Queue mit Mock, Mobil-Layout) | P2 | ✅ erledigt | AKL-M010-05 | Screenshots Dark/Light/Mobil |
 
 ## AKL-M030 – Protect-Contract-Labor
 

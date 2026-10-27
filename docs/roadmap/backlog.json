@@ -329,12 +329,12 @@
     {
       "id": "AKL-M020-08",
       "ms": "AKL-M020",
-      "status": "open",
+      "status": "done",
       "prio": "P2",
       "deps": [
         "AKL-M010-05"
       ],
-      "title": "Playwright-E2E + visuelle Regression in CI",
+      "title": "Playwright-E2E in CI (Setup, Rollen, Provider/Queue mit Mock, Mobil-Layout)",
       "accept": [
         "Screenshots Dark/Light/Mobil"
       ]

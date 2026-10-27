@@ -57,7 +57,7 @@
 		<h2 id="users" class="text-sm font-semibold">{t('users.title')}</h2>
 	</div>
 	<FormError message={loadError} />
-	<div class="overflow-x-auto">
+	<div class="relative overflow-x-auto">
 		<table class="w-full min-w-[420px] text-[13px]">
 			<thead class="text-left text-xs text-faint">
 				<tr>

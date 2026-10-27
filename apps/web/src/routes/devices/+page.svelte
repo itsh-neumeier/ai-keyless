@@ -63,7 +63,7 @@
 					<span class="mx-1 text-faint">·</span>
 					<span>{t('devices.source')}: {range.source}</span>
 				</div>
-				<div class="overflow-x-auto">
+				<div class="relative overflow-x-auto">
 					<table class="mt-2 w-full min-w-[560px] text-[13px]">
 						<thead class="text-left text-xs text-faint">
 							<tr>
