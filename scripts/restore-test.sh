@@ -26,10 +26,16 @@ CSRF=$(curl -fsS -c "$JAR" -H 'content-type: application/json' \
 curl -fsS -b "$JAR" -H 'content-type: application/json' -H "x-csrf-token: $CSRF" \
   -d '{"username":"zweiter","password":"restore-test-pw-2","role":"operator"}' \
   "$BASE/api/v1/users" >/dev/null || fail "Benutzer anlegen"
+# Geräteprofil mit Identität (privater Schlüssel im Volume akl-devices).
+FINGERPRINT=$(curl -fsS -b "$JAR" -H 'content-type: application/json' -H "x-csrf-token: $CSRF" \
+  -d '{"kind":"ai_key","display_name":"Restore-Probe"}' "$BASE/api/v1/devices" |
+  python3 -c "import json,sys; print(json.load(sys.stdin)['fingerprint'])") || fail "Geräteprofil anlegen"
+[[ ${#FINGERPRINT} -eq 95 ]] || fail "Fingerprint unerwartet: $FINGERPRINT"
 
 # 2. Sichern.
 DUMP=$("$ROOT/scripts/backup.sh" "$WORK/backups")
 [[ -s "$DUMP" ]] || fail "leere Sicherung"
+[[ -s "${DUMP%.dump}.devices.tar" ]] || fail "Identitäten nicht gesichert"
 
 # 3. Totalverlust simulieren: Volumes löschen, frisch starten.
 "${COMPOSE[@]}" down -v >/dev/null
@@ -41,6 +47,10 @@ curl -fsS "$BASE/api/v1/auth/state" | grep -q '"setup_required":true' || fail "V
 cp "$DUMP" "$WORK/tampered.dump"; cp "${DUMP%.dump}.json" "$WORK/tampered.json"
 printf 'x' >>"$WORK/tampered.dump"
 if "$ROOT/scripts/restore.sh" "$WORK/tampered.dump" >/dev/null 2>&1; then fail "manipulierte Sicherung akzeptiert"; fi
+# Manipulierte Identitätssicherung (Dump unverändert) wird ebenfalls abgelehnt.
+cp "$DUMP" "$WORK/tampered2.dump"; cp "${DUMP%.dump}.json" "$WORK/tampered2.json"
+cp "${DUMP%.dump}.devices.tar" "$WORK/tampered2.devices.tar"; printf 'x' >>"$WORK/tampered2.devices.tar"
+if "$ROOT/scripts/restore.sh" "$WORK/tampered2.dump" >/dev/null 2>&1; then fail "manipulierte Identitätssicherung akzeptiert"; fi
 
 # 5. Wiederherstellen und prüfen.
 "$ROOT/scripts/restore.sh" "$DUMP"
@@ -50,4 +60,14 @@ for cred in admin:restore-test-pw-1 zweiter:restore-test-pw-2; do
   curl -fsS -H 'content-type: application/json' -d "{\"username\":\"$user\",\"password\":\"$pw\"}" \
     "$BASE/api/v1/auth/login" | grep -q "\"username\":\"$user\"" || fail "Anmeldung $user nach Restore"
 done
+# Identität unverändert (gleicher Fingerprint, Schlüssel passt laut API zum Zertifikat).
+curl -fsS -c "$JAR" -H 'content-type: application/json' \
+  -d '{"username":"admin","password":"restore-test-pw-1"}' "$BASE/api/v1/auth/login" >/dev/null
+AFTER=$(curl -fsS -b "$JAR" "$BASE/api/v1/devices" |
+  python3 -c "import json,sys; print(json.load(sys.stdin)['profiles'][0]['fingerprint'])") || fail "Geräteliste nach Restore"
+[[ "$AFTER" == "$FINGERPRINT" ]] || fail "Fingerprint nach Restore: $AFTER ≠ $FINGERPRINT"
+# Rechte und Eigentümer (nonroot = 65532) erhalten.
+MODES=$(docker run --rm -v "${AKL_COMPOSE_PROJECT}_akl-devices:/d:ro" alpine:3.20 sh -c \
+  'stat -c "%a %u" /d; stat -c "%a %u" /d/*/key.pem')
+[[ "$MODES" == $'700 65532\n600 65532' ]] || fail "Rechte nach Restore: $MODES"
 echo "Wiederherstellungsprobe erfolgreich"

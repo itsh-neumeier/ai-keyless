@@ -97,17 +97,27 @@ Logs: `docker compose logs api` (JSON, mit `correlation_id` aus `x-request-id`).
 ## Backup / Restore
 
 ```bash
-scripts/backup.sh /pfad/zu/backups          # → akl-<UTC-Zeit>.dump + .json (Schema-Version, SHA-256)
+scripts/backup.sh /pfad/zu/backups          # → akl-<UTC-Zeit>.dump + .devices.tar + .json (Schema-Version, SHA-256)
 scripts/restore.sh /pfad/zu/backups/akl-20261027T001500Z.dump
 ```
 
 - **Sicherung:** `pg_dump` im Custom-Format aus dem laufenden DB-Container (konsistenter
   Snapshot), Metadaten mit Schema-Version und SHA-256. Dateien mit Modus 600, Verzeichnis 700.
   Enthält Passwort- und Token-**Hashes**, Audit-Log und Konfiguration → wie ein Geheimnis behandeln.
+- **Geräteidentitäten** (Volume `akl-devices`) als `akl-<zeit>.devices.tar` mit eigener SHA-256
+  (`devices_sha256`); Rechte und Eigentümer bleiben erhalten. Enthält **private Schlüssel** → die
+  Sicherung nur verschlüsselt aufbewahren. Ohne sie erzeugt AI-Keyless neue Identitäten und Protect
+  muss die Geräte neu adoptieren.
 - **Nicht enthalten:** das Secret-Verzeichnis (`deploy/compose/secrets`) – separat sichern.
-- **Nicht enthalten:** die Geräteidentitäten (Volume `akl-devices`, `AKL_DEVICE_DIR`, privater
-  Schlüssel je Profil). Geht es verloren, erzeugt AI-Keyless eine neue Identität und Protect muss das
-  Gerät neu adoptieren. Bis `backup.sh` es mitsichert: Volume separat und verschlüsselt sichern.
+- **Wiederherstellung:** prüft beide Prüfsummen (manipulierte/defekte Dateien werden abgelehnt),
+  stoppt die API, ersetzt Datenbank und Identitätsverzeichnis, startet die API und prüft Readiness und
+  Schema-Version. Ältere Sicherungen ohne `devices_sha256` lassen die Identitäten unverändert. Nur auf
+  gleiche oder neuere AI-Keyless-Versionen wiederherstellen.
+- Andere Projekt-/Dateinamen: `AKL_COMPOSE_PROJECT`, `AKL_COMPOSE_FILES`, `AKL_ADMIN_PORT`.
+- **Wiederherstellungsprobe:** `scripts/restore-test.sh` (auch in der CI): Daten und Geräteprofil
+  anlegen → sichern → Volumes löschen → manipulierte Sicherungen (Dump bzw. Identitäten) müssen
+  scheitern → wiederherstellen → Anmeldung mit den alten Konten, gleicher Fingerprint, Rechte 700/600
+  für `nonroot`. Ergebnis 2026-10-27: erfolgreich (lokal, Docker 29.9.2).
 
 ## Geräteidentität (`AKL_DEVICE_DIR`)
 
@@ -127,13 +137,6 @@ Per API möglich sind nur der sichere Rückweg (`disable`) und dessen Aufhebung 
 Profile und blockiert Anlage und Reaktivierung, bis er wieder ausgeschaltet wird. Mit
 `AKL_DEVICE_KILL_SWITCH=true` ist er erzwungen und per API nicht abschaltbar (z. B. bei Verdacht auf
 Fehlverhalten gegenüber Protect).
-- **Wiederherstellung:** prüft die Prüfsumme (manipulierte/defekte Dumps werden abgelehnt), stoppt
-  die API, ersetzt die Datenbank, startet die API und prüft Readiness und Schema-Version. Nur auf
-  gleiche oder neuere AI-Keyless-Versionen wiederherstellen.
-- Andere Projekt-/Dateinamen: `AKL_COMPOSE_PROJECT`, `AKL_COMPOSE_FILES`, `AKL_ADMIN_PORT`.
-- **Wiederherstellungsprobe:** `scripts/restore-test.sh` (auch in der CI): Daten anlegen → sichern →
-  Volumes löschen → manipulierte Sicherung muss scheitern → wiederherstellen → Anmeldung mit den
-  alten Konten. Ergebnis 2026-10-27: erfolgreich (lokal, Docker 29.9.2).
 
 ## Upgrade / Rollback
 
