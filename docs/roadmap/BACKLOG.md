@@ -61,7 +61,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | AKL-M040-02 | Lifecycle-Service mit Zustandsautomat + Transition-Log | P0 | ⬜ offen | AKL-M040-01 | Unzulässige Übergänge abgelehnt<br>Kill-Switch |
 | AKL-M040-03 | Discovery (UDP) gegen synthetischen Controller | P0 | ⬜ offen | AKL-M040-02, AKL-M080-01 | synthetic_verified |
 | AKL-M040-04 | Adoption, Credential-Rotation, Keepalive, Reconnect (synthetisch) | P0 | ⬜ offen | AKL-M040-03 | synthetic_verified inkl. Restart |
-| AKL-M040-05 | Nativer Akzeptanztest Adoption (autorisierte Umgebung) – blockiert: keine Testumgebung (Q-003) | P0 | ⛔ blockiert | AKL-M040-04, AKL-M030-04, AKL-M000-06 | native_verified-Nachweis gemäß MATRIX.md |
+| AKL-M040-05 | Nativer Akzeptanztest Adoption an der UNVR (192.168.10.181) – nur in einer Sitzung auf dem PC des Projektverantwortlichen | P0 | ⛔ blockiert | AKL-M040-04, AKL-M030-04, AKL-M000-06 | native_verified-Nachweis gemäß MATRIX.md |
 | AKL-M040-06 | UI Geräte: Profile, Zustand, Evidenz, Recovery-Assistent | P1 | ⬜ offen | AKL-M040-02, AKL-M020-03 | Echtzeit per SSE<br>keine vorgetäuschten Zustände |
 
 ## AKL-M050 – Protect-Kamerainventar
@@ -89,7 +89,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | ID | Titel | Prio | Status | Abhängigkeiten | Abnahmekriterien |
 |---|---|---|---|---|---|
 | AKL-M070-01 | Caption-Callback-Vertrag (synthetisch) + Readback-Prüfung | P0 | ⬜ offen | AKL-M060-03, AKL-M040-04 | Status http_accepted ≠ persisted |
-| AKL-M070-02 | Native Ereignisbeschreibung on-demand/automatisch (autorisiert) – blockiert: keine Testumgebung (Q-003) | P0 | ⛔ blockiert | AKL-M070-01, AKL-M040-05 | native_verified pro Version und Kamera |
+| AKL-M070-02 | Native Ereignisbeschreibung on-demand/automatisch an der UNVR – nur in einer Sitzung auf dem PC des Projektverantwortlichen | P0 | ⛔ blockiert | AKL-M070-01, AKL-M040-05 | native_verified pro Version und Kamera |
 
 ## AKL-M080 – Produktiver Linux-/Docker-Betrieb
 
@@ -100,7 +100,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | AKL-M080-03 | ARM64-Image bauen und testen (keine Zielplattform, nachrangig) | P3 | ⬜ offen | AKL-M010-04 | Smoke-Test auf arm64 |
 | AKL-M080-04 | Backup/Restore + Wiederherstellungsprobe (Upgrade/Rollback-Doku vorhanden) | P1 | ✅ erledigt | AKL-M010-03 | Restore-Test automatisiert |
 | AKL-M080-05 | 72-h-Endurance- und Lasttest | P2 | ⬜ offen | AKL-M070-02 | Bericht mit Metriken |
-| AKL-M080-06 | GPU-Betrieb: Compose-Profil Ollama + NVIDIA (<12 GB VRAM), Intel/AMD bewerten | P1 | ⬜ offen | AKL-M060-05 | Modellempfehlung für <12 GB gemessen<br>Betrieb ohne GPU weiterhin möglich<br>Intel/AMD-Ergebnis dokumentiert |
+| AKL-M080-06 | GPU-Betrieb: Compose-Profil Ollama + NVIDIA T600 (4 GB VRAM), Modellempfehlung messen | P1 | ⬜ offen | AKL-M060-05 | Modellempfehlung für <12 GB gemessen<br>Betrieb ohne GPU weiterhin möglich<br>Intel/AMD-Ergebnis dokumentiert |
 
 ## AKL-M090 – Native Suche
 
@@ -113,7 +113,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | ID | Titel | Prio | Status | Abhängigkeiten | Abnahmekriterien |
 |---|---|---|---|---|---|
 | AKL-M100-01 | AI Alerts, STT, LPR, Gesicht, Enhancement – je eigenes Issue mit DSFA | P3 | ⬜ offen | AKL-M070-02 | Datenschutzprüfung pro Funktion |
-| AKL-M100-02 | Coral Edge TPU als Objekterkennungs-Backend (TFLite, kein VLM) | P3 | ⬜ offen | AKL-M060-02 | Rolle object_detection, nicht caption<br>Messung Latenz/Genauigkeit mit künstlichen Daten |
+| AKL-M100-02 | Coral Edge TPU (USB) als Objekterkennungs-Backend (TFLite, kein VLM) | P2 | ⬜ offen | AKL-M060-02 | Rolle object_detection, nicht caption<br>Messung Latenz/Genauigkeit mit künstlichen Daten |
 
 ## AKL-M110 – AI-Port-Profil
 

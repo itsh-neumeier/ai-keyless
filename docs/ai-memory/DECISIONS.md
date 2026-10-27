@@ -22,3 +22,6 @@
 | 2026-10-27 | Worker vorerst im API-Prozess (ein Container); Auslagerung in `event-engine`-Crate/eigenen Prozess mit M070 | Einfachheit; Leases + Recovery machen Neustarts sicher | OVERVIEW.md |
 | 2026-10-27 | Job im Callback-Schritt abgebrochen → `uncertain`, nie automatisch wiederholt | Doppelte Protect-Ergebnisse vermeiden | core/src/job.rs |
 | 2026-10-27 | Verarbeitungs-UI aktualisiert alle 10 s nur bei sichtbarer Seite; Job-Ereignisstream folgt | kein Polling-Sturm, ausreichend bis M070 | processing/+page.svelte |
+| 2026-10-27 | Testumgebung UNVR 192.168.10.181; Live-Tests erfolgen in einer Claude-Sitzung auf dem PC des Projektverantwortlichen bzw. mit AI-Keyless im LAN (Cloud-Container erreicht das Heimnetz nicht; Adoption braucht das Gerät im LAN) | UNVR muss das Gerät erreichen (UDP-Discovery, eingehende Verbindung) | OPEN_QUESTIONS Q-003 |
+| 2026-10-27 | Kein UniFi Protect in Docker (kein offizielles Image; inoffizielle enthalten proprietäre Firmware) → simulierter Controller als Testumgebung | ADR-002 | AKL-M030-02 |
+| 2026-10-27 | GitHub-Issues sind führend; Agent darf im Repo agieren (Freigabe Projektverantwortlicher) | Interview | – |

@@ -455,7 +455,7 @@
         "AKL-M030-04",
         "AKL-M000-06"
       ],
-      "title": "Nativer Akzeptanztest Adoption (autorisierte Umgebung) – blockiert: keine Testumgebung (Q-003)",
+      "title": "Nativer Akzeptanztest Adoption an der UNVR (192.168.10.181) – nur in einer Sitzung auf dem PC des Projektverantwortlichen",
       "accept": [
         "native_verified-Nachweis gemäß MATRIX.md"
       ]
@@ -637,7 +637,7 @@
         "AKL-M070-01",
         "AKL-M040-05"
       ],
-      "title": "Native Ereignisbeschreibung on-demand/automatisch (autorisiert) – blockiert: keine Testumgebung (Q-003)",
+      "title": "Native Ereignisbeschreibung on-demand/automatisch an der UNVR – nur in einer Sitzung auf dem PC des Projektverantwortlichen",
       "accept": [
         "native_verified pro Version und Kamera"
       ]
@@ -714,7 +714,7 @@
       "deps": [
         "AKL-M060-05"
       ],
-      "title": "GPU-Betrieb: Compose-Profil Ollama + NVIDIA (<12 GB VRAM), Intel/AMD bewerten",
+      "title": "GPU-Betrieb: Compose-Profil Ollama + NVIDIA T600 (4 GB VRAM), Modellempfehlung messen",
       "accept": [
         "Modellempfehlung für <12 GB gemessen",
         "Betrieb ohne GPU weiterhin möglich",
@@ -751,11 +751,11 @@
       "id": "AKL-M100-02",
       "ms": "AKL-M100",
       "status": "open",
-      "prio": "P3",
+      "prio": "P2",
       "deps": [
         "AKL-M060-02"
       ],
-      "title": "Coral Edge TPU als Objekterkennungs-Backend (TFLite, kein VLM)",
+      "title": "Coral Edge TPU (USB) als Objekterkennungs-Backend (TFLite, kein VLM)",
       "accept": [
         "Rolle object_detection, nicht caption",
         "Messung Latenz/Genauigkeit mit künstlichen Daten"
