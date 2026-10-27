@@ -1,5 +1,15 @@
 # Session-Handoff
 
+## Sitzung 2026-10-27 (Lab-PC, TP-000)
+
+- Claude-Code-Sitzung auf dem Windows-PC (Remote Control); Lab-Stack (API, DB, Ollama) lief bereits, `/readyz` ready.
+- TP-000 durchgeführt, nur lesend, ohne Login: `docs/compatibility/evidence/2026-10-27-tp000-umgebung.md`.
+  Protect 7.2.105 / UniFi OS 5.1.33 / 8 × G5 Turret Ultra FW 5.5.31 (vom Projektverantwortlichen aus der UI abgelesen).
+- T600-Messung `granite3.2-vision-4k`: 20/41 Schichten GPU, Kaltstart 131,7 s (> API-Limit 120 s), warm 0,49–0,66 s → `PROVIDERS.md`.
+- Coral: `usbipd` hängt `18d1:9302` an WSL, im privilegierten Container sichtbar; kein Modelltest.
+- **Offen für TP-001 (Entscheidung Projektverantwortlicher):** Test-VLAN vs. Produktivnetz; Protect-Update (7.3.70) vor/nach TP-001;
+  ob 7.2.105 AI-Key überhaupt anbietet. Kaltstart-Ursache (Laden aus WSL-Volume?) bzw. API-Zeitlimit prüfen.
+
 ## Sitzung 2026-10-27 (Windows-Lab)
 
 - PR #37 gemergt (Windows-Lab-Doku, `.gitattributes`, TLS-Pinning, `akl-protect-sim`, TP-000 freigegeben).

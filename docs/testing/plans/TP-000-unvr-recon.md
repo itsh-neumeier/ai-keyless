@@ -5,7 +5,7 @@
 | Testplan-ID | TP-000 |
 | Ziel | Umgebung für TP-001 exakt dokumentieren, **ohne** etwas an der UNVR zu verändern |
 | Erwartete Evidenzstufe danach | keine Fähigkeitsänderung (reine Umgebungsdokumentation) |
-| Status | **freigegeben** |
+| Status | **durchgeführt 2026-10-27** → `docs/compatibility/evidence/2026-10-27-tp000-umgebung.md` |
 | Freigabe (Name, Datum) | Projektverantwortlicher, 2026-10-27 (Chat: „Ja darfst alles machen“) |
 
 ## Umgebung

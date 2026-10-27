@@ -1,6 +1,6 @@
 # Projektstand
 
-> Zuletzt aktualisiert: 2026-10-26 · Branch `claude/ai-keyless-unifi-protect-w0ntn0`
+> Zuletzt aktualisiert: 2026-10-27 · Branch `claude/tp000-unvr-recon`
 
 ## Aktive Meilensteine
 
@@ -19,7 +19,8 @@
 - UI-Bereiche mit echten Daten: Übersicht, Geräte (Profile + Kompatibilitätsmatrix), KI-Modelle, Verarbeitung, System, Einstellungen (inkl. Benutzer).
 - Verarbeitungs-Queue mit Worker; einziger Job-Typ bisher `vision_probe`.
 - Modell-Provider real gemessen: Ollama 0.12.6 + granite3.2-vision (CPU) erkennt das synthetische Testbild; moondream liefert leere Antworten (`docs/compatibility/PROVIDERS.md`).
-- **Keinerlei Protect-Kommunikation implementiert. Keine `native_verified`-Aussage.** Keine Protect-Testumgebung vorhanden (Q-003).
+- **Keinerlei Protect-Kommunikation implementiert. Keine `native_verified`-Aussage.**
+- Testumgebung dokumentiert (TP-000, 2026-10-27): UNVR, UniFi OS 5.1.33, Protect 7.2.105, 8 × G5 Turret Ultra (FW 5.5.31), Produktivbetrieb; Lab-PC mit T600 (Ollama, 20/41 Schichten GPU, Kaltstart >120 s, warm ~0,5 s) und Coral (in WSL/Container sichtbar, ungetestet).
 
 ## Rahmenbedingungen (Interview 2026-10-26)
 
