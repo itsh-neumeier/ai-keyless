@@ -97,7 +97,7 @@ switch ($Command) {
         $scripts = (Resolve-Path 'scripts').Path
         & docker run --rm --privileged --network host --pid host `
             -v /var/run/docker.sock:/var/run/docker.sock -v "${scripts}:/scripts:ro" `
-            docker:27.5.1-cli sh -c 'apk add -q bash iproute2 util-linux && bash /scripts/netlab.sh'
+            docker:27.5.1-cli sh -c 'apk add -q bash iproute2 util-linux procps && bash /scripts/netlab.sh'
         if ($LASTEXITCODE -ne 0) { throw 'Netzwerk-Lab fehlgeschlagen.' }
     }
     'status' { Compose ps }

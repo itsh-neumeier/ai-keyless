@@ -67,6 +67,9 @@ measure() {
   docker run -d --name "$P-probe" "$@" --entrypoint akl-netprobe "$IMAGE" \
     listen --udp "$UDP" --tcp "$TCP" --seconds 30 >/dev/null
   sleep 1
+  # Leitet ein Userland-Proxy veröffentlichte Ports weiter? (Linux-Standard)
+  local proxies
+  proxies=$(pgrep -c -x docker-proxy || true)
   lan send "$NET.255:$UDP" --count 3 --tag subnet >/dev/null || true
   lan send "255.255.255.255:$UDP" --count 3 --tag global >/dev/null || true
   local conn seen="–" tcp=0
@@ -75,21 +78,23 @@ measure() {
     seen=${conn##*seen_as=}
   fi
   sleep 0.5
-  local logs sub=0 glob=0
+  local logs sub=0 glob=0 udp_from
   logs=$(docker logs "$P-probe" 2>&1)
   grep -q 'payload=AKL-NETPROBE subnet' <<<"$logs" && sub=1
   grep -q 'payload=AKL-NETPROBE global' <<<"$logs" && glob=1
+  # Absender des ersten empfangenen Broadcasts (IP ohne Port).
+  udp_from=$(grep -m1 -o 'udp from=[0-9.]*' <<<"$logs" | cut -d= -f2 || true)
   docker rm -f "$P-probe" >/dev/null
-  printf '| %s | %s | %s | %s (%s:%s) | %s |\n' "$mode" "$(mark $sub)" "$(mark $glob)" \
-    "$(mark $tcp)" "$target" "$TCP" "$seen"
+  printf '| %s | %s | %s | %s | %s (%s:%s) | %s | %s |\n' "$mode" "$(mark $sub)" "$(mark $glob)" \
+    "${udp_from:-–}" "$(mark $tcp)" "$target" "$TCP" "${seen%:*}" "${proxies:-0}"
   [ "$mode" != host ] || [ "$sub$glob$tcp" = 111 ] || HOST_FAIL=1
 }
 
 HOST_FAIL=0
 echo "Netzwerk-Lab $(date -u +%FT%TZ), Image $IMAGE, LAN-Gerät $LAN_IP"
 echo
-echo "| Modus | Broadcast $NET.255 | Broadcast 255.255.255.255 | TCP aus dem LAN | Absender laut Container |"
-echo "|---|---|---|---|---|"
+echo "| Modus | Broadcast $NET.255 | Broadcast 255.255.255.255 | UDP-Absender laut Container | TCP aus dem LAN | TCP-Absender laut Container | docker-proxy-Prozesse |"
+echo "|---|---|---|---|---|---|---|"
 measure host "$NET.1" --network host
 measure bridge "$NET.1" --network "$P-bridge" -p "$UDP:$UDP/udp" -p "$TCP:$TCP/tcp"
 measure macvlan "$MV_IP" --network "$P-macvlan" --ip "$MV_IP"
