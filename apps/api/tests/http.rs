@@ -1,4 +1,4 @@
-//! HTTP-Vertragstests ohne Datenbank und gegen eine nicht erreichbare DB.
+//! HTTP-Vertragstests ohne Datenbank bzw. gegen eine nicht erreichbare DB.
 
 use akl_api::{AppState, app};
 use akl_persistence::Database;
@@ -29,35 +29,53 @@ async fn healthz_is_ok_and_sets_headers() {
 }
 
 #[tokio::test]
-async fn status_without_database_is_honest() {
-    let (code, body, _) = get_json(AppState::default(), "/api/v1/system/status").await;
-    assert_eq!(code, 200);
-    assert_eq!(body["service"], "ai-keyless");
-    assert_eq!(body["unofficial"], true);
-    assert_eq!(body["database"]["status"], "not_configured");
-    let devices = body["devices"].as_array().unwrap();
-    assert_eq!(devices.len(), 2);
-    for device in devices {
-        // Kein erfundener Zustand, keine vorgetäuschte Evidenz.
-        assert!(device["state"].is_null(), "{device}");
-        assert_eq!(device["lifecycle_evidence"], "planned");
+async fn without_database_everything_but_health_is_unavailable() {
+    for uri in [
+        "/api/v1/system/status",
+        "/api/v1/auth/state",
+        "/api/v1/auth/session",
+    ] {
+        let (code, body, _) = get_json(AppState::default(), uri).await;
+        assert_eq!(code, 503, "{uri}");
+        assert_eq!(body["error"]["code"], "database_unavailable", "{uri}");
     }
-    assert_eq!(devices[0]["profile"], "ai_key");
-    assert_eq!(devices[1]["profile"], "ai_port");
+    let (code, body, _) = get_json(AppState::default(), "/readyz").await;
+    assert_eq!(code, 200);
+    assert_eq!(body["database"]["status"], "not_configured");
 }
 
 #[tokio::test]
 async fn unreachable_database_reports_unavailable_and_not_ready() {
     // Port 9 (discard) auf Loopback: Verbindung schlägt schnell fehl.
     let db = Database::connect_lazy("postgres://akl:x@127.0.0.1:9/akl").unwrap();
-    let state = AppState { db: Some(db) };
-    let (_, body, _) = get_json(state.clone(), "/api/v1/system/status").await;
-    assert_eq!(body["database"]["status"], "unavailable");
-    assert!(body["devices"][0]["state"].is_null());
-
-    let (code, body, _) = get_json(state, "/readyz").await;
+    let state = AppState::new(Some(db), false);
+    let (code, body, _) = get_json(state.clone(), "/readyz").await;
     assert_eq!(code, 503);
     assert_eq!(body["ready"], false);
+    assert_eq!(body["database"]["status"], "unavailable");
+
+    let (code, body, _) = get_json(state, "/api/v1/auth/state").await;
+    assert_eq!(code, 503);
+    assert_eq!(body["error"]["code"], "database_unavailable");
+}
+
+#[tokio::test]
+async fn cross_origin_writes_are_rejected_before_handlers() {
+    let res = app(AppState::default(), None)
+        .oneshot(
+            Request::post("/api/v1/auth/login")
+                .header("host", "nas.lan:8090")
+                .header("origin", "https://evil.example")
+                .header("content-type", "application/json")
+                .body(Body::from(r#"{"username":"a","password":"b"}"#))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(res.status().as_u16(), 403);
+    let body = res.into_body().collect().await.unwrap().to_bytes();
+    let json: Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(json["error"]["code"], "origin_rejected");
 }
 
 #[tokio::test]

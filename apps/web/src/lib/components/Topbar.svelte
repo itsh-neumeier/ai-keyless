@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { systemStatus } from '#lib/api/status.svelte.ts';
+	import { auth } from '#lib/auth/auth.svelte.ts';
 	import { t, type MessageKey } from '#lib/i18n/index.svelte.ts';
 	import StatusChip from './StatusChip.svelte';
 	import { linkTone } from './tone';
@@ -34,5 +35,17 @@
 			tone={linkTone(systemStatus.link)}
 			label={t(`link.${systemStatus.link}` as MessageKey)}
 		/>
+		{#if auth.user}
+			<span class="hidden h-5 border-l border-line md:inline" aria-hidden="true"></span>
+			<span
+				class="hidden text-xs text-muted md:inline"
+				title={t(`role.${auth.user.role}` as MessageKey)}>{auth.user.username}</span
+			>
+			<button
+				type="button"
+				class="rounded-md px-2 py-1 text-xs text-muted hover:bg-surface-hover hover:text-fg"
+				onclick={() => auth.logout()}>{t('auth.logout')}</button
+			>
+		{/if}
 	</div>
 </header>

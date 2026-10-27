@@ -12,3 +12,13 @@
 | 2026-10-26 | Startlimit 12 Jobs/h (Sicherheitsvorgabe, kein Leistungsziel) | Kosten/Last; aus Referenz-Doku als Praxiswert | BACKLOG M060-03 |
 | 2026-10-26 | GitHub-Issues noch nicht angelegt; lokaler Backlog + Import-Skript | Veröffentlichung nicht ausdrücklich freigegeben | BACKLOG.md |
 | 2026-10-26 | Docker darf für alle Entwicklertätigkeiten genutzt werden | Anweisung des Nutzers | – |
+| 2026-10-26 | **Lizenz AGPL-3.0-or-later**; Quellcode-Link (AGPL §13) über API `source_url` + UI | Interview mit Projektverantwortlichem | ADR-004 |
+| 2026-10-26 | Rechtliches Restrisiko der Geräteimitation wird bewusst getragen (privat, nur eigene Geräte) | Interview | docs/legal/RISK-ACCEPTANCE.md |
+| 2026-10-26 | Noch keine Testumgebung → nur synthetische Entwicklung; native Tests blockiert | Interview (Q-003) | – |
+| 2026-10-26 | GitHub: Draft-PR erlaubt; Issues/Meilensteine noch **nicht** anlegen | Interview (Q-005) | – |
+| 2026-10-26 | Zielplattformen: Linux-Server/VM und x86_64-NAS; ARM64 nachrangig (P3) | Interview | BACKLOG M080 |
+| 2026-10-26 | Provider-Reihenfolge: Ollama lokal → OpenAI-kompatibel lokal → OpenAI Cloud (Opt-in) → weitere Cloud | Interview (Q-011) | BACKLOG M060-05…08 |
+| 2026-10-26 | Hardware: NVIDIA < 12 GB, Intel/AMD-GPU, Coral Edge TPU; Coral nur für Objekterkennung, nicht für Captions | Interview; Edge TPU führt nur quantisierte TFLite-Modelle aus | BACKLOG M080-06, M100-02 |
+| 2026-10-27 | Worker vorerst im API-Prozess (ein Container); Auslagerung in `event-engine`-Crate/eigenen Prozess mit M070 | Einfachheit; Leases + Recovery machen Neustarts sicher | OVERVIEW.md |
+| 2026-10-27 | Job im Callback-Schritt abgebrochen → `uncertain`, nie automatisch wiederholt | Doppelte Protect-Ergebnisse vermeiden | core/src/job.rs |
+| 2026-10-27 | Verarbeitungs-UI aktualisiert alle 10 s nur bei sichtbarer Seite; Job-Ereignisstream folgt | kein Polling-Sturm, ausreichend bis M070 | processing/+page.svelte |

@@ -85,7 +85,7 @@
 	<div class="flex items-center justify-between border-b border-line px-4 py-3">
 		<h2 id="devices" class="text-sm font-semibold">{t('overview.devices')}</h2>
 	</div>
-	<div class="overflow-x-auto">
+	<div class="relative overflow-x-auto">
 		<table class="w-full min-w-[480px] text-[13px]">
 			<thead class="text-left text-xs text-faint">
 				<tr>

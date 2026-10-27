@@ -14,10 +14,14 @@ ein echtes UniFi-Protect-System getestet.
 | Funktion | Stufe | Beleg |
 |---|---|---|
 | Management-API `/healthz`, `/readyz`, `/api/v1/system/status` | `synthetic_verified` | `apps/api/tests/http.rs`; Compose-Smoke-Test `scripts/smoke-compose.sh` (2026-10-26, Docker 29.9.2, linux/amd64) |
+| Authentifizierung (Einrichtung, Login, Rollen, CSRF, Audit) | `synthetic_verified` | `apps/api/tests/auth_flow.rs` (echte PG 17), Playwright-Ablauf, Compose-Smoke-Test (2026-10-27) |
+| Verarbeitungs-Queue (Idempotenz, Leases, Backoff, Limit, `uncertain`) | `synthetic_verified` | `crates/persistence/tests/jobs.rs`, `apps/api/tests/jobs_flow.rs`; echter Worker-Lauf mit Ollama 0.12.6 + granite3.2-vision (2026-10-27) |
+| Modell-Provider | siehe `PROVIDERS.md` | |
 | PostgreSQL-Migrationen | `synthetic_verified` | `crates/persistence/tests/migrations.rs` gegen postgres:17-alpine (2026-10-26) |
 | Gerätezustandsautomat | `implemented` (Unit-Tests) | `crates/core/src/device.rs` – noch ohne Lifecycle-Anbindung |
 | Container linux/amd64 | `synthetic_verified` | Image-Build + Smoke-Test 2026-10-26 |
-| Container linux/arm64 | `planned` | AKL-M080-03 |
+| Container linux/arm64 | `planned` | AKL-M080-03 (nachrangig, keine Zielplattform) |
+| Backup/Restore inkl. Wiederherstellungsprobe | `synthetic_verified` | `scripts/restore-test.sh` (2026-10-27, lokal; CI) |
 | Portainer-Stack | `planned` | AKL-M080-02 (Compose ist Portainer-kompatibel formuliert, nicht getestet) |
 
 ### Profil `ai_key`
@@ -45,6 +49,16 @@ ein echtes UniFi-Protect-System getestet.
 
 Siehe `REFERENCE-ANALYSIS.md`. Diese Aussagen werden **niemals** in die Tabellen oben
 übernommen, sondern dienen nur als Testhypothesen.
+
+## Maschinenlesbare Quelle
+
+Die Profile pro Protect-Version liegen in `crates/protect-compat/profiles/{ai_key,ai_port}.json`
+und werden in der UI unter *Geräte* angezeigt. Freigaberegel (`Resolution::decide`):
+`native_verified` → aktiv; `synthetic_verified` → nur mit ausdrücklichem Opt-in; alles andere
+→ inaktiv; unbekannte oder nicht lesbare Version → konservativer Modus (nichts aktiv, Warnung).
+Ein `native_verified`-Eintrag ohne Verweis auf `evidence/…` wird beim Laden abgelehnt; ein Test
+stellt sicher, dass es derzeit keinen einzigen gibt. Änderungen an den JSON-Dateien und an dieser
+Matrix erfolgen immer gemeinsam.
 
 ## Nachweisformat für `native_verified`
 

@@ -1,0 +1,18 @@
+{
+  "profile": "ai_port",
+  "comment": "Keine eigene Evidenz. AI-Port-Kandidat laut Referenzbericht auf 7.3.60 (needs_evidence).",
+  "ranges": [
+    {
+      "id": "ai_port-protect-7.3",
+      "min": "7.3.0",
+      "max_exclusive": "7.4.0",
+      "source": "Referenzbericht: Kandidat 7.3.60, G3 (needs_evidence)",
+      "claims": [
+        { "capability": "port_pairing", "evidence": "needs_evidence", "note": "berichtet: RTSP TCP 7447 ausgehend" },
+        { "capability": "port_stream_processing", "evidence": "needs_evidence", "note": "" },
+        { "capability": "port_smart_detections", "evidence": "needs_evidence", "note": "100+ Aufrufe ohne native Events berichtet" },
+        { "capability": "port_smart_zones", "evidence": "needs_evidence", "note": "" }
+      ]
+    }
+  ]
+}

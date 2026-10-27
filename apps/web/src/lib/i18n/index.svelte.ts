@@ -36,3 +36,9 @@ class I18n {
 export const i18n = new I18n();
 export const t = (key: MessageKey) => i18n.t(key);
 export { type MessageKey };
+
+/** Übersetzt einen API-Fehlercode; unbekannte Codes → generischer Text. */
+export function errorText(code: string): string {
+	const key = `error.${code}` as MessageKey;
+	return key in de ? t(key) : t('error.unknown');
+}

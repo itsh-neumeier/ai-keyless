@@ -1,9 +1,17 @@
 //! PostgreSQL-Zugriff und versionierte SQLx-Migrationen.
 
+pub mod auth;
+pub mod jobs;
+pub mod providers;
+#[cfg(feature = "testing")]
+pub mod testing;
+
 use std::time::Duration;
 
 use akl_core::{DeviceProfileKind, DeviceState};
 use sqlx::postgres::{PgPool, PgPoolOptions};
+
+pub use sqlx::Error as SqlxError;
 
 pub static MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
 

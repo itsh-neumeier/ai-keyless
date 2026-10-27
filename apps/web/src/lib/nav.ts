@@ -30,7 +30,7 @@ export const NAV: readonly NavItem[] = [
 		label: 'nav.devices',
 		icon: 'device',
 		milestone: 'AKL-M040',
-		implemented: false,
+		implemented: true,
 		group: 'main'
 	},
 	{
@@ -66,7 +66,7 @@ export const NAV: readonly NavItem[] = [
 		label: 'nav.models',
 		icon: 'model',
 		milestone: 'AKL-M060',
-		implemented: false,
+		implemented: true,
 		group: 'main'
 	},
 	{
@@ -75,7 +75,7 @@ export const NAV: readonly NavItem[] = [
 		label: 'nav.processing',
 		icon: 'queue',
 		milestone: 'AKL-M060',
-		implemented: false,
+		implemented: true,
 		group: 'main'
 	},
 	{

@@ -1,0 +1,38 @@
+# TP-001: AI-Key-Profil – Discovery und Adoption (Entwurf)
+
+| Feld | Inhalt |
+|---|---|
+| Testplan-ID | TP-001 |
+| Backlog-Issue | AKL-M040-05 |
+| Ziel-Fähigkeiten | `discovery`, `adoption`, `keepalive` (Profil `ai_key`) |
+| Erwartete Evidenzstufe danach | `native_verified` oder `unsupported` für die getestete Version |
+| Status | **Entwurf – blockiert** (AKL-M040-01…04 nicht implementiert; keine Testumgebung, Q-003) |
+| Freigabe | — |
+
+## Hypothesen (aus Berichten Dritter, nicht unsere Evidenz)
+
+- Protect findet ein AI-Key-Gerät per UDP-Discovery im selben L2-Segment (Q-006).
+- Die Adoption läuft über HTTPS (berichtet: Port 8080) mit Zertifikats-Pinning; danach rotiert
+  Protect Zugangsdaten (berichtet für 7.3.56).
+- Ein Kontrollkanal (berichtet: „UCP4“ über WebSocket) hält das Gerät online (Q-007).
+
+## Mindestumgebung
+
+Eigene Konsole mit exakt dokumentierter Protect-Version, isoliertes Test-VLAN, AI-Keyless im
+Netzwerkmodus `host` oder `macvlan` (Ergebnis aus AKL-M080-01), keine Produktivkameras nötig.
+
+## Geplante Schritte (nach Implementierung von AKL-M040-01…04)
+
+| # | Aktion | Erwartete Beobachtung |
+|---|---|---|
+| 1 | AI-Keyless starten, Profil `ai_key` aktivieren (Zustand `unconfigured → discovered` nur bei Discovery-Anfrage) | Übergang im `device_state_transitions`-Log mit Korrelation |
+| 2 | In Protect nach neuen Geräten suchen | Gerät erscheint (oder nicht → `unsupported`/`needs_evidence` mit Paketmitschnitt) |
+| 3 | Adoption in Protect starten | `pending_adoption → adopted`; Zertifikat-Fingerprint des Controllers vor Credential-Übergabe geprüft |
+| 4 | 30 min warten | `online`, keine Fehler in Protect |
+| 5 | AI-Keyless neu starten | `reconnecting → online` ohne erneute Adoption |
+| 6 | Rückweg: Gerät in Protect entfernen, Profil `disabled` | Protect ohne Restartefakte |
+
+## Readback
+
+Protect-UI nach vollständigem Neuladen (Gerät online), Integration-API-Abfrage der Geräteliste,
+Konsolen-Neustart und erneute Prüfung.

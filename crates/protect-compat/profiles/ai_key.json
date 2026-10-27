@@ -1,0 +1,26 @@
+{
+  "profile": "ai_key",
+  "comment": "Keine eigene Evidenz. Versionen und Hypothesen stammen aus Berichten Dritter (docs/compatibility/REFERENCE-ANALYSIS.md) und dienen nur als Testziele.",
+  "ranges": [
+    {
+      "id": "ai_key-protect-7.3",
+      "min": "7.3.0",
+      "max_exclusive": "7.4.0",
+      "source": "Referenzbericht: Adoption 7.3.56, Beschreibungen 7.3.60 (needs_evidence)",
+      "claims": [
+        { "capability": "discovery", "evidence": "needs_evidence", "note": "UDP-Discovery; Vertrag offen (Q-006)" },
+        { "capability": "adoption", "evidence": "needs_evidence", "note": "berichtet für 7.3.56" },
+        { "capability": "control_channel", "evidence": "needs_evidence", "note": "berichtet: UCP4 über WebSocket (Q-007)" },
+        { "capability": "keepalive", "evidence": "planned", "note": "" },
+        { "capability": "caption_on_demand", "evidence": "needs_evidence", "note": "berichtet für 7.3.60, G5 Flex" },
+        { "capability": "caption_automatic", "evidence": "needs_evidence", "note": "berichtet: ein Ereignis, 7.3.60, G5 Flex" },
+        { "capability": "native_search", "evidence": "needs_evidence", "note": "CLIP vs. E5 offen (Q-009)" },
+        { "capability": "ai_alerts", "evidence": "needs_evidence", "note": "" },
+        { "capability": "speech_to_text", "evidence": "needs_evidence", "note": "" },
+        { "capability": "license_plates", "evidence": "needs_evidence", "note": "" },
+        { "capability": "faces", "evidence": "needs_evidence", "note": "" },
+        { "capability": "enhancement", "evidence": "needs_evidence", "note": "" }
+      ]
+    }
+  ]
+}

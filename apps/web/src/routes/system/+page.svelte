@@ -18,7 +18,24 @@
 			<dt class="text-muted">{t('overview.version')}</dt>
 			<dd class="font-mono">{systemStatus.data?.version ?? t('common.unknown')}</dd>
 			<dt class="text-muted">{t('system.license')}</dt>
-			<dd>{t('system.licensePending')}</dd>
+			<dd>{t('system.licenseValue')}</dd>
+			<dt class="text-muted">{t('system.source')}</dt>
+			<dd class="break-all">
+				{#if systemStatus.data}
+					<!-- Externer Link (Quellcode-Repository), keine App-Route; URL vom Parser auf https geprüft. -->
+					<!-- eslint-disable svelte/no-navigation-without-resolve -->
+					<a
+						href={systemStatus.data.source_url}
+						class="text-accent hover:underline"
+						target="_blank"
+						rel="noopener noreferrer">{systemStatus.data.source_url}</a
+					>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
+				{:else}
+					{t('common.unknown')}
+				{/if}
+			</dd>
 		</dl>
+		<p class="text-xs text-faint">{t('system.sourceNote')}</p>
 	</div>
 </section>

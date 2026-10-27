@@ -2,12 +2,18 @@ openapi: 3.1.0
 info:
   title: AI-Keyless Management API
   version: 0.1.0
+  license: { name: AGPL-3.0-or-later, identifier: AGPL-3.0-or-later }
   description: >
     Inoffizielles, unabhängiges Projekt. Quelle der Typen: crates/core/src/status.rs.
     Bis zur Generierung (AKL-M010-07) manuell synchron halten.
+servers:
+  - url: /
+security:
+  - session: []
 paths:
   /healthz:
     get:
+      security: []
       summary: Liveness
       responses:
         '200':
@@ -17,22 +23,307 @@ paths:
               schema: { type: object, properties: { status: { const: ok } }, required: [status] }
   /readyz:
     get:
+      security: []
       summary: Readiness (DB erreichbar und migriert oder nicht konfiguriert)
       responses:
         '200': { description: bereit, content: { application/json: { schema: { $ref: '#/components/schemas/Readiness' } } } }
         '503': { description: nicht bereit, content: { application/json: { schema: { $ref: '#/components/schemas/Readiness' } } } }
+  /api/v1/auth/state:
+    get:
+      security: []
+      summary: Ist eine Ersteinrichtung nötig?
+      responses:
+        '200': { description: Zustand, content: { application/json: { schema: { type: object, required: [setup_required], properties: { setup_required: { type: [boolean, 'null'] } } } } } }
+        '503': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/setup:
+    post:
+      security: []
+      summary: Erstes Admin-Konto mit Einrichtungs-Token anlegen (meldet direkt an)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [token, username, password], properties: { token: { type: string }, username: { type: string }, password: { type: string, minLength: 12, maxLength: 256 } } } } } }
+      responses:
+        '201': { description: angelegt, headers: { Set-Cookie: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/Session' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/login:
+    post:
+      security: []
+      summary: Anmelden
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [username, password], properties: { username: { type: string }, password: { type: string } } } } } }
+      responses:
+        '200': { description: angemeldet, headers: { Set-Cookie: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/Session' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/logout:
+    post:
+      summary: Abmelden (CSRF-Header erforderlich)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '204': { description: abgemeldet }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/session:
+    get:
+      summary: Aktuelle Sitzung inkl. CSRF-Token
+      responses:
+        '200': { description: Sitzung, content: { application/json: { schema: { $ref: '#/components/schemas/Session' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+  /api/v1/users:
+    get:
+      summary: Konten auflisten (Admin)
+      responses:
+        '200': { description: Konten, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/User' } } } } }
+        '403': { $ref: '#/components/responses/Error' }
+    post:
+      summary: Konto anlegen (Admin, CSRF-Header erforderlich)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [username, password, role], properties: { username: { type: string }, password: { type: string, minLength: 12 }, role: { $ref: '#/components/schemas/Role' } } } } } }
+      responses:
+        '201': { description: angelegt, content: { application/json: { schema: { $ref: '#/components/schemas/User' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/users/{id}:
+    patch:
+      summary: Konto aktivieren/deaktivieren (Admin, CSRF; nicht das eigene, nicht den letzten aktiven Admin; beendet Sitzungen)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [disabled], properties: { disabled: { type: boolean } } } } } }
+      responses:
+        '200': { description: geändert, content: { application/json: { schema: { $ref: '#/components/schemas/User' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v1/auth/password:
+    post:
+      summary: Eigenes Passwort ändern (CSRF; beendet alle anderen Sitzungen; gedrosselt)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [current_password, new_password], properties: { current_password: { type: string }, new_password: { type: string, minLength: 12, maxLength: 256 } } } } } }
+      responses:
+        '204': { description: geändert }
+        '400': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /api/v1/compat/profiles:
+    get:
+      summary: Versionierte Kompatibilitätsprofile mit Evidenzstufen (jede Rolle)
+      responses:
+        '200':
+          description: Profile ai_key und ai_port
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [profiles]
+                properties:
+                  profiles:
+                    type: array
+                    items:
+                      type: object
+                      required: [profile, ranges]
+                      properties:
+                        profile: { $ref: '#/components/schemas/DeviceProfileKind' }
+                        ranges:
+                          type: array
+                          items:
+                            type: object
+                            required: [id, min, max_exclusive, source, claims]
+                            properties:
+                              id: { type: string }
+                              min: { type: string, example: 7.3.0 }
+                              max_exclusive: { type: string, example: 7.4.0 }
+                              source: { type: string }
+                              claims:
+                                type: array
+                                items:
+                                  type: object
+                                  required: [capability, evidence, note]
+                                  properties:
+                                    capability: { type: string }
+                                    evidence: { $ref: '#/components/schemas/EvidenceLevel' }
+                                    note: { type: string }
+        '401': { $ref: '#/components/responses/Error' }
+  /api/v1/providers:
+    get:
+      summary: Provider inkl. letzter Testergebnisse (jede Rolle)
+      responses:
+        '200': { description: Liste, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Provider' } } } } }
+        '401': { $ref: '#/components/responses/Error' }
+    post:
+      summary: Provider anlegen (Admin, CSRF)
+      parameters: [{ $ref: '#/components/parameters/Csrf' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, kind, base_url]
+              properties:
+                name: { type: string, maxLength: 64 }
+                kind: { type: string, enum: [ollama, openai_compatible] }
+                base_url: { type: string, format: uri }
+                api_key_secret: { type: [string, 'null'], description: Dateiname im Secret-Verzeichnis }
+                default_model: { type: [string, 'null'] }
+      responses:
+        '201': { description: angelegt, content: { application/json: { schema: { $ref: '#/components/schemas/Provider' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/providers/{id}:
+    delete:
+      summary: Provider löschen (Admin, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '204': { description: gelöscht }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/providers/{id}/test:
+    post:
+      summary: Verbindungstest (Modellliste, keine Inferenz; Admin, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '200':
+          description: Testergebnis (ok=false bei Providerfehlern)
+          content: { application/json: { schema: { type: object, required: [ok, latency_ms, models, error_code], properties: { ok: { type: boolean }, latency_ms: { type: [integer, 'null'] }, models: { type: array, items: { type: string } }, error_code: { type: [string, 'null'] } } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /api/v1/providers/{id}/test-vision:
+    post:
+      summary: Bildtest mit synthetischem Testbild (löst Inferenz aus; Admin, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { model: { type: [string, 'null'] } } } } } }
+      responses:
+        '200':
+          description: Testergebnis
+          content: { application/json: { schema: { type: object, required: [ok, model, latency_ms, text, matched, error_code], properties: { ok: { type: boolean }, model: { type: string }, latency_ms: { type: [integer, 'null'] }, text: { type: [string, 'null'] }, matched: { type: [boolean, 'null'] }, error_code: { type: [string, 'null'] } } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/providers/{id}/probe-job:
+    post:
+      summary: Bildtest als Job einreihen (Admin, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { model: { type: [string, 'null'] } } } } } }
+      responses:
+        '202': { description: eingereiht, content: { application/json: { schema: { $ref: '#/components/schemas/Job' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/jobs:
+    get:
+      summary: Jobs (neueste zuerst; jede Rolle)
+      parameters:
+        - { name: state, in: query, schema: { $ref: '#/components/schemas/JobState' } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 50 } }
+      responses:
+        '200': { description: Liste, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Job' } } } } }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/jobs/stats:
+    get:
+      summary: Queue-Kennzahlen inkl. Stundenlimit (jede Rolle)
+      responses:
+        '200':
+          description: Kennzahlen
+          content: { application/json: { schema: { type: object, required: [counts, oldest_ready_at, starts_last_hour, limit_per_hour], properties: { counts: { type: object, additionalProperties: { type: integer } }, oldest_ready_at: { type: [string, 'null'], format: date-time }, starts_last_hour: { type: integer }, limit_per_hour: { type: integer } } } } }
+  /api/v1/jobs/{id}/cancel:
+    post:
+      summary: Job abbrechen (Operator, CSRF; nicht für laufende/abgeschlossene)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '204': { description: abgebrochen }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v1/jobs/{id}/requeue:
+    post:
+      summary: Fehlgeschlagenen/unklaren Job neu einreihen (Operator, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '204': { description: eingereiht }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
   /api/v1/system/status:
     get:
-      summary: Belegter Systemstatus
+      summary: Belegter Systemstatus (jede Rolle)
       responses:
         '200': { description: Status, content: { application/json: { schema: { $ref: '#/components/schemas/SystemStatus' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+        '503': { $ref: '#/components/responses/Error' }
   /api/v1/system/status/stream:
     get:
       summary: Systemstatus als Server-Sent Events (Ereignis `status`, nur bei Änderung)
       responses:
         '200': { description: SSE-Stream, content: { text/event-stream: { schema: { type: string } } } }
 components:
+  securitySchemes:
+    session: { type: apiKey, in: cookie, name: akl_session }
+  parameters:
+    Csrf: { name: x-csrf-token, in: header, required: true, schema: { type: string }, description: 'CSRF-Token aus der Sitzung' }
+  responses:
+    Error:
+      description: >
+        Fehler. Codes u. a.: unauthenticated, forbidden, csrf_failed, origin_rejected,
+        invalid_credentials, too_many_attempts, invalid_setup_token, setup_completed,
+        invalid_username, invalid_password, username_taken, invalid_request,
+        invalid_current_password, cannot_modify_self, last_admin, invalid_transition,
+        database_unavailable, not_found, internal
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
   schemas:
+    Error:
+      type: object
+      required: [error]
+      properties: { error: { type: object, required: [code, message], properties: { code: { type: string }, message: { type: string } } } }
+    Role: { type: string, enum: [viewer, operator, admin] }
+    User:
+      type: object
+      required: [id, username, role, disabled]
+      properties: { id: { type: string, format: uuid }, username: { type: string }, role: { $ref: '#/components/schemas/Role' }, disabled: { type: boolean } }
+    JobState: { type: string, enum: [queued, running, completed, failed, retryable, uncertain, cancelled] }
+    Job:
+      type: object
+      required: [id, idempotency_key, kind, state, phase, priority, attempts, max_attempts, next_attempt_at, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        idempotency_key: { type: string }
+        kind: { type: string }
+        state: { $ref: '#/components/schemas/JobState' }
+        phase: { type: string, enum: [pending, processing, callback] }
+        priority: { type: integer }
+        attempts: { type: integer }
+        max_attempts: { type: integer }
+        next_attempt_at: { type: string, format: date-time }
+        last_error_code: { type: [string, 'null'] }
+        payload: { type: object }
+        result: { type: [object, 'null'] }
+        created_at: { type: string, format: date-time }
+        started_at: { type: [string, 'null'], format: date-time }
+        finished_at: { type: [string, 'null'], format: date-time }
+    ProviderTest:
+      type: object
+      required: [kind, ok, tested_at]
+      properties:
+        kind: { type: string, enum: [connection, vision] }
+        ok: { type: boolean }
+        latency_ms: { type: [integer, 'null'] }
+        error_code: { type: [string, 'null'] }
+        model: { type: [string, 'null'] }
+        result_text: { type: [string, 'null'], maxLength: 500 }
+        matched: { type: [boolean, 'null'] }
+        tested_at: { type: string, format: date-time }
+    Provider:
+      type: object
+      required: [id, name, kind, base_url, api_key_secret, default_model, enabled, created_at, tests]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        kind: { type: string, enum: [ollama, openai_compatible] }
+        base_url: { type: string }
+        api_key_secret: { type: [string, 'null'], description: 'Nur der Dateiname, nie der Schlüssel' }
+        default_model: { type: [string, 'null'] }
+        enabled: { type: boolean }
+        created_at: { type: string, format: date-time }
+        tests: { type: array, items: { $ref: '#/components/schemas/ProviderTest' } }
+    Session:
+      type: object
+      required: [user, csrf_token]
+      properties: { user: { $ref: '#/components/schemas/User' }, csrf_token: { type: string } }
     EvidenceLevel:
       type: string
       enum: [planned, implemented, synthetic_verified, native_verified, unsupported, needs_evidence]
@@ -58,11 +349,12 @@ components:
         lifecycle_evidence: { $ref: '#/components/schemas/EvidenceLevel' }
     SystemStatus:
       type: object
-      required: [service, version, unofficial, database, devices]
+      required: [service, version, unofficial, source_url, database, devices]
       properties:
         service: { type: string }
         version: { type: string }
         unofficial: { const: true }
+        source_url: { type: string, format: uri, description: 'Quellcode dieser Instanz (AGPL §13)' }
         database: { $ref: '#/components/schemas/DatabaseStatus' }
         devices: { type: array, items: { $ref: '#/components/schemas/DeviceProfileStatus' } }
     Readiness:

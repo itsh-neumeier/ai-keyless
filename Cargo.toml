@@ -1,11 +1,11 @@
 [workspace]
 resolver = "3"
-members = ["apps/api", "crates/core", "crates/persistence"]
+members = ["apps/api", "crates/core", "crates/persistence", "crates/protect-compat", "crates/providers"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
-license = "LicenseRef-AI-Keyless-Pending"
+license = "AGPL-3.0-or-later"
 repository = "https://github.com/itsh-neumeier/ai-keyless"
 publish = false
 rust-version = "1.88"
@@ -13,11 +13,13 @@ rust-version = "1.88"
 [workspace.dependencies]
 akl-core = { path = "crates/core" }
 akl-persistence = { path = "crates/persistence" }
+akl-protect-compat = { path = "crates/protect-compat" }
+akl-providers = { path = "crates/providers" }
 axum = "0.8"
 futures = "0.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "migrate", "chrono"] }
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "migrate", "chrono", "uuid", "json"] }
 thiserror = "2"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "net", "time", "sync", "io-util"] }
 tokio-stream = { version = "0.1", features = ["sync"] }
@@ -26,6 +28,15 @@ tower-http = { version = "0.7", features = ["trace", "fs", "set-header", "reques
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 http-body-util = "0.1"
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "json", "http2"] }
+url = "2"
+argon2 = "0.6"
+base64 = "0.22"
+getrandom = "0.3"
+sha2 = "0.11"
+subtle = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

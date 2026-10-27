@@ -40,6 +40,8 @@ export interface SystemStatus {
 	service: string;
 	version: string;
 	unofficial: boolean;
+	/** Quellcode dieser Instanz (AGPL §13). */
+	source_url: string;
 	database: DatabaseStatus;
 	devices: DeviceProfileStatus[];
 }
@@ -75,10 +77,12 @@ function isObject(v: unknown): v is Record<string, unknown> {
  */
 export function parseSystemStatus(input: unknown): SystemStatus {
 	if (!isObject(input)) throw new Error('Status: kein Objekt');
-	const { service, version, unofficial, database, devices } = input;
+	const { service, version, unofficial, source_url, database, devices } = input;
 	if (typeof service !== 'string' || typeof version !== 'string')
 		throw new Error('Status: service/version fehlen');
 	if (unofficial !== true) throw new Error('Status: unofficial muss true sein');
+	if (typeof source_url !== 'string' || !/^https:\/\//.test(source_url))
+		throw new Error('Status: source_url ungültig');
 	if (!isObject(database) || !COMPONENT.includes(database.status as ComponentStatus))
 		throw new Error('Status: database ungültig');
 	const schema = database.schema_version;
@@ -103,6 +107,7 @@ export function parseSystemStatus(input: unknown): SystemStatus {
 		service,
 		version,
 		unofficial,
+		source_url,
 		database: { status: database.status as ComponentStatus, schema_version: schema },
 		devices: parsedDevices
 	};

@@ -5,3 +5,4 @@ node_modules
 !.env.example
 deploy/compose/secrets/
 *.log
+backups/

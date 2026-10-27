@@ -38,6 +38,14 @@ services:
       AKL_BIND: 0.0.0.0:8090
       AKL_DATABASE_URL_FILE: /run/secrets/akl_database_url
       RUST_LOG: ${AKL_RUST_LOG:-info}
+      # true, sobald die UI per HTTPS (z. B. Reverse-Proxy mit TLS) erreichbar ist.
+      AKL_COOKIE_SECURE: ${AKL_COOKIE_SECURE:-false}
+      # Modell-Provider (SSRF-Richtlinie, siehe docs/operations/README.md)
+      AKL_PROVIDER_ALLOW_PRIVATE: ${AKL_PROVIDER_ALLOW_PRIVATE:-true}
+      AKL_PROVIDER_ALLOWED_HOSTS: ${AKL_PROVIDER_ALLOWED_HOSTS:-}
+      AKL_PROVIDER_TIMEOUT_SECS: ${AKL_PROVIDER_TIMEOUT_SECS:-120}
+      # Globales, dauerhaftes Startlimit der Verarbeitungs-Queue (Sicherheitsvorgabe)
+      AKL_JOBS_PER_HOUR: ${AKL_JOBS_PER_HOUR:-12}
     secrets: [akl_database_url]
     ports:
       # Standardmäßig nur lokal erreichbar; für LAN-Zugriff AKL_ADMIN_BIND anpassen.

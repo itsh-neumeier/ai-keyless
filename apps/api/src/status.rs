@@ -72,6 +72,7 @@ pub async fn collect(state: &AppState) -> SystemStatus {
         service: "ai-keyless",
         version: env!("CARGO_PKG_VERSION"),
         unofficial: true,
+        source_url: env!("CARGO_PKG_REPOSITORY"),
         database,
         devices,
     }

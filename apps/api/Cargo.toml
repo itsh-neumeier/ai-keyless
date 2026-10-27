@@ -4,6 +4,7 @@ description = "AI-Keyless Management-API (Axum)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
 publish.workspace = true
 
 [[bin]]
@@ -13,7 +14,15 @@ path = "src/main.rs"
 [dependencies]
 akl-core.workspace = true
 akl-persistence.workspace = true
+akl-protect-compat.workspace = true
+akl-providers.workspace = true
+argon2.workspace = true
 axum.workspace = true
+base64.workspace = true
+chrono.workspace = true
+getrandom.workspace = true
+sha2.workspace = true
+subtle.workspace = true
 futures.workspace = true
 serde.workspace = true
 serde_json.workspace = true
@@ -22,8 +31,10 @@ tokio.workspace = true
 tower-http.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+uuid.workspace = true
 
 [dev-dependencies]
+akl-persistence = { workspace = true, features = ["testing"] }
 http-body-util.workspace = true
 tower.workspace = true
 

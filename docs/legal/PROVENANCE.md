@@ -53,9 +53,10 @@ Vertragstests, dann schrittweise Migration hinter Adaptern, keine Regression der
 
 ## 4. Eigene Lizenz von AI-Keyless
 
-**Noch nicht festgelegt** – Entscheidung des Projektverantwortlichen (OPEN_QUESTIONS Q-001).
-Bis dahin: `license = "LicenseRef-AI-Keyless-Pending"` in Cargo, keine Veröffentlichung als
-Open Source, keine GHCR-Releases.
+**AGPL-3.0-or-later** (Entscheidung des Projektverantwortlichen vom 2026-10-26, ADR-004).
+Volltext in `LICENSE` (offizielle Fassung von https://www.gnu.org/licenses/agpl-3.0.txt,
+abgerufen 2026-10-26, SHA-256 `0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0`).
+Rechtliche Risikoentscheidung zur Geräteimitation: `docs/legal/RISK-ACCEPTANCE.md`.
 
 ## 5. Drittabhängigkeiten
 
@@ -80,3 +81,4 @@ Design-Tokens wurden für dieses Projekt neu erstellt. Keine Hersteller-Icons, -
 | Datum | Änderung |
 |---|---|
 | 2026-10-26 | Erstfassung (AKL-M000) |
+| 2026-10-26 | Lizenz AGPL-3.0-or-later festgelegt; Risikoentscheidung ergänzt |

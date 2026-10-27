@@ -3,79 +3,800 @@
   "generated": "2026-10-26",
   "dod": "Funktion umgesetzt; Unit-, Negativ- und Integrationstests; Doku; Sicherheitsprüfung; Migrations-/Rollback-Betrachtung; Versionsevidenz; PR-Review; AI-Memory aktualisiert",
   "milestones": [
-    {"id": "AKL-M000", "title": "Recht, Bestand, Machbarkeit"},
-    {"id": "AKL-M010", "title": "Projektfundament"},
-    {"id": "AKL-M020", "title": "UniFi-inspiriertes UI-System"},
-    {"id": "AKL-M030", "title": "Protect-Contract-Labor"},
-    {"id": "AKL-M040", "title": "AI-Key-Geräte-Lifecycle"},
-    {"id": "AKL-M050", "title": "Protect-Kamerainventar"},
-    {"id": "AKL-M060", "title": "KI-Provider und Event-Engine"},
-    {"id": "AKL-M070", "title": "Native Ereignisbeschreibung"},
-    {"id": "AKL-M080", "title": "Produktiver Linux-/Docker-Betrieb"},
-    {"id": "AKL-M090", "title": "Native Suche"},
-    {"id": "AKL-M100", "title": "Erweiterte Funktionen"},
-    {"id": "AKL-M110", "title": "AI-Port-Profil"},
-    {"id": "AKL-M120", "title": "Releasequalität"}
+    {
+      "id": "AKL-M000",
+      "title": "Recht, Bestand, Machbarkeit"
+    },
+    {
+      "id": "AKL-M010",
+      "title": "Projektfundament"
+    },
+    {
+      "id": "AKL-M020",
+      "title": "UniFi-inspiriertes UI-System"
+    },
+    {
+      "id": "AKL-M030",
+      "title": "Protect-Contract-Labor"
+    },
+    {
+      "id": "AKL-M040",
+      "title": "AI-Key-Geräte-Lifecycle"
+    },
+    {
+      "id": "AKL-M050",
+      "title": "Protect-Kamerainventar"
+    },
+    {
+      "id": "AKL-M060",
+      "title": "KI-Provider und Event-Engine"
+    },
+    {
+      "id": "AKL-M070",
+      "title": "Native Ereignisbeschreibung"
+    },
+    {
+      "id": "AKL-M080",
+      "title": "Produktiver Linux-/Docker-Betrieb"
+    },
+    {
+      "id": "AKL-M090",
+      "title": "Native Suche"
+    },
+    {
+      "id": "AKL-M100",
+      "title": "Erweiterte Funktionen"
+    },
+    {
+      "id": "AKL-M110",
+      "title": "AI-Port-Profil"
+    },
+    {
+      "id": "AKL-M120",
+      "title": "Releasequalität"
+    }
   ],
   "issues": [
-    {"id": "AKL-M000-01", "ms": "AKL-M000", "status": "done", "prio": "P0", "deps": [], "title": "Lizenz-/Provenienzprüfung Referenzprojekt", "accept": ["PROVENANCE.md mit Commit, Lizenzstatus, Methode", "Go/No-Go-Gates dokumentiert"]},
-    {"id": "AKL-M000-02", "ms": "AKL-M000", "status": "done", "prio": "P0", "deps": [], "title": "Bestandsbericht bestätigte vs. unbestätigte Funktionen", "accept": ["REFERENCE-ANALYSIS.md", "Matrix ohne übernommene Fremdevidenz"]},
-    {"id": "AKL-M000-03", "ms": "AKL-M000", "status": "blocked", "prio": "P1", "deps": [], "title": "Offizielle AI-Key-FAQ manuell sichten (help.ui.com nicht abrufbar)", "accept": ["Funktionsliste, Limits, Mindestversionen in OPEN_QUESTIONS/Matrix erfasst"]},
-    {"id": "AKL-M000-04", "ms": "AKL-M000", "status": "blocked", "prio": "P2", "deps": [], "title": "Lizenzanfrage an Referenz-Maintainer (nur nach Freigabe, durch Projektverantwortlichen)", "accept": ["Antwort dokumentiert in PROVENANCE.md"]},
-    {"id": "AKL-M000-05", "ms": "AKL-M000", "status": "blocked", "prio": "P0", "deps": [], "title": "Projektlizenz für AI-Keyless festlegen", "accept": ["LICENSE-Datei", "Cargo/package.json aktualisiert", "ADR"]},
-    {"id": "AKL-M000-06", "ms": "AKL-M000", "status": "blocked", "prio": "P1", "deps": [], "title": "Rechtliche Einschätzung Geräteimitation/Interoperabilität (DE/EU)", "accept": ["Kurzgutachten oder bewusste Risikoentscheidung des Projektverantwortlichen dokumentiert"]},
-
-    {"id": "AKL-M010-01", "ms": "AKL-M010", "status": "done", "prio": "P0", "deps": [], "title": "Monorepo, Rust-Workspace, SvelteKit-App, Basisdokumente", "accept": ["cargo build/test grün", "pnpm check/lint/test/build grün"]},
-    {"id": "AKL-M010-02", "ms": "AKL-M010", "status": "done", "prio": "P0", "deps": ["AKL-M010-01"], "title": "API /healthz, /readyz, Systemstatus + SSE", "accept": ["HTTP-Vertragstests", "kein erfundener Gerätezustand"]},
-    {"id": "AKL-M010-03", "ms": "AKL-M010", "status": "done", "prio": "P0", "deps": ["AKL-M010-01"], "title": "PostgreSQL-Grundschema + Migrationstest", "accept": ["Migration idempotent gegen echte DB", "Constraints getestet"]},
-    {"id": "AKL-M010-04", "ms": "AKL-M010", "status": "done", "prio": "P0", "deps": ["AKL-M010-02"], "title": "Dockerfile, Compose, Secrets, Smoke-Test", "accept": ["Image nonroot/read-only", "Smoke-Test grün"]},
-    {"id": "AKL-M010-05", "ms": "AKL-M010", "status": "in_progress", "prio": "P0", "deps": ["AKL-M010-01"], "title": "Basis-CI (Rust, Web, Security, Container)", "accept": ["Workflow vorhanden", "erster grüner Lauf auf GitHub"]},
-    {"id": "AKL-M010-06", "ms": "AKL-M010", "status": "open", "prio": "P1", "deps": ["AKL-M010-05"], "title": "Ersten CI-Lauf auf GitHub verifizieren und Fehler beheben", "accept": ["Alle Jobs grün auf PR"]},
-    {"id": "AKL-M010-07", "ms": "AKL-M010", "status": "open", "prio": "P2", "deps": ["AKL-M010-02"], "title": "OpenAPI aus Rust-Typen generieren + TS-Client-Typen prüfen", "accept": ["CI schlägt fehl bei Drift zwischen Rust, OpenAPI und TS"]},
-    {"id": "AKL-M010-08", "ms": "AKL-M010", "status": "open", "prio": "P2", "deps": ["AKL-M010-05"], "title": "Branch-Schutz, PR-Template, CODEOWNERS, Issue-Templates", "accept": ["Review-Pflicht auf main"]},
-
-    {"id": "AKL-M020-01", "ms": "AKL-M020", "status": "open", "prio": "P0", "deps": ["AKL-M010-02"], "title": "Setup-Modus mit Einmal-Token + Admin-Konto (Argon2id)", "accept": ["Token einmalig, zeitlich begrenzt", "Negativtests: Wiederverwendung, Ablauf"]},
-    {"id": "AKL-M020-02", "ms": "AKL-M020", "status": "open", "prio": "P0", "deps": ["AKL-M020-01"], "title": "Sessions, Rollen Admin/Operator/Viewer, CSRF, Audit-Log", "accept": ["HttpOnly/SameSite-Cookies", "CSRF-Negativtests", "Audit-Einträge"]},
-    {"id": "AKL-M020-03", "ms": "AKL-M020", "status": "open", "prio": "P1", "deps": [], "title": "Komponentenbibliothek: Button, Input, Select, Switch, Tabs, Dialog, Drawer, Toast, Menu, DataTable", "accept": ["Tastaturbedienung", "Komponententests"]},
-    {"id": "AKL-M020-04", "ms": "AKL-M020", "status": "open", "prio": "P1", "deps": ["AKL-M020-02"], "title": "Login-/Setup-Screens und Nutzerverwaltung", "accept": ["E2E mit Playwright"]},
-    {"id": "AKL-M020-05", "ms": "AKL-M020", "status": "open", "prio": "P2", "deps": ["AKL-M020-03"], "title": "Getrennter Demo-Modus mit Banner", "accept": ["Demo-Daten im Normalbuild technisch ausgeschlossen (Test)"]},
-    {"id": "AKL-M020-06", "ms": "AKL-M020", "status": "open", "prio": "P1", "deps": ["AKL-M020-03"], "title": "Accessibility-Audit (axe) + Kontrastprüfung in CI", "accept": ["0 kritische axe-Befunde"]},
-    {"id": "AKL-M020-07", "ms": "AKL-M020", "status": "open", "prio": "P2", "deps": [], "title": "CSP ohne unsafe-inline (Hashes)", "accept": ["CSP-Test", "UI funktioniert"]},
-    {"id": "AKL-M020-08", "ms": "AKL-M020", "status": "open", "prio": "P2", "deps": ["AKL-M010-05"], "title": "Playwright-E2E + visuelle Regression in CI", "accept": ["Screenshots Dark/Light/Mobil"]},
-
-    {"id": "AKL-M030-01", "ms": "AKL-M030", "status": "open", "prio": "P0", "deps": ["AKL-M010-01"], "title": "crate protect-compat: Versionsprofile + konservativer Modus", "accept": ["Unbekannte Version → konservativ + Warnung (Test)"]},
-    {"id": "AKL-M030-02", "ms": "AKL-M030", "status": "open", "prio": "P0", "deps": ["AKL-M030-01"], "title": "Synthetischer Controller (TLS, Pinning, Fehlerfälle) als Testharness", "accept": ["Deterministische Tests ohne echtes Material"]},
-    {"id": "AKL-M030-03", "ms": "AKL-M030", "status": "open", "prio": "P0", "deps": ["AKL-M030-02"], "title": "Contract-Fixtures Discovery/Adoption/Callback als needs_evidence-Hypothesen", "accept": ["Jede Fixture mit Quelle + Evidenzstufe"]},
-    {"id": "AKL-M030-04", "ms": "AKL-M030", "status": "open", "prio": "P1", "deps": [], "title": "Native Testplan-Vorlage + Freigabeprozess für Live-Tests", "accept": ["Vorlage in docs/testing", "Freigabe durch Projektverantwortlichen"]},
-
-    {"id": "AKL-M040-01", "ms": "AKL-M040", "status": "open", "prio": "P0", "deps": ["AKL-M030-03"], "title": "Persistente Geräteidentität + Schlüssel/Zertifikate (Secret-Store)", "accept": ["Identität überlebt Neustart", "Schlüssel nie in DB/Logs"]},
-    {"id": "AKL-M040-02", "ms": "AKL-M040", "status": "open", "prio": "P0", "deps": ["AKL-M040-01"], "title": "Lifecycle-Service mit Zustandsautomat + Transition-Log", "accept": ["Unzulässige Übergänge abgelehnt", "Kill-Switch"]},
-    {"id": "AKL-M040-03", "ms": "AKL-M040", "status": "open", "prio": "P0", "deps": ["AKL-M040-02", "AKL-M080-01"], "title": "Discovery (UDP) gegen synthetischen Controller", "accept": ["synthetic_verified"]},
-    {"id": "AKL-M040-04", "ms": "AKL-M040", "status": "open", "prio": "P0", "deps": ["AKL-M040-03"], "title": "Adoption, Credential-Rotation, Keepalive, Reconnect (synthetisch)", "accept": ["synthetic_verified inkl. Restart"]},
-    {"id": "AKL-M040-05", "ms": "AKL-M040", "status": "blocked", "prio": "P0", "deps": ["AKL-M040-04", "AKL-M030-04", "AKL-M000-06"], "title": "Nativer Akzeptanztest Adoption (autorisierte Umgebung)", "accept": ["native_verified-Nachweis gemäß MATRIX.md"]},
-    {"id": "AKL-M040-06", "ms": "AKL-M040", "status": "open", "prio": "P1", "deps": ["AKL-M040-02", "AKL-M020-03"], "title": "UI Geräte: Profile, Zustand, Evidenz, Recovery-Assistent", "accept": ["Echtzeit per SSE", "keine vorgetäuschten Zustände"]},
-
-    {"id": "AKL-M050-01", "ms": "AKL-M050", "status": "open", "prio": "P1", "deps": ["AKL-M040-04"], "title": "Lesender Kamera-Import (Integration API), Eligibility, Scoping", "accept": ["Nur lesend", "ungültiges Inventar → sicher deaktiviert"]},
-    {"id": "AKL-M050-02", "ms": "AKL-M050", "status": "open", "prio": "P1", "deps": ["AKL-M050-01"], "title": "UI Kameras (Tabelle/Kacheln, Freigabe pro Kamera/Gruppe)", "accept": ["Änderungen nur lokal"]},
-
-    {"id": "AKL-M060-01", "ms": "AKL-M060", "status": "open", "prio": "P0", "deps": ["AKL-M010-03"], "title": "Persistente Job-Queue mit Zuständen, Idempotenz, Backoff, Dead-Letter", "accept": ["Crash-Recovery-Test", "uncertain-Zustand"]},
-    {"id": "AKL-M060-02", "ms": "AKL-M060", "status": "open", "prio": "P0", "deps": [], "title": "Provider-Abstraktion (Ollama, OpenAI-kompatibel, Responses) + SSRF-Schutz", "accept": ["SSRF-Negativtests", "Testaufruf nur nach Freigabe bei kostenpflichtigen APIs"]},
-    {"id": "AKL-M060-03", "ms": "AKL-M060", "status": "open", "prio": "P0", "deps": ["AKL-M060-01"], "title": "Rate-/Kostenlimits (Start: 12 Jobs/h global), Medienlimits", "accept": ["Limit dauerhaft über Neustart"]},
-    {"id": "AKL-M060-04", "ms": "AKL-M060", "status": "open", "prio": "P1", "deps": ["AKL-M060-01", "AKL-M060-02"], "title": "UI KI-Modelle + Verarbeitung", "accept": ["Latenz/Fehlerrate aus echten Messungen"]},
-
-    {"id": "AKL-M070-01", "ms": "AKL-M070", "status": "open", "prio": "P0", "deps": ["AKL-M060-03", "AKL-M040-04"], "title": "Caption-Callback-Vertrag (synthetisch) + Readback-Prüfung", "accept": ["Status http_accepted ≠ persisted"]},
-    {"id": "AKL-M070-02", "ms": "AKL-M070", "status": "blocked", "prio": "P0", "deps": ["AKL-M070-01", "AKL-M040-05"], "title": "Native Ereignisbeschreibung on-demand/automatisch (autorisiert)", "accept": ["native_verified pro Version und Kamera"]},
-
-    {"id": "AKL-M080-01", "ms": "AKL-M080", "status": "open", "prio": "P0", "deps": [], "title": "Netzwerkmodi bewerten (bridge/host/macvlan) für Discovery", "accept": ["Messbarer Test pro Modus", "Empfehlung in NETWORKING.md"]},
-    {"id": "AKL-M080-02", "ms": "AKL-M080", "status": "open", "prio": "P1", "deps": ["AKL-M010-04"], "title": "Portainer-Stack testen", "accept": ["Deployment-Protokoll"]},
-    {"id": "AKL-M080-03", "ms": "AKL-M080", "status": "open", "prio": "P1", "deps": ["AKL-M010-04"], "title": "ARM64-Image bauen und testen", "accept": ["Smoke-Test auf arm64"]},
-    {"id": "AKL-M080-04", "ms": "AKL-M080", "status": "open", "prio": "P1", "deps": ["AKL-M010-03"], "title": "Backup/Restore + Upgrade/Rollback mit Wiederherstellungsprobe", "accept": ["Restore-Test automatisiert"]},
-    {"id": "AKL-M080-05", "ms": "AKL-M080", "status": "open", "prio": "P2", "deps": ["AKL-M070-02"], "title": "72-h-Endurance- und Lasttest", "accept": ["Bericht mit Metriken"]},
-
-    {"id": "AKL-M090-01", "ms": "AKL-M090", "status": "open", "prio": "P2", "deps": ["AKL-M030-03"], "title": "Such-Vertrag klären (CLIP vs. E5) – needs_evidence", "accept": ["Testplan + Ergebnis"]},
-    {"id": "AKL-M100-01", "ms": "AKL-M100", "status": "open", "prio": "P3", "deps": ["AKL-M070-02"], "title": "AI Alerts, STT, LPR, Gesicht, Enhancement – je eigenes Issue mit DSFA", "accept": ["Datenschutzprüfung pro Funktion"]},
-    {"id": "AKL-M110-01", "ms": "AKL-M110", "status": "open", "prio": "P3", "deps": ["AKL-M040-05"], "title": "AI-Port-Profil: eigene Identität, Pairing-Vertrag, Streams", "accept": ["Getrennt von ai_key (Test)"]},
-    {"id": "AKL-M120-01", "ms": "AKL-M120", "status": "open", "prio": "P2", "deps": ["AKL-M000-05"], "title": "Stable-Release-Prozess, GHCR nur nach manueller Freigabe", "accept": ["Kein automatisches Publish"]},
-    {"id": "AKL-M120-02", "ms": "AKL-M120", "status": "open", "prio": "P2", "deps": [], "title": "Lizenzinventur Abhängigkeiten (cargo-deny, license-checker)", "accept": ["CI-Prüfung"]}
+    {
+      "id": "AKL-M000-01",
+      "ms": "AKL-M000",
+      "status": "done",
+      "prio": "P0",
+      "deps": [],
+      "title": "Lizenz-/Provenienzprüfung Referenzprojekt",
+      "accept": [
+        "PROVENANCE.md mit Commit, Lizenzstatus, Methode",
+        "Go/No-Go-Gates dokumentiert"
+      ]
+    },
+    {
+      "id": "AKL-M000-02",
+      "ms": "AKL-M000",
+      "status": "done",
+      "prio": "P0",
+      "deps": [],
+      "title": "Bestandsbericht bestätigte vs. unbestätigte Funktionen",
+      "accept": [
+        "REFERENCE-ANALYSIS.md",
+        "Matrix ohne übernommene Fremdevidenz"
+      ]
+    },
+    {
+      "id": "AKL-M000-03",
+      "ms": "AKL-M000",
+      "status": "blocked",
+      "prio": "P1",
+      "deps": [],
+      "title": "Offizielle AI-Key-FAQ manuell sichten (help.ui.com nicht abrufbar) – zurückgestellt",
+      "accept": [
+        "Funktionsliste, Limits, Mindestversionen in OPEN_QUESTIONS/Matrix erfasst"
+      ]
+    },
+    {
+      "id": "AKL-M000-04",
+      "ms": "AKL-M000",
+      "status": "blocked",
+      "prio": "P2",
+      "deps": [],
+      "title": "Lizenzanfrage an Referenz-Maintainer (nur nach Freigabe, durch Projektverantwortlichen)",
+      "accept": [
+        "Antwort dokumentiert in PROVENANCE.md"
+      ]
+    },
+    {
+      "id": "AKL-M000-05",
+      "ms": "AKL-M000",
+      "status": "done",
+      "prio": "P0",
+      "deps": [],
+      "title": "Projektlizenz festlegen → AGPL-3.0-or-later (ADR-004)",
+      "accept": [
+        "LICENSE-Datei",
+        "Cargo/package.json aktualisiert",
+        "ADR"
+      ]
+    },
+    {
+      "id": "AKL-M000-06",
+      "ms": "AKL-M000",
+      "status": "done",
+      "prio": "P1",
+      "deps": [],
+      "title": "Rechtliches Risiko Geräteimitation: bewusste Risikoentscheidung (RISK-ACCEPTANCE.md)",
+      "accept": [
+        "Kurzgutachten oder bewusste Risikoentscheidung des Projektverantwortlichen dokumentiert"
+      ]
+    },
+    {
+      "id": "AKL-M010-01",
+      "ms": "AKL-M010",
+      "status": "done",
+      "prio": "P0",
+      "deps": [],
+      "title": "Monorepo, Rust-Workspace, SvelteKit-App, Basisdokumente",
+      "accept": [
+        "cargo build/test grün",
+        "pnpm check/lint/test/build grün"
+      ]
+    },
+    {
+      "id": "AKL-M010-02",
+      "ms": "AKL-M010",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M010-01"
+      ],
+      "title": "API /healthz, /readyz, Systemstatus + SSE",
+      "accept": [
+        "HTTP-Vertragstests",
+        "kein erfundener Gerätezustand"
+      ]
+    },
+    {
+      "id": "AKL-M010-03",
+      "ms": "AKL-M010",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M010-01"
+      ],
+      "title": "PostgreSQL-Grundschema + Migrationstest",
+      "accept": [
+        "Migration idempotent gegen echte DB",
+        "Constraints getestet"
+      ]
+    },
+    {
+      "id": "AKL-M010-04",
+      "ms": "AKL-M010",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M010-02"
+      ],
+      "title": "Dockerfile, Compose, Secrets, Smoke-Test",
+      "accept": [
+        "Image nonroot/read-only",
+        "Smoke-Test grün"
+      ]
+    },
+    {
+      "id": "AKL-M010-05",
+      "ms": "AKL-M010",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M010-01"
+      ],
+      "title": "Basis-CI (Rust, Web, Security, Container)",
+      "accept": [
+        "Workflow vorhanden",
+        "erster grüner Lauf auf GitHub"
+      ]
+    },
+    {
+      "id": "AKL-M010-06",
+      "ms": "AKL-M010",
+      "status": "done",
+      "prio": "P1",
+      "deps": [
+        "AKL-M010-05"
+      ],
+      "title": "Ersten CI-Lauf auf GitHub verifizieren und Fehler beheben",
+      "accept": [
+        "Alle Jobs grün auf PR"
+      ]
+    },
+    {
+      "id": "AKL-M010-07",
+      "ms": "AKL-M010",
+      "status": "open",
+      "prio": "P2",
+      "deps": [
+        "AKL-M010-02"
+      ],
+      "title": "OpenAPI aus Rust-Typen generieren + TS-Client-Typen prüfen",
+      "accept": [
+        "CI schlägt fehl bei Drift zwischen Rust, OpenAPI und TS"
+      ]
+    },
+    {
+      "id": "AKL-M010-08",
+      "ms": "AKL-M010",
+      "status": "open",
+      "prio": "P2",
+      "deps": [
+        "AKL-M010-05"
+      ],
+      "title": "Branch-Schutz, PR-Template, CODEOWNERS, Issue-Templates",
+      "accept": [
+        "Review-Pflicht auf main"
+      ]
+    },
+    {
+      "id": "AKL-M020-01",
+      "ms": "AKL-M020",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M010-02"
+      ],
+      "title": "Setup-Modus mit Einmal-Token + Admin-Konto (Argon2id)",
+      "accept": [
+        "Token einmalig, zeitlich begrenzt",
+        "Negativtests: Wiederverwendung, Ablauf"
+      ]
+    },
+    {
+      "id": "AKL-M020-02",
+      "ms": "AKL-M020",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M020-01"
+      ],
+      "title": "Sessions, Rollen Admin/Operator/Viewer, CSRF, Audit-Log",
+      "accept": [
+        "HttpOnly/SameSite-Cookies",
+        "CSRF-Negativtests",
+        "Audit-Einträge"
+      ]
+    },
+    {
+      "id": "AKL-M020-03",
+      "ms": "AKL-M020",
+      "status": "open",
+      "prio": "P1",
+      "deps": [],
+      "title": "Komponentenbibliothek: Button, Input, Select, Switch, Tabs, Dialog, Drawer, Toast, Menu, DataTable",
+      "accept": [
+        "Tastaturbedienung",
+        "Komponententests"
+      ]
+    },
+    {
+      "id": "AKL-M020-04",
+      "ms": "AKL-M020",
+      "status": "done",
+      "prio": "P1",
+      "deps": [
+        "AKL-M020-02"
+      ],
+      "title": "Login-/Setup-Screens, Nutzerverwaltung, Konten deaktivieren, Passwort ändern",
+      "accept": [
+        "E2E mit Playwright"
+      ]
+    },
+    {
+      "id": "AKL-M020-05",
+      "ms": "AKL-M020",
+      "status": "open",
+      "prio": "P2",
+      "deps": [
+        "AKL-M020-03"
+      ],
+      "title": "Getrennter Demo-Modus mit Banner",
+      "accept": [
+        "Demo-Daten im Normalbuild technisch ausgeschlossen (Test)"
+      ]
+    },
+    {
+      "id": "AKL-M020-06",
+      "ms": "AKL-M020",
+      "status": "open",
+      "prio": "P1",
+      "deps": [
+        "AKL-M020-03"
+      ],
+      "title": "Accessibility-Audit (axe) + Kontrastprüfung in CI",
+      "accept": [
+        "0 kritische axe-Befunde"
+      ]
+    },
+    {
+      "id": "AKL-M020-07",
+      "ms": "AKL-M020",
+      "status": "open",
+      "prio": "P2",
+      "deps": [],
+      "title": "CSP ohne unsafe-inline (Hashes)",
+      "accept": [
+        "CSP-Test",
+        "UI funktioniert"
+      ]
+    },
+    {
+      "id": "AKL-M020-08",
+      "ms": "AKL-M020",
+      "status": "done",
+      "prio": "P2",
+      "deps": [
+        "AKL-M010-05"
+      ],
+      "title": "Playwright-E2E in CI (Setup, Rollen, Provider/Queue mit Mock, Mobil-Layout)",
+      "accept": [
+        "Screenshots Dark/Light/Mobil"
+      ]
+    },
+    {
+      "id": "AKL-M030-01",
+      "ms": "AKL-M030",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M010-01"
+      ],
+      "title": "crate protect-compat: Versionsprofile + konservativer Modus (+ API/UI unter Geräte)",
+      "accept": [
+        "Unbekannte Version → konservativ + Warnung (Test)"
+      ]
+    },
+    {
+      "id": "AKL-M030-02",
+      "ms": "AKL-M030",
+      "status": "open",
+      "prio": "P0",
+      "deps": [
+        "AKL-M030-01"
+      ],
+      "title": "Synthetischer Controller (TLS, Pinning, Fehlerfälle) als Testharness",
+      "accept": [
+        "Deterministische Tests ohne echtes Material"
+      ]
+    },
+    {
+      "id": "AKL-M030-03",
+      "ms": "AKL-M030",
+      "status": "open",
+      "prio": "P0",
+      "deps": [
+        "AKL-M030-02"
+      ],
+      "title": "Contract-Fixtures Discovery/Adoption/Callback als needs_evidence-Hypothesen",
+      "accept": [
+        "Jede Fixture mit Quelle + Evidenzstufe"
+      ]
+    },
+    {
+      "id": "AKL-M030-04",
+      "ms": "AKL-M030",
+      "status": "done",
+      "prio": "P1",
+      "deps": [],
+      "title": "Native Testplan-Vorlage, Nachweisformat, Entwurf TP-001 (Adoption)",
+      "accept": [
+        "Vorlage in docs/testing",
+        "Freigabe durch Projektverantwortlichen"
+      ]
+    },
+    {
+      "id": "AKL-M040-01",
+      "ms": "AKL-M040",
+      "status": "open",
+      "prio": "P0",
+      "deps": [
+        "AKL-M030-03"
+      ],
+      "title": "Persistente Geräteidentität + Schlüssel/Zertifikate (Secret-Store)",
+      "accept": [
+        "Identität überlebt Neustart",
+        "Schlüssel nie in DB/Logs"
+      ]
+    },
+    {
+      "id": "AKL-M040-02",
+      "ms": "AKL-M040",
+      "status": "open",
+      "prio": "P0",
+      "deps": [
+        "AKL-M040-01"
+      ],
+      "title": "Lifecycle-Service mit Zustandsautomat + Transition-Log",
+      "accept": [
+        "Unzulässige Übergänge abgelehnt",
+        "Kill-Switch"
+      ]
+    },
+    {
+      "id": "AKL-M040-03",
+      "ms": "AKL-M040",
+      "status": "open",
+      "prio": "P0",
+      "deps": [
+        "AKL-M040-02",
+        "AKL-M080-01"
+      ],
+      "title": "Discovery (UDP) gegen synthetischen Controller",
+      "accept": [
+        "synthetic_verified"
+      ]
+    },
+    {
+      "id": "AKL-M040-04",
+      "ms": "AKL-M040",
+      "status": "open",
+      "prio": "P0",
+      "deps": [
+        "AKL-M040-03"
+      ],
+      "title": "Adoption, Credential-Rotation, Keepalive, Reconnect (synthetisch)",
+      "accept": [
+        "synthetic_verified inkl. Restart"
+      ]
+    },
+    {
+      "id": "AKL-M040-05",
+      "ms": "AKL-M040",
+      "status": "blocked",
+      "prio": "P0",
+      "deps": [
+        "AKL-M040-04",
+        "AKL-M030-04",
+        "AKL-M000-06"
+      ],
+      "title": "Nativer Akzeptanztest Adoption (autorisierte Umgebung) – blockiert: keine Testumgebung (Q-003)",
+      "accept": [
+        "native_verified-Nachweis gemäß MATRIX.md"
+      ]
+    },
+    {
+      "id": "AKL-M040-06",
+      "ms": "AKL-M040",
+      "status": "open",
+      "prio": "P1",
+      "deps": [
+        "AKL-M040-02",
+        "AKL-M020-03"
+      ],
+      "title": "UI Geräte: Profile, Zustand, Evidenz, Recovery-Assistent",
+      "accept": [
+        "Echtzeit per SSE",
+        "keine vorgetäuschten Zustände"
+      ]
+    },
+    {
+      "id": "AKL-M050-01",
+      "ms": "AKL-M050",
+      "status": "open",
+      "prio": "P1",
+      "deps": [
+        "AKL-M040-04"
+      ],
+      "title": "Lesender Kamera-Import (Integration API), Eligibility, Scoping",
+      "accept": [
+        "Nur lesend",
+        "ungültiges Inventar → sicher deaktiviert"
+      ]
+    },
+    {
+      "id": "AKL-M050-02",
+      "ms": "AKL-M050",
+      "status": "open",
+      "prio": "P1",
+      "deps": [
+        "AKL-M050-01"
+      ],
+      "title": "UI Kameras (Tabelle/Kacheln, Freigabe pro Kamera/Gruppe)",
+      "accept": [
+        "Änderungen nur lokal"
+      ]
+    },
+    {
+      "id": "AKL-M060-01",
+      "ms": "AKL-M060",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M010-03"
+      ],
+      "title": "Persistente Job-Queue mit Zuständen, Idempotenz, Backoff, Dead-Letter",
+      "accept": [
+        "Crash-Recovery-Test",
+        "uncertain-Zustand"
+      ]
+    },
+    {
+      "id": "AKL-M060-02",
+      "ms": "AKL-M060",
+      "status": "done",
+      "prio": "P0",
+      "deps": [],
+      "title": "Provider-Abstraktion (Rollen, Fähigkeiten, Limits) + SSRF-Schutz",
+      "accept": [
+        "SSRF-Negativtests",
+        "Fähigkeiten pro Modell explizit geprüft, nicht angenommen"
+      ]
+    },
+    {
+      "id": "AKL-M060-03",
+      "ms": "AKL-M060",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M060-01"
+      ],
+      "title": "Rate-/Kostenlimits (Start: 12 Jobs/h global), Medienlimits",
+      "accept": [
+        "Limit dauerhaft über Neustart"
+      ]
+    },
+    {
+      "id": "AKL-M060-04",
+      "ms": "AKL-M060",
+      "status": "in_progress",
+      "prio": "P1",
+      "deps": [
+        "AKL-M060-01",
+        "AKL-M060-02"
+      ],
+      "title": "UI KI-Modelle + Verarbeitung (fertig; aggregierte Fehlerrate/Latenz-Statistik offen)",
+      "accept": [
+        "Latenz/Fehlerrate aus echten Messungen"
+      ]
+    },
+    {
+      "id": "AKL-M060-05",
+      "ms": "AKL-M060",
+      "status": "done",
+      "prio": "P0",
+      "deps": [
+        "AKL-M060-02"
+      ],
+      "title": "Provider Ollama (lokal) – erster Vision-Provider (gemessen: Ollama 0.12.6, granite3.2-vision)",
+      "accept": [
+        "Testaufruf mit synthetischem Bild",
+        "Latenz/Fehler gemessen",
+        "keine Bilder verlassen das LAN"
+      ]
+    },
+    {
+      "id": "AKL-M060-06",
+      "ms": "AKL-M060",
+      "status": "in_progress",
+      "prio": "P1",
+      "deps": [
+        "AKL-M060-02"
+      ],
+      "title": "Provider OpenAI-kompatibel lokal (Mock-Contract fertig; Messung mit echtem Server offen)",
+      "accept": [
+        "Contract-Test gegen lokalen Mock",
+        "Bild-Input-Fähigkeit pro Modell geprüft"
+      ]
+    },
+    {
+      "id": "AKL-M060-07",
+      "ms": "AKL-M060",
+      "status": "open",
+      "prio": "P2",
+      "deps": [
+        "AKL-M060-02",
+        "AKL-M060-03"
+      ],
+      "title": "Provider OpenAI Responses (Cloud, Opt-in, store=false)",
+      "accept": [
+        "Nur nach Kostenfreigabe getestet",
+        "Opt-in pro Kamera",
+        "Kostenlimit greift"
+      ]
+    },
+    {
+      "id": "AKL-M060-08",
+      "ms": "AKL-M060",
+      "status": "blocked",
+      "prio": "P3",
+      "deps": [
+        "AKL-M060-02"
+      ],
+      "title": "Weitere Cloud-Provider – Anbieter noch zu benennen (Q-013)",
+      "accept": [
+        "Anbieter festgelegt",
+        "eigener Contract-Test"
+      ]
+    },
+    {
+      "id": "AKL-M070-01",
+      "ms": "AKL-M070",
+      "status": "open",
+      "prio": "P0",
+      "deps": [
+        "AKL-M060-03",
+        "AKL-M040-04"
+      ],
+      "title": "Caption-Callback-Vertrag (synthetisch) + Readback-Prüfung",
+      "accept": [
+        "Status http_accepted ≠ persisted"
+      ]
+    },
+    {
+      "id": "AKL-M070-02",
+      "ms": "AKL-M070",
+      "status": "blocked",
+      "prio": "P0",
+      "deps": [
+        "AKL-M070-01",
+        "AKL-M040-05"
+      ],
+      "title": "Native Ereignisbeschreibung on-demand/automatisch (autorisiert) – blockiert: keine Testumgebung (Q-003)",
+      "accept": [
+        "native_verified pro Version und Kamera"
+      ]
+    },
+    {
+      "id": "AKL-M080-01",
+      "ms": "AKL-M080",
+      "status": "open",
+      "prio": "P0",
+      "deps": [],
+      "title": "Netzwerkmodi bewerten (bridge/host/macvlan) auf Linux-VM und x86_64-NAS",
+      "accept": [
+        "Messbarer Test pro Modus",
+        "Empfehlung in NETWORKING.md"
+      ]
+    },
+    {
+      "id": "AKL-M080-02",
+      "ms": "AKL-M080",
+      "status": "open",
+      "prio": "P1",
+      "deps": [
+        "AKL-M010-04"
+      ],
+      "title": "Portainer-Stack testen",
+      "accept": [
+        "Deployment-Protokoll"
+      ]
+    },
+    {
+      "id": "AKL-M080-03",
+      "ms": "AKL-M080",
+      "status": "open",
+      "prio": "P3",
+      "deps": [
+        "AKL-M010-04"
+      ],
+      "title": "ARM64-Image bauen und testen (keine Zielplattform, nachrangig)",
+      "accept": [
+        "Smoke-Test auf arm64"
+      ]
+    },
+    {
+      "id": "AKL-M080-04",
+      "ms": "AKL-M080",
+      "status": "done",
+      "prio": "P1",
+      "deps": [
+        "AKL-M010-03"
+      ],
+      "title": "Backup/Restore + Wiederherstellungsprobe (Upgrade/Rollback-Doku vorhanden)",
+      "accept": [
+        "Restore-Test automatisiert"
+      ]
+    },
+    {
+      "id": "AKL-M080-05",
+      "ms": "AKL-M080",
+      "status": "open",
+      "prio": "P2",
+      "deps": [
+        "AKL-M070-02"
+      ],
+      "title": "72-h-Endurance- und Lasttest",
+      "accept": [
+        "Bericht mit Metriken"
+      ]
+    },
+    {
+      "id": "AKL-M080-06",
+      "ms": "AKL-M080",
+      "status": "open",
+      "prio": "P1",
+      "deps": [
+        "AKL-M060-05"
+      ],
+      "title": "GPU-Betrieb: Compose-Profil Ollama + NVIDIA (<12 GB VRAM), Intel/AMD bewerten",
+      "accept": [
+        "Modellempfehlung für <12 GB gemessen",
+        "Betrieb ohne GPU weiterhin möglich",
+        "Intel/AMD-Ergebnis dokumentiert"
+      ]
+    },
+    {
+      "id": "AKL-M090-01",
+      "ms": "AKL-M090",
+      "status": "open",
+      "prio": "P2",
+      "deps": [
+        "AKL-M030-03"
+      ],
+      "title": "Such-Vertrag klären (CLIP vs. E5) – needs_evidence",
+      "accept": [
+        "Testplan + Ergebnis"
+      ]
+    },
+    {
+      "id": "AKL-M100-01",
+      "ms": "AKL-M100",
+      "status": "open",
+      "prio": "P3",
+      "deps": [
+        "AKL-M070-02"
+      ],
+      "title": "AI Alerts, STT, LPR, Gesicht, Enhancement – je eigenes Issue mit DSFA",
+      "accept": [
+        "Datenschutzprüfung pro Funktion"
+      ]
+    },
+    {
+      "id": "AKL-M100-02",
+      "ms": "AKL-M100",
+      "status": "open",
+      "prio": "P3",
+      "deps": [
+        "AKL-M060-02"
+      ],
+      "title": "Coral Edge TPU als Objekterkennungs-Backend (TFLite, kein VLM)",
+      "accept": [
+        "Rolle object_detection, nicht caption",
+        "Messung Latenz/Genauigkeit mit künstlichen Daten"
+      ]
+    },
+    {
+      "id": "AKL-M110-01",
+      "ms": "AKL-M110",
+      "status": "open",
+      "prio": "P3",
+      "deps": [
+        "AKL-M040-05"
+      ],
+      "title": "AI-Port-Profil: eigene Identität, Pairing-Vertrag, Streams",
+      "accept": [
+        "Getrennt von ai_key (Test)"
+      ]
+    },
+    {
+      "id": "AKL-M120-01",
+      "ms": "AKL-M120",
+      "status": "open",
+      "prio": "P2",
+      "deps": [
+        "AKL-M000-05"
+      ],
+      "title": "Stable-Release-Prozess, GHCR nur nach manueller Freigabe",
+      "accept": [
+        "Kein automatisches Publish"
+      ]
+    },
+    {
+      "id": "AKL-M120-02",
+      "ms": "AKL-M120",
+      "status": "open",
+      "prio": "P2",
+      "deps": [],
+      "title": "Lizenzinventur Abhängigkeiten (cargo-deny, license-checker)",
+      "accept": [
+        "CI-Prüfung"
+      ]
+    }
   ]
 }

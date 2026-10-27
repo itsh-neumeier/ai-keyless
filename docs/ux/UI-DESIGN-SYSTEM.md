@@ -21,12 +21,12 @@ Name/Logo „AI-Keyless“ verhindern Verwechslung mit einem Herstellerprodukt.
 ```text
 Hauptbereich                      Admin
 ├─ Übersicht        (M010 ✓)      ├─ System         (M010 ✓, Über/Unofficial)
-├─ Geräte           (M040)        └─ Einstellungen  (M020, Theme/Sprache ✓)
+├─ Geräte           (Profile + Kompatibilitätsmatrix ✓; Lifecycle M040)        └─ Einstellungen  (M020, Theme/Sprache ✓)
 ├─ Kameras          (M050)
 ├─ Erkennungen      (M070)
 ├─ Suche            (M090)
-├─ KI-Modelle       (M060)
-├─ Verarbeitung     (M060)
+├─ KI-Modelle       (Provider, Tests ✓ M060)
+├─ Verarbeitung     (Queue, Limit, Aktionen ✓ M060)
 └─ Alarmierung      (M100)
 ```
 
@@ -87,7 +87,13 @@ Tailwind-Utilities: `bg-surface`, `text-muted`, `border-line`, `bg-ok-soft text-
 | StatusChip (ok/warn/danger/neutral/accent) | `StatusChip.svelte`, `tone.ts` | ✓ |
 | Platzhalter für nicht implementierte Bereiche | `Placeholder.svelte` | ✓ |
 | Skeleton (Ladezustand) | inline `animate-pulse` | ✓ (Komponente M020) |
-| Button, Input, Select, Switch, Tabs, Drawer, Dialog, Toast, Menu, DataTable, CameraTile | – | M020 |
+| Button (primary/secondary/ghost, busy) | `Button.svelte` | ✓ |
+| TextField (Label, Hinweis, `aria-describedby`) | `TextField.svelte` | ✓ |
+| FormError (`role=alert`) | `FormError.svelte` | ✓ |
+| Einrichtungs-/Anmeldemaske | `AuthScreen.svelte` | ✓ |
+| ConfirmButton (zweistufige Bestätigung) | `ConfirmButton.svelte` | ✓ (bis Dialog) |
+| Benutzerverwaltung | `UsersSection.svelte` | ✓ |
+| Select, Switch, Tabs, Drawer, Dialog, Toast, Menu, DataTable, CameraTile | – | M020-03 |
 
 ## 6. Zustandsdesign
 
@@ -109,7 +115,7 @@ Regel: Wenn die Live-Verbindung fehlt, werden zuvor empfangene Gerätezustände 
   `aria-expanded` am Einklapp-Button, Tabellen mit `scope`, `prefers-reduced-motion` respektiert.
 - Kontrast: Text-Tokens ≥ 4.5:1 auf Surface (Dark `#e7e9ee` auf `#17191d`, Light `#1b1d22` auf `#fff`);
   Audit mit Werkzeug in M020 (AKL-M020-06).
-- Responsiv: keine horizontale Seiten-Scrollbar (mit Playwright bei 390 px geprüft); breite Tabellen scrollen in ihrem Container.
+- Responsiv: keine horizontale Seiten-Scrollbar (E2E-Test bei 390 px für alle Seiten); breite Tabellen scrollen in ihrem Container. Der Container ist immer `relative overflow-x-auto`, sonst entkommen absolut positionierte Elemente (z. B. `sr-only`-Beschriftungen) dem Clipping und verbreitern die Seite.
 
 ## 8. Demo-/Mock-Modus
 

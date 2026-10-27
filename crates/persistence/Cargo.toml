@@ -4,15 +4,28 @@ description = "AI-Keyless Persistenz: SQLx/PostgreSQL, versionierte Migrationen"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
 publish.workspace = true
 
 [dependencies]
 akl-core.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 sqlx.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
+uuid.workspace = true
+
+[features]
+# Hilfen für Tests anderer Crates (eigenes Schema pro Test).
+testing = []
 
 [dev-dependencies]
+# Eigene Testhilfen auch in den Integrationstests dieses Crates aktivieren.
+akl-persistence = { path = ".", features = ["testing"] }
+chrono.workspace = true
+serde_json.workspace = true
 tokio.workspace = true
 
 [lints]

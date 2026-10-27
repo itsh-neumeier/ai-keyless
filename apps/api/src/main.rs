@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use akl_api::{AppState, app, config::Config};
+use akl_api::{AppState, app, auth, config::Config, crypto};
 use akl_persistence::Database;
 use tracing_subscriber::{EnvFilter, fmt};
 
@@ -17,6 +17,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         });
     }
+    if std::env::args().nth(1).as_deref() == Some("setup-token") {
+        std::process::exit(match issue_setup_token(&config).await {
+            Ok(()) => 0,
+            Err(err) => {
+                eprintln!("Fehler: {err}");
+                1
+            }
+        });
+    }
     init_tracing(config.log_json);
     tracing::info!(
         ?config,
@@ -27,6 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(url) => {
             let db = Database::connect_lazy(url)?;
             tokio::spawn(migrate_with_retry(db.clone()));
+            tokio::spawn(cleanup_sessions(db.clone()));
             Some(db)
         }
         None => {
@@ -35,13 +45,68 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let router = app(AppState { db }, config.web_dir.as_deref());
+    let mut state = AppState::new(db, config.cookie_secure);
+    state.provider_policy = akl_providers::NetworkPolicy {
+        allow_loopback: config.provider_allow_loopback,
+        allow_private: config.provider_allow_private,
+        allowed_hosts: config.provider_allowed_hosts.clone(),
+    };
+    state.provider_timeout = Duration::from_secs(config.provider_timeout_secs);
+    state.secrets_dir = config.secrets_dir.clone();
+    state.jobs_per_hour = config.jobs_per_hour;
+    if let Some(db) = state.db.clone() {
+        tracing::info!(
+            jobs_per_hour = state.jobs_per_hour,
+            "Verarbeitungs-Worker gestartet"
+        );
+        tokio::spawn(akl_api::worker::Worker::new(state.clone(), db).run());
+    }
+    let router = app(state, config.web_dir.as_deref());
     let listener = tokio::net::TcpListener::bind(config.bind).await?;
     tracing::info!(addr = %config.bind, "lauscht");
     axum::serve(listener, router)
         .with_graceful_shutdown(shutdown_signal())
         .await?;
     Ok(())
+}
+
+/// Gibt ein Einrichtungs-Token auf stdout aus (nicht ins Log). Nur möglich,
+/// solange noch kein Konto existiert; ältere offene Tokens werden ungültig.
+async fn issue_setup_token(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
+    let url = config
+        .database_url
+        .as_deref()
+        .ok_or("AKL_DATABASE_URL bzw. AKL_DATABASE_URL_FILE ist nicht gesetzt")?;
+    let db = Database::connect_lazy(url)?;
+    db.migrate().await?;
+    if db.user_count().await? > 0 {
+        return Err("Einrichtung bereits abgeschlossen – es existiert schon ein Konto".into());
+    }
+    let token = crypto::random_token();
+    db.replace_setup_token(
+        &crypto::token_hash(&token),
+        chrono::Utc::now() + auth::SETUP_TOKEN_TTL,
+    )
+    .await?;
+    println!(
+        "Einrichtungs-Token (einmalig, {} Minuten gültig):",
+        auth::SETUP_TOKEN_TTL.num_minutes()
+    );
+    println!("{token}");
+    Ok(())
+}
+
+/// Entfernt abgelaufene Sitzungen stündlich.
+async fn cleanup_sessions(db: Database) {
+    let mut interval = tokio::time::interval(Duration::from_secs(3600));
+    loop {
+        interval.tick().await;
+        match db.delete_expired_sessions().await {
+            Ok(n) if n > 0 => tracing::info!(removed = n, "abgelaufene Sitzungen entfernt"),
+            Ok(_) => {}
+            Err(err) => tracing::debug!(error = %err, "Sitzungsbereinigung übersprungen"),
+        }
+    }
 }
 
 async fn healthcheck(port: u16) -> Result<(), Box<dyn std::error::Error>> {

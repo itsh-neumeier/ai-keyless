@@ -5,6 +5,7 @@ const valid = {
 	service: 'ai-keyless',
 	version: '0.1.0',
 	unofficial: true,
+	source_url: 'https://github.com/itsh-neumeier/ai-keyless',
 	database: { status: 'not_configured', schema_version: null },
 	devices: [
 		{ profile: 'ai_key', state: null, lifecycle_evidence: 'planned' },
@@ -27,6 +28,11 @@ describe('parseSystemStatus', () => {
 
 	it('lehnt Antworten ohne Inoffiziell-Kennzeichnung ab', () => {
 		expect(() => parseSystemStatus({ ...valid, unofficial: false })).toThrow();
+	});
+
+	it('verlangt eine https-Quellcode-URL', () => {
+		expect(() => parseSystemStatus({ ...valid, source_url: 'javascript:alert(1)' })).toThrow();
+		expect(() => parseSystemStatus({ ...valid, source_url: undefined })).toThrow();
 	});
 
 	it('lehnt Nicht-Objekte ab', () => {
