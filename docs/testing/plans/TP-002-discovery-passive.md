@@ -6,14 +6,14 @@
 | Backlog-Issue | AKL-M030-03 (#10), Vorbereitung AKL-M040-03 (#5) |
 | Ziel | Prüfen, ob und wie die UNVR Discovery-Anfragen ins LAN sendet; Hypothesen DISC-H01…H04 (`tests/contracts/discovery/hypotheses.json`) bestätigen oder widerlegen |
 | Erwartete Evidenzstufe danach | Für die **Anfrageseite** der beobachteten Version: bestätigt/widerlegt (Beobachtung, kein Fähigkeitsnachweis). Kein `native_verified` für AI-Keyless (es antwortet nicht). |
-| Status | **Entwurf – Freigabe erforderlich** |
-| Freigabe (Name, Datum) | — |
+| Status | **freigegeben**, Lauf 1 gestartet 2026-10-27 |
+| Freigabe (Name, Datum) | Projektverantwortlicher, 2026-10-27 (Chat: „Freigabe hast du“) |
 
 ## Umgebung
 
 | Element | Wert |
 |---|---|
-| Konsole | UNVR 192.168.10.181, Protect/UniFi OS: nach dem Update auf 7.3.70 **exakt ablesen und hier eintragen** |
+| Konsole | UNVR 192.168.10.181, **UniFi OS 6.0.11**, **Protect 7.2.105** (Update auf 7.3.70 angeboten, noch nicht eingespielt), 8 × G5 Turret Ultra FW 5.5.31 – abgelesen vom Projektverantwortlichen 2026-10-27 |
 | PC | Windows 11, 192.168.10.160/24 (gleiches Segment wie die UNVR) |
 | Werkzeug | `scripts/discovery-listen.ps1` (nur Empfang, sendet nichts) |
 
