@@ -36,6 +36,10 @@ Speicher, Neustart setzt zurück). Alle Anmelde- und Kontoereignisse landen in `
 - Container: nonroot, read-only Root-FS, `cap_drop: ALL`, `no-new-privileges`, Healthcheck
   (`ai-keyless-api healthcheck`).
 
+## Lab auf dem PC (UNVR-Tests, GPU)
+
+Siehe `LAB-SETUP.md` und Overlay `deploy/compose/compose.lab.yaml` (Ollama mit NVIDIA-GPU).
+
 ## KI-Provider (Modelle)
 
 Unter *KI-Modelle* legen Administratoren Provider an (Typ Ollama oder OpenAI-kompatibel), testen
