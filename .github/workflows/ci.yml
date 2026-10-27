@@ -99,6 +99,8 @@ jobs:
         run: docker build -f deploy/docker/Dockerfile -t ai-keyless:dev .
       - name: Compose-Smoke-Test
         run: scripts/smoke-compose.sh
+      - name: Netzwerk-Lab (host/bridge/macvlan, synthetisch)
+        run: sudo scripts/netlab.sh | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: tests/e2e/package.json
