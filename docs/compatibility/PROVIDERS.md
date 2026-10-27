@@ -19,8 +19,8 @@
 | 2026-10-26 | Mock (Ollama-/OpenAI-Protokoll) | – | – | Format, Fehlerfälle, SSRF-Schutz | – | `synthetic_verified` |
 | 2026-10-26 | Ollama 0.12.6 (Docker, `ollama/ollama:0.12.6`) | `moondream` (latest) | CPU, Cloud-Container | ✗ leere Antwort bei `/api/chat` und `/api/generate`, auch bei 384×384 | 0,1–16 s | `unsupported` (mit dieser Ollama-Version) |
 | 2026-10-26 | Ollama 0.12.6 (Docker) | `granite3.2-vision` (latest, 2B) | CPU, Cloud-Container | ✓ „Red“ (64×64 und 384×384), über UI und API | Kaltstart 31,7 s, warm 0,4–4,7 s | getestet (synthetisch) |
-
 | 2026-10-27 | Ollama 0.12.6 (Lab-Overlay, Docker Desktop/WSL2) | `granite3.2-vision` (latest, 2B, `num_ctx` 16384 aus Modelfile) | NVIDIA T600 (4 GB, 2,7 GiB frei), teilweise ausgelagert (18/41 Schichten GPU) | ✓ „Red“ (64×64), über UI | erster Aufruf nach Laden 27 s bzw. >120 s (Zeitlimit, mit Flash-Attention + q8_0-KV), danach 458 ms | getestet (synthetisch); Kaltstartursache offen |
+| 2026-10-27 | Ollama 0.12.6 (Lab-Overlay, Docker Desktop/WSL2) | `granite3.2-vision-4k` (Variante von latest, `num_ctx` 4096) | NVIDIA T600 (4 GB, ~2,4 GiB frei), 20/41 Schichten GPU, `ollama ps`: 28 %/72 % CPU/GPU | ✓ „Red“ (64×64), direkt `/api/chat` (5 Läufe) | Kaltstart inkl. Laden 131,7 s (über dem 120-s-Limit der API), warm 0,49–0,66 s | getestet (synthetisch); kleiner Kontext bringt kaum mehr Schichten auf die GPU, Kaltstart bleibt Problem |
 
 Noch offen: Messung auf der Zielhardware (NVIDIA < 12 GB, Intel/AMD; Q-014), OpenAI-kompatible
 Server (vLLM, LM Studio, llama.cpp) mit echtem Modell, Qualitätsbewertung mit realistischen,

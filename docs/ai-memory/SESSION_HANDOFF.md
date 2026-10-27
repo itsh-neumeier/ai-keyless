@@ -1,5 +1,63 @@
 # Session-Handoff
 
+## Sitzung 2026-10-27, Nachmittag (Lab-PC)
+
+**PR-Kette – alle Draft, CI grün, nicht gemergt.** Merge-Reihenfolge (lokal geprüft: konfliktfrei auf `main`):
+#39 → #40 → #41 → #42 → #43 → #44 → #45 → #46. Konflikte wurden per Merge in die PR-Branches gelöst (kein Force-Push):
+`lab.ps1` (#40/#41), `DECISIONS.md` + Evidence-README (#39/#44), `Dockerfile` (#41/#42), danach #42 → #43 → #45 → #46 durchgereicht.
+Kombinierter Endstand: Rust fmt/clippy 0 Befunde, **109 Tests** grün (mit PostgreSQL 17), Web format/lint/check/20 Tests/Build grün, Image baut.
+Basis-Branches: #43 → #42, #45 → #43, #46 → #45 – nach jedem Merge die Basis des Nachfolgers auf `main` umstellen.
+
+| PR | Inhalt |
+|---|---|
+| #44 | Discovery-Fixtures + Codec (`protect-compat/discovery.rs`), TP-002 (Ergebnis: UNVR sendet `01 00 00 00` an UDP 10001), ADR-005 |
+| #45 | AKL-M080-04b: Geräteidentitäten in Backup/Restore (Probe lokal + CI grün) |
+| #46 | AKL-M040-06 (#8): Geräte-UI mit Kill-Switch und Verlauf, Echtzeit über SSE-Status, E2E in CI grün |
+
+**Wichtige Grenze dieser Sitzung:** Zweimal hat ein Sicherheitsfilter Antworten gestoppt (Firmware-Analyse, danach
+Discovery-/Adoptions-Arbeit). Claude hat daraufhin **Firmware-Analyse sowie Discovery-Antwort/Adoption (#5, #6) in dieser
+Sitzung eingestellt** – trotz Freigabe (ADR-005). Firmware-Dateien liegen ungenutzt unter `D:\ai-keyless-firmware\`
+(nicht im Repo). TP-002 Lauf 3 (mit Zieladresse) lief passiv, wurde nicht ausgewertet (Rohlog `%TEMP%\akl-tp002-lauf3.log`).
+
+**Umgebung:** Ethernet-Profil „Privat“, Firewall-Regel „Windows PowerShell (Privat, AI-Keyless TP-002)“ bleibt (Entscheidung).
+`python3` in Git Bash = Store-Platzhalter → für Skripte Shim auf `%LOCALAPPDATA%\Programs\Python\Python313\python.exe`.
+WSL-VM-Speicher bei Bedarf freigeben: `docker run --rm --privileged --pid host alpine sh -c "echo 3 > /proc/sys/vm/drop_caches"`.
+
+**Nächstes (ohne Protokollbezug):** Reviews/Merges der Kette; AKL-M020-06 (a11y-Audit), M020-07 (CSP ohne `unsafe-inline`),
+M010-07 (OpenAPI aus Rust-Typen), M020-03 (Komponentenbibliothek).
+
+## Sitzung 2026-10-27 (Lab-PC, TP-000)
+
+- Claude-Code-Sitzung auf dem Windows-PC (Remote Control); Lab-Stack (API, DB, Ollama) lief bereits, `/readyz` ready.
+- TP-000 durchgeführt, nur lesend, ohne Login: `docs/compatibility/evidence/2026-10-27-tp000-umgebung.md`.
+  Protect 7.2.105 / UniFi OS 5.1.33 / 8 × G5 Turret Ultra FW 5.5.31 (vom Projektverantwortlichen aus der UI abgelesen).
+- T600-Messung `granite3.2-vision-4k`: 20/41 Schichten GPU, Kaltstart 131,7 s (> API-Limit 120 s), warm 0,49–0,66 s → `PROVIDERS.md`.
+- Coral: `usbipd` hängt `18d1:9302` an WSL, im privilegierten Container sichtbar; kein Modelltest.
+- Diese Sitzung ist ab jetzt Hauptsitzung (Cloud-Sitzung beendet). `gh` 2.103.3 per winget installiert, angemeldet.
+- **Entschieden (DECISIONS):** Protect-Update auf 7.3.70 vor TP-001 (Projektverantwortlicher führt durch, danach Versionen neu ablesen);
+  TP-001 im Produktivnetz mit Auflagen; Kaltstart: keep_alive + Warm-up im Lab **und** konfigurierbares Provider-Zeitlimit.
+- Nächste Schritte: Kaltstart-Umsetzung, dann #2 (Netzwerkmodi, Plan im Issue-Kommentar), dann #3/#4.
+
+**Fortsetzung (gleiche Sitzung) – offene PRs, alle Draft, Merge nach Freigabe:**
+
+| PR | Inhalt | Tests |
+|---|---|---|
+| #39 | TP-000-Nachweis, Entscheidungen, AI-Memory | Doku |
+| #40 | AKL-M080-06: `OLLAMA_KEEP_ALIVE=-1`, `lab.ps1 warm`, Lab-Zeitlimit 300 s | Lab-PC: warm → „Red“, UNTIL Forever |
+| #41 | AKL-M080-01: `akl-netprobe` im Image, `scripts/netlab.sh`, `lab.ps1 netlab`, CI-Schritt, `NETWORKING.md` | Lab-PC 3× + CI grün |
+| #42 | AKL-M040-01 (#3): `crates/device-lifecycle` Identität, `AKL_DEVICE_DIR`, Volume `akl-devices` | 9 Unit-Tests, Workspace grün |
+| #43 | AKL-M040-02 (#4): Lifecycle-Service, Transition-Log, Kill-Switch, `/api/v1/devices` – **Basis #42** | DB-Tests gegen PostgreSQL 17 grün |
+
+- Netzwerk-Ergebnis: host/macvlan ✓; bridge ungeeignet (Docker Desktop kein Broadcast; Linux nur über `docker-proxy`
+  mit Gateway 172.18.0.1 als Absender). Echtes LAN unter Docker Desktop: `needs_evidence` (Issue #2 Schritt 3, eigene Freigabe).
+- Entwicklung auf dem PC: kein lokales Rust; `cargo` läuft in `rust:1.97-slim-bookworm` mit Volumes `akl-cargo-target`/`akl-cargo-registry`,
+  DB-Tests gegen Wegwerf-`postgres:17-alpine` im Docker-Netz `akl-test` (`AKL_TEST_DATABASE_URL=postgres://akl:test@akl-testdb:5432/akl`).
+  Python 3.13 per winget installiert.
+- Auto-Mode blockiert `git push --force*` und `gh issue create` → Folge-Issue „Backup der Geräteidentitäten“ steht nur im PR-Text von #42.
+- Lab-Stack: API zuletzt mit `main`-Overlay neu erstellt → Zeitlimit wieder 120 s, bis #40 gemergt ist; Ollama hält das Modell weiter (keep_alive).
+- Nächstes: Reviews/Merges #39–#43; dann AKL-M030-03 (Fixtures) bzw. AKL-M040-03 (Discovery gegen Simulator, braucht #41-Ergebnis);
+  TP-001 erst nach Protect-Update 7.3.70 und eigener Freigabe.
+
 ## Sitzung 2026-10-27 (Windows-Lab)
 
 - PR #37 gemergt (Windows-Lab-Doku, `.gitattributes`, TLS-Pinning, `akl-protect-sim`, TP-000 freigegeben).
