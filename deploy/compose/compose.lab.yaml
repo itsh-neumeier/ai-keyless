@@ -17,6 +17,13 @@ services:
       # Ein Modell gleichzeitig im VRAM (T600: 4 GB).
       OLLAMA_MAX_LOADED_MODELS: "1"
       OLLAMA_NUM_PARALLEL: "1"
+      # Kontext begrenzen: Ollama wählte auf der T600 16384 Token; der KV-Cache
+      # dafür passte nicht mehr in 4 GB VRAM → Modell lief zu 100 % auf der CPU
+      # (gemessen 2026-10-27, ~27 s je Bildtest). Flash-Attention + q8_0-Cache
+      # halbieren den KV-Speicher zusätzlich.
+      OLLAMA_CONTEXT_LENGTH: "${AKL_OLLAMA_CONTEXT:-8192}"
+      OLLAMA_FLASH_ATTENTION: "1"
+      OLLAMA_KV_CACHE_TYPE: q8_0
     volumes:
       - akl-ollama:/root/.ollama
     deploy:
