@@ -66,16 +66,20 @@ async function audit(page: Page, label: string): Promise<string[]> {
 	);
 }
 
-test('Barrierefreiheit: alle Seiten hell und dunkel ohne WCAG-2.1-AA-Verstöße', async ({
-	page
-}) => {
+test('Barrierefreiheit und CSP: alle Seiten hell und dunkel ohne Verstöße', async ({ page }) => {
 	const found: string[] = [];
+	// AKL-M020-07: Die strikte CSP (ohne 'unsafe-inline') darf nichts blockieren.
+	page.on('console', (msg) => {
+		if (msg.text().includes('Content Security Policy')) found.push(`CSP: ${msg.text()}`);
+	});
 	for (const scheme of ['dark', 'light'] as const) {
 		await page.emulateMedia({ colorScheme: scheme });
 		// Anmeldebildschirm (abgemeldet).
 		await page.context().clearCookies();
 		await page.goto('/');
 		await expect(page.locator('#username')).toBeVisible();
+		// Theme-Skript (externe Datei) hat vor dem Rendern gegriffen.
+		await expect(page.locator('html')).toHaveAttribute('data-theme', scheme);
 		found.push(...(await audit(page, `login/${scheme}`)));
 
 		await login(page, ADMIN.user, ADMIN.pass);

@@ -116,7 +116,7 @@
 			>
 				<div
 					class="h-full rounded-full {usage >= 100 ? 'bg-warn' : 'bg-accent'}"
-					style="width: {usage}%"
+					style:width="{usage}%"
 				></div>
 			</div>
 			<p class="mt-3 text-xs text-faint">{t('processing.limitHint')}</p>

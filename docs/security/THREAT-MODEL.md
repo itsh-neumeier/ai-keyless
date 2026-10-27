@@ -37,15 +37,19 @@
 | T10 | E | Container-Ausbruch / Rechteausweitung | distroless, nonroot, `read_only`, `cap_drop: ALL`, `no-new-privileges` ✓ | ✓ (amd64 getestet) |
 | T11 | E | Netzwerkmodus host vergrößert Angriffsfläche | Nur Geräteschnittstelle im LAN, Admin-Port getrennt bindbar, Bewertung in NETWORKING.md | geplant M080 |
 | T12 | T | Manipulierte Callbacks/Ergebnisse an Protect | Idempotenz, Signatur-/Herkunftsprüfung je Vertrag, keine Erfolgsmeldung ohne Readback | geplant M070 |
-| T13 | S | Clickjacking/Content-Injection in UI | `X-Frame-Options: DENY`, CSP `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy: no-referrer` ✓ | ✓ |
+| T13 | S | Clickjacking/Content-Injection in UI | `X-Frame-Options: DENY`, CSP ohne `'unsafe-inline'` (Hashes, `frame-ancestors 'none'`, `object-src 'none'`), `nosniff`, `Referrer-Policy: no-referrer` ✓ | ✓ (M020-07) |
 | T14 | – | Rechtliches Risiko durch Geräteimitation/RE | ADR-002, nur autorisierte Systeme, keine Umgehung von Lizenzprüfungen | ✓ Prozess |
 
 Bekannte Restrisiken Authentifizierung: Die Drosselung ist pro Benutzername und im Speicher
 (ein Angreifer kann ein Konto kurzzeitig sperren; Neustart setzt Zähler zurück). Ohne TLS sind
 Passwörter im LAN mitlesbar – Betrieb im LAN nur hinter TLS-Proxy (docs/operations).
 
-Bekannte Abweichung: CSP erlaubt derzeit `'unsafe-inline'` für Skripte (Theme-Init-Snippet und
-SvelteKit-Bootstrap). Backlog AKL-M020-07: Hash-basierte CSP.
+CSP ohne `'unsafe-inline'` (AKL-M020-07, 2026-10-27): Das Theme-Init-Skript ist eine eigene Datei; die
+API berechnet beim Start die SHA-256-Hashes der Inline-Skripte aus `index.html` (SvelteKit-Bootstrap,
+ändert sich je Build) und der festen `style="…"`-Literale der gebauten Dateien (nur der SvelteKit-
+Routen-Ansager) und erlaubt genau diese (`script-src 'self' 'sha256-…'`, `style-src 'self'
+'unsafe-hashes' 'sha256-…'`). Zusätzlich `object-src 'none'`, `form-action 'self'`. Der E2E-Test lässt
+die CI bei jeder CSP-Meldung in der Browserkonsole scheitern.
 
 ## 4. Sicherer Rückweg
 

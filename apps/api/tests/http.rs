@@ -91,7 +91,11 @@ async fn unknown_api_route_is_404() {
 async fn spa_fallback_serves_index_but_not_for_api() {
     let dir = std::env::temp_dir().join(format!("akl-web-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
-    std::fs::write(dir.join("index.html"), "<!doctype html><title>AKL</title>").unwrap();
+    std::fs::write(
+        dir.join("index.html"),
+        "<!doctype html><title>AKL</title><script>boot()</script>",
+    )
+    .unwrap();
 
     let router = app(AppState::default(), Some(&dir));
     let res = router
@@ -100,7 +104,11 @@ async fn spa_fallback_serves_index_but_not_for_api() {
         .await
         .unwrap();
     assert_eq!(res.status().as_u16(), 200);
-    assert!(res.headers().contains_key("content-security-policy"));
+    let csp = res.headers()["content-security-policy"].to_str().unwrap();
+    // AKL-M020-07: Inline-Skripte nur per Hash, keine Inline-Styles.
+    assert!(!csp.contains("unsafe-inline"), "{csp}");
+    assert!(csp.contains("script-src 'self' 'sha256-"), "{csp}");
+    assert!(csp.contains("style-src 'self';"), "{csp}");
 
     let res = router
         .oneshot(Request::get("/api/v1/unknown").body(Body::empty()).unwrap())
