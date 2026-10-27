@@ -6,20 +6,11 @@
 		<meta name="color-scheme" content="dark light" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
 		<title>AI-Keyless</title>
-		<script>
-			// Theme vor dem ersten Rendern setzen, um Aufblitzen zu vermeiden.
-			try {
-				const t = localStorage.getItem('akl.theme');
-				const dark =
-					t === 'dark' || (t !== 'light' && !matchMedia('(prefers-color-scheme: light)').matches);
-				document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-			} catch {
-				/* Speicher nicht verfügbar: Dark bleibt Standard */
-			}
-		</script>
+		<!-- Blockierend im Kopf: Theme steht vor dem ersten Paint fest (kein Aufblitzen). -->
+		<script src="%sveltekit.assets%/theme-init.js"></script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">%sveltekit.body%</div>
+		<div class="akl-root">%sveltekit.body%</div>
 	</body>
 </html>

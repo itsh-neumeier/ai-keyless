@@ -81,6 +81,11 @@
 	--font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
 }
 
+/* Wurzel-Container aus app.html (statt style-Attribut, wegen CSP ohne 'unsafe-inline'). */
+.akl-root {
+	display: contents;
+}
+
 html {
 	background: var(--akl-bg);
 	color: var(--akl-text);

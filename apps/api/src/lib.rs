@@ -3,6 +3,7 @@
 pub mod auth;
 pub mod config;
 pub mod crypto;
+mod csp;
 mod devices;
 mod error;
 mod jobs;
@@ -109,11 +110,8 @@ pub fn app(state: AppState, web_dir: Option<&Path>) -> Router {
         ))
         .layer(SetResponseHeaderLayer::if_not_present(
             header::CONTENT_SECURITY_POLICY,
-            HeaderValue::from_static(
-                "default-src 'self'; script-src 'self' 'unsafe-inline'; \
-                 style-src 'self' 'unsafe-inline'; img-src 'self' data:; \
-                 connect-src 'self'; frame-ancestors 'none'; base-uri 'self'",
-            ),
+            // Nur Base64, Buchstaben und Satzzeichen – immer ein gültiger Headerwert.
+            HeaderValue::from_str(&csp::policy(web_dir)).expect("CSP ist ASCII"),
         ))
         .layer(PropagateRequestIdLayer::new(REQUEST_ID))
         .layer(
