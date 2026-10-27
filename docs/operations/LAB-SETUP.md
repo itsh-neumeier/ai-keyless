@@ -50,8 +50,8 @@ Standardmodell `granite3.2-vision:latest` → *Verbindung testen* → *Bildtest*
 in `docs/compatibility/PROVIDERS.md` eintragen (Zeile „NVIDIA T600“).
 
 **VRAM der T600 (gemessen 2026-10-27):** Von 4 GB sind neben dem Windows-Desktop nur ~2,7 GiB frei.
-`granite3.2-vision` setzt im Modelfile `num_ctx 16384`; damit landen nur 18 von 41 Schichten auf der GPU
-(Bildtest ~27 s). `OLLAMA_CONTEXT_LENGTH` greift dagegen nicht. Kleineren Kontext über eine Modellvariante:
+`granite3.2-vision` setzt im Modelfile `num_ctx 16384`; damit landen nur 18 von 41 Schichten auf der GPU.
+Gemessen: erster Bildtest nach dem Laden 27 s (einmal >120 s), danach 458 ms. `OLLAMA_CONTEXT_LENGTH` greift dagegen nicht. Kleineren Kontext über eine Modellvariante:
 
 ```powershell
 docker compose -f deploy/compose/compose.yaml -f deploy/compose/compose.lab.yaml exec ollama sh -c "printf 'FROM granite3.2-vision\nPARAMETER num_ctx 4096\n' > /tmp/Modelfile && ollama create granite3.2-vision-4k -f /tmp/Modelfile"

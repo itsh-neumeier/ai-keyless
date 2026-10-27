@@ -20,8 +20,9 @@ services:
       # Standardkontext für Modelle ohne eigene Vorgabe. Achtung: Modelle mit
       # num_ctx im Modelfile (z. B. granite3.2-vision: 16384) überschreiben das.
       # Gemessen 2026-10-27 auf der T600 (2,7 GiB frei): 16384 Token → nur 18/41
-      # Schichten auf der GPU; mit Flash-Attention + q8_0-KV lief der Bildtest
-      # in die 120-s-Zeitgrenze (ohne beides ~27 s). Beides daher nicht gesetzt;
+      # Schichten auf der GPU; erster Bildtest nach dem Laden mit Flash-Attention
+      # + q8_0-KV >120 s (Zeitlimit), ohne beides 27 s; warm 458 ms. Ursache des
+      # langsamen Erstaufrufs offen, FA/q8_0 vorerst nicht gesetzt;
       # kleineren Kontext per Modellvariante setzen (docs/operations/LAB-SETUP.md).
       OLLAMA_CONTEXT_LENGTH: "${AKL_OLLAMA_CONTEXT:-4096}"
     volumes:
