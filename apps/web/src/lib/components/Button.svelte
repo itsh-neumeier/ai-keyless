@@ -14,7 +14,7 @@
 	} & HTMLButtonAttributes = $props();
 
 	const styles = {
-		primary: 'bg-accent text-white hover:brightness-110',
+		primary: 'bg-accent text-on-accent hover:brightness-110',
 		secondary: 'border border-line bg-surface-2 text-fg hover:bg-surface-hover',
 		ghost: 'text-muted hover:bg-surface-hover hover:text-fg'
 	};

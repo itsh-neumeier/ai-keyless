@@ -68,6 +68,7 @@ Eine Lizenzinventur (z. B. `cargo deny check licenses`) ist Backlog **AKL-M120-0
 |---|---|---|
 | Rust: tokio, axum, tower-http, serde, sqlx, tracing | crates.io | MIT / Apache-2.0 |
 | Web: SvelteKit 3.1, Svelte 5, Vite 8, Tailwind CSS 4 | npm | MIT |
+| E2E (nur Test): `@axe-core/playwright` 4.13.0 inkl. `axe-core` | npm | MPL-2.0 (unverändert genutzt, nicht ausgeliefert) |
 | Container: postgres:17-alpine, distroless/cc-debian12 | Docker Hub / gcr.io | PostgreSQL / Apache-2.0 (+ Debian-Pakete) |
 
 ## 6. Eigene Assets

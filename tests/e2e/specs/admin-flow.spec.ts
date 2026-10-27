@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { startMockOllama } from './mock-ollama.ts';
 
@@ -50,6 +51,45 @@ test('Einrichtung nur mit gültigem Token, danach Übersicht ohne erfundene Zust
 	expect(cookie?.sameSite).toBe('Strict');
 });
 
+/** WCAG 2.1 A/AA (inkl. Farbkontrast) per axe; liefert lesbare Befunde je Element. */
+async function audit(page: Page, label: string): Promise<string[]> {
+	const result = await new AxeBuilder({ page })
+		.withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+		.analyze();
+	return result.violations.flatMap((v) =>
+		v.nodes.map((n) => {
+			const c = n.any.find((a) => a.id === 'color-contrast')?.data as
+				{ fgColor?: string; bgColor?: string; contrastRatio?: number } | undefined;
+			const detail = c ? ` [${c.fgColor} auf ${c.bgColor}, ${c.contrastRatio}:1]` : '';
+			return `${label}: ${v.id} (${v.impact}) ${n.target.join(' ')}${detail}`;
+		})
+	);
+}
+
+test('Barrierefreiheit: alle Seiten hell und dunkel ohne WCAG-2.1-AA-Verstöße', async ({
+	page
+}) => {
+	const found: string[] = [];
+	for (const scheme of ['dark', 'light'] as const) {
+		await page.emulateMedia({ colorScheme: scheme });
+		// Anmeldebildschirm (abgemeldet).
+		await page.context().clearCookies();
+		await page.goto('/');
+		await expect(page.locator('#username')).toBeVisible();
+		found.push(...(await audit(page, `login/${scheme}`)));
+
+		await login(page, ADMIN.user, ADMIN.pass);
+		for (const path of ['/', '/devices', '/models', '/processing', '/settings', '/system']) {
+			await page.goto(path);
+			await expect(page.locator('main')).toBeVisible();
+			// Kein 'networkidle' (SSE bleibt offen); Ladeplatzhalter abwarten.
+			await page.waitForTimeout(800);
+			found.push(...(await audit(page, `${path}/${scheme}`)));
+		}
+	}
+	expect(found, found.join('\n')).toEqual([]);
+});
+
 test('Rollen: Betrachter sieht keine Verwaltungsfunktionen', async ({ page }) => {
 	await login(page, ADMIN.user, ADMIN.pass);
 	await page.goto('/settings');
@@ -90,9 +130,7 @@ test('Rollen: Betrachter sieht keine Verwaltungsfunktionen', async ({ page }) =>
 	await expect(page.getByRole('alert')).toContainText('Benutzername oder Passwort falsch');
 });
 
-test('Provider: Sperre, Verbindung, Bildtest und Verarbeitung über die Queue', async ({
-	page
-}) => {
+test('Provider: Sperre, Verbindung, Bildtest und Verarbeitung über die Queue', async ({ page }) => {
 	const mock = await startMockOllama();
 	try {
 		await login(page, ADMIN.user, ADMIN.pass);
@@ -121,7 +159,9 @@ test('Provider: Sperre, Verbindung, Bildtest und Verarbeitung über die Queue', 
 		await page.goto('/processing');
 		await expect(async () => {
 			await page.getByRole('button', { name: 'Aktualisieren' }).click();
-			await expect(page.locator('tbody')).toContainText('Abgeschlossen', { timeout: 1000 });
+			await expect(page.locator('tbody')).toContainText('Abgeschlossen', {
+				timeout: 1000
+			});
 		}).toPass({ timeout: 30_000 });
 		await expect(page.locator('tbody')).toContainText('vision_probe');
 	} finally {
