@@ -10,10 +10,17 @@ Geräts gegenüber UniFi Protect **bewusst selbst**, unter folgenden Bedingungen
 
 1. Nutzung ausschließlich mit **eigenen** Geräten, Konten und Netzwerken (privater Betrieb).
 2. Keine Umgehung von Lizenzprüfungen, Kopierschutz, Zugriffssicherungen oder Cloud-Diensten des Herstellers.
-3. Kein Dekompilieren/Extrahieren von Firmware, Schlüsseln oder Modellen; nur Black-Box-Beobachtung
-   eigener Systeme und öffentlich dokumentierter Schnittstellen (ADR-002).
+3. ~~Kein Dekompilieren/Extrahieren von Firmware~~ – **geändert 2026-10-27 (ADR-005):** statische
+   Analyse öffentlich angebotener AI-Key-Firmware ist erlaubt; Schlüssel, Zugangsdaten und Modelle
+   werden weiterhin weder extrahiert noch verwendet, Firmware(-teile) nicht ins Repository übernommen.
 4. Keine Werbung mit Herstellermarken; durchgehende Kennzeichnung „inoffiziell · unabhängig“.
 5. Native Live-Tests nur nach freigegebenem Testplan (docs/testing/STRATEGY.md).
+
+## Ergänzung 2026-10-27: Firmware-Analyse und öffentliches Repository
+
+Der Projektverantwortliche hat die statische Firmware-Analyse freigegeben (ADR-005) und entschieden,
+das Repository **öffentlich** zu lassen. Er trägt das Restrisiko ausdrücklich auch dafür, dass aus der
+Analyse abgeleitete Erkenntnisse und Implementierungen öffentlich einsehbar sind.
 
 ## Geltungsgrenzen
 

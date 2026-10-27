@@ -6,6 +6,7 @@
 
 use std::{fmt, str::FromStr};
 
+pub mod discovery;
 pub mod tls;
 
 use akl_core::{DeviceProfileKind, EvidenceLevel};
