@@ -1,0 +1,8 @@
+# Einheitliche Zeilenenden, auch beim Klonen unter Windows (core.autocrlf):
+# Shell-Skripte und Container-Dateien müssen LF behalten, sonst brechen sie
+# in Bash/Docker mit "$'\r': command not found".
+* text=auto eol=lf
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.ico binary

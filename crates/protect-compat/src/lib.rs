@@ -6,6 +6,8 @@
 
 use std::{fmt, str::FromStr};
 
+pub mod tls;
+
 use akl_core::{DeviceProfileKind, EvidenceLevel};
 use serde::{Deserialize, Serialize};
 
