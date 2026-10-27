@@ -3,6 +3,7 @@
 pub mod auth;
 pub mod config;
 pub mod crypto;
+mod devices;
 mod error;
 mod jobs;
 mod providers;
@@ -41,8 +42,8 @@ pub struct AppState {
     pub provider_timeout: Duration,
     /// Verzeichnis, aus dem Provider-Secrets per Name gelesen werden.
     pub secrets_dir: PathBuf,
-    /// Speicher der Geräteidentitäten (`AKL_DEVICE_DIR`); `None`, wenn nicht konfiguriert.
-    pub identities: Option<akl_device_lifecycle::identity::IdentityStore>,
+    /// Geräteverwaltung; `None` ohne Datenbank oder Identitätsverzeichnis (`AKL_DEVICE_DIR`).
+    pub lifecycle: Option<akl_device_lifecycle::service::Lifecycle>,
     /// Globales, dauerhaftes Limit gestarteter Jobs pro rollierender Stunde.
     pub jobs_per_hour: i64,
     /// Weckt den Worker, sobald ein Job eingereiht wurde.
@@ -63,7 +64,7 @@ impl AppState {
             provider_policy: akl_providers::NetworkPolicy::default(),
             provider_timeout: Duration::from_secs(120),
             secrets_dir: PathBuf::from("/run/secrets"),
-            identities: None,
+            lifecycle: None,
             jobs_per_hour: DEFAULT_JOBS_PER_HOUR,
             job_signal: Arc::default(),
         }

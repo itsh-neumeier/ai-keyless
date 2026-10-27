@@ -115,6 +115,18 @@ Im Image `/var/lib/ai-keyless/devices` (Compose-Volume `akl-devices`, Eigentüme
 Je Profil ein Unterverzeichnis mit `identity.json` (Profilart, SHA-256-Fingerprint), `cert.pem` und
 `key.pem` (0600). Schlüssel stehen nie in der Datenbank, in Logs oder API-Antworten. Eine beschädigte
 oder vertauschte Identität wird beim Laden erkannt und **nicht** still ersetzt.
+
+## Geräteprofile und Kill-Switch
+
+Profile (`ai_key`, `ai_port`) legt ein Admin über `POST /api/v1/devices` an; dabei entsteht zuerst die
+Identität, dann das Profil (Zustand `unconfigured`). Zustände ändert nur der Lifecycle-Service; jeder
+Übergang wird mit Akteur, Grund und Korrelations-ID protokolliert (`/api/v1/devices/{id}/transitions`).
+Per API möglich sind nur der sichere Rückweg (`disable`) und dessen Aufhebung (`enable`).
+
+**Kill-Switch (Notaus):** `PUT /api/v1/devices/kill-switch {"active": true}` deaktiviert sofort alle
+Profile und blockiert Anlage und Reaktivierung, bis er wieder ausgeschaltet wird. Mit
+`AKL_DEVICE_KILL_SWITCH=true` ist er erzwungen und per API nicht abschaltbar (z. B. bei Verdacht auf
+Fehlverhalten gegenüber Protect).
 - **Wiederherstellung:** prüft die Prüfsumme (manipulierte/defekte Dumps werden abgelehnt), stoppt
   die API, ersetzt die Datenbank, startet die API und prüft Readiness und Schema-Version. Nur auf
   gleiche oder neuere AI-Keyless-Versionen wiederherstellen.

@@ -54,7 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     state.provider_timeout = Duration::from_secs(config.provider_timeout_secs);
     state.secrets_dir = config.secrets_dir.clone();
     state.jobs_per_hour = config.jobs_per_hour;
-    state.identities = match &config.device_dir {
+    let identities = match &config.device_dir {
         Some(dir) => match akl_device_lifecycle::identity::IdentityStore::open(dir) {
             Ok(store) => Some(store),
             Err(err) => {
@@ -67,6 +67,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             None
         }
     };
+    if let (Some(db), Some(store)) = (state.db.clone(), identities) {
+        let lifecycle =
+            akl_device_lifecycle::service::Lifecycle::new(db, store, config.device_kill_switch);
+        if config.device_kill_switch {
+            tracing::warn!("Kill-Switch per AKL_DEVICE_KILL_SWITCH erzwungen");
+            tokio::spawn(enforce_kill_switch(lifecycle.clone()));
+        }
+        state.lifecycle = Some(lifecycle);
+    }
     if let Some(db) = state.db.clone() {
         tracing::info!(
             jobs_per_hour = state.jobs_per_hour,
@@ -81,6 +90,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_graceful_shutdown(shutdown_signal())
         .await?;
     Ok(())
+}
+
+/// Gleicht den gespeicherten Kill-Switch an, sobald die Migrationen gelaufen
+/// sind. Bis dahin verhindert der Service Übergänge ohnehin.
+async fn enforce_kill_switch(lifecycle: akl_device_lifecycle::service::Lifecycle) {
+    let mut delay = Duration::from_secs(1);
+    loop {
+        match lifecycle.enforce_forced_kill_switch().await {
+            Ok(disabled) => {
+                tracing::warn!(
+                    disabled_profiles = disabled.len(),
+                    "Kill-Switch erzwungen und gespeichert"
+                );
+                return;
+            }
+            Err(err) => {
+                tracing::debug!(%err, "Kill-Switch noch nicht speicherbar, neuer Versuch");
+                tokio::time::sleep(delay).await;
+                delay = (delay * 2).min(Duration::from_secs(60));
+            }
+        }
+    }
 }
 
 /// Gibt ein Einrichtungs-Token auf stdout aus (nicht ins Log). Nur möglich,
