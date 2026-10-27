@@ -90,14 +90,24 @@ Secrets als Dateien auf dem Host bereitstellen (`AKL_SECRETS_DIR`). **Status: `p
 
 Logs: `docker compose logs api` (JSON, mit `correlation_id` aus `x-request-id`). Log-Level über `AKL_RUST_LOG`.
 
-## Backup / Restore (vorläufig, Automatisierung in AKL-M080-04)
+## Backup / Restore
 
 ```bash
-docker compose -f deploy/compose/compose.yaml exec -T db pg_dump -U akl -Fc akl > akl-$(date +%F).dump
-docker compose -f deploy/compose/compose.yaml exec -T db pg_restore -U akl -d akl --clean < akl-YYYY-MM-DD.dump
+scripts/backup.sh /pfad/zu/backups          # → akl-<UTC-Zeit>.dump + .json (Schema-Version, SHA-256)
+scripts/restore.sh /pfad/zu/backups/akl-20261027T001500Z.dump
 ```
 
-Secrets-Verzeichnis separat sichern. Wiederherstellungsprobe: **noch nicht durchgeführt**.
+- **Sicherung:** `pg_dump` im Custom-Format aus dem laufenden DB-Container (konsistenter
+  Snapshot), Metadaten mit Schema-Version und SHA-256. Dateien mit Modus 600, Verzeichnis 700.
+  Enthält Passwort- und Token-**Hashes**, Audit-Log und Konfiguration → wie ein Geheimnis behandeln.
+- **Nicht enthalten:** das Secret-Verzeichnis (`deploy/compose/secrets`) – separat sichern.
+- **Wiederherstellung:** prüft die Prüfsumme (manipulierte/defekte Dumps werden abgelehnt), stoppt
+  die API, ersetzt die Datenbank, startet die API und prüft Readiness und Schema-Version. Nur auf
+  gleiche oder neuere AI-Keyless-Versionen wiederherstellen.
+- Andere Projekt-/Dateinamen: `AKL_COMPOSE_PROJECT`, `AKL_COMPOSE_FILES`, `AKL_ADMIN_PORT`.
+- **Wiederherstellungsprobe:** `scripts/restore-test.sh` (auch in der CI): Daten anlegen → sichern →
+  Volumes löschen → manipulierte Sicherung muss scheitern → wiederherstellen → Anmeldung mit den
+  alten Konten. Ergebnis 2026-10-27: erfolgreich (lokal, Docker 29.9.2).
 
 ## Upgrade / Rollback
 

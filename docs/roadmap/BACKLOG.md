@@ -98,7 +98,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | AKL-M080-01 | Netzwerkmodi bewerten (bridge/host/macvlan) auf Linux-VM und x86_64-NAS | P0 | ⬜ offen | – | Messbarer Test pro Modus<br>Empfehlung in NETWORKING.md |
 | AKL-M080-02 | Portainer-Stack testen | P1 | ⬜ offen | AKL-M010-04 | Deployment-Protokoll |
 | AKL-M080-03 | ARM64-Image bauen und testen (keine Zielplattform, nachrangig) | P3 | ⬜ offen | AKL-M010-04 | Smoke-Test auf arm64 |
-| AKL-M080-04 | Backup/Restore + Upgrade/Rollback mit Wiederherstellungsprobe | P1 | ⬜ offen | AKL-M010-03 | Restore-Test automatisiert |
+| AKL-M080-04 | Backup/Restore + Wiederherstellungsprobe (Upgrade/Rollback-Doku vorhanden) | P1 | ✅ erledigt | AKL-M010-03 | Restore-Test automatisiert |
 | AKL-M080-05 | 72-h-Endurance- und Lasttest | P2 | ⬜ offen | AKL-M070-02 | Bericht mit Metriken |
 | AKL-M080-06 | GPU-Betrieb: Compose-Profil Ollama + NVIDIA (<12 GB VRAM), Intel/AMD bewerten | P1 | ⬜ offen | AKL-M060-05 | Modellempfehlung für <12 GB gemessen<br>Betrieb ohne GPU weiterhin möglich<br>Intel/AMD-Ergebnis dokumentiert |
 

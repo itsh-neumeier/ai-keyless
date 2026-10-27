@@ -683,12 +683,12 @@
     {
       "id": "AKL-M080-04",
       "ms": "AKL-M080",
-      "status": "open",
+      "status": "done",
       "prio": "P1",
       "deps": [
         "AKL-M010-03"
       ],
-      "title": "Backup/Restore + Upgrade/Rollback mit Wiederherstellungsprobe",
+      "title": "Backup/Restore + Wiederherstellungsprobe (Upgrade/Rollback-Doku vorhanden)",
       "accept": [
         "Restore-Test automatisiert"
       ]

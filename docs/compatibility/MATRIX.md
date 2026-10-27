@@ -21,6 +21,7 @@ ein echtes UniFi-Protect-System getestet.
 | Gerätezustandsautomat | `implemented` (Unit-Tests) | `crates/core/src/device.rs` – noch ohne Lifecycle-Anbindung |
 | Container linux/amd64 | `synthetic_verified` | Image-Build + Smoke-Test 2026-10-26 |
 | Container linux/arm64 | `planned` | AKL-M080-03 (nachrangig, keine Zielplattform) |
+| Backup/Restore inkl. Wiederherstellungsprobe | `synthetic_verified` | `scripts/restore-test.sh` (2026-10-27, lokal; CI) |
 | Portainer-Stack | `planned` | AKL-M080-02 (Compose ist Portainer-kompatibel formuliert, nicht getestet) |
 
 ### Profil `ai_key`
