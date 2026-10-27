@@ -54,6 +54,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     state.provider_timeout = Duration::from_secs(config.provider_timeout_secs);
     state.secrets_dir = config.secrets_dir.clone();
     state.jobs_per_hour = config.jobs_per_hour;
+    state.identities = match &config.device_dir {
+        Some(dir) => match akl_device_lifecycle::identity::IdentityStore::open(dir) {
+            Ok(store) => Some(store),
+            Err(err) => {
+                tracing::error!(%err, dir = %dir.display(), "Identitätsverzeichnis nicht nutzbar");
+                None
+            }
+        },
+        None => {
+            tracing::warn!("AKL_DEVICE_DIR nicht gesetzt – keine Geräteidentitäten");
+            None
+        }
+    };
     if let Some(db) = state.db.clone() {
         tracing::info!(
             jobs_per_hour = state.jobs_per_hour,

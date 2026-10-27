@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["apps/api", "crates/core", "crates/persistence", "crates/protect-compat", "crates/providers", "crates/protect-sim", "crates/netprobe"]
+members = ["apps/api", "crates/core", "crates/persistence", "crates/protect-compat", "crates/providers", "crates/protect-sim", "crates/netprobe", "crates/device-lifecycle"]
 
 [workspace.package]
 version = "0.1.0"
@@ -16,6 +16,7 @@ akl-persistence = { path = "crates/persistence" }
 akl-protect-compat = { path = "crates/protect-compat" }
 akl-providers = { path = "crates/providers" }
 akl-protect-sim = { path = "crates/protect-sim" }
+akl-device-lifecycle = { path = "crates/device-lifecycle" }
 axum = "0.8"
 futures = "0.3"
 serde = { version = "1", features = ["derive"] }

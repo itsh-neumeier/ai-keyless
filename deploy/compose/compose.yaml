@@ -54,6 +54,9 @@ services:
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
     tmpfs: ["/tmp:size=16m"]
+    volumes:
+      # Geräteidentitäten (privater Schlüssel je Profil). Verlust = Neu-Adoption.
+      - akl-devices:/var/lib/ai-keyless/devices
     networks: [internal, default]
 
 secrets:
@@ -64,6 +67,7 @@ secrets:
 
 volumes:
   akl-db:
+  akl-devices:
 
 networks:
   internal:
