@@ -10,6 +10,7 @@
     up      Secrets anlegen (falls fehlend), Image bauen, Stack starten
     token   Einmaliges Setup-Token ausgeben (erste Anmeldung)
     model   Vision-Modell in Ollama laden (Standard: granite3.2-vision)
+    netlab  Synthetisches Netzwerk-Lab (host/bridge/macvlan) in der Docker-VM
     status  Container-Status anzeigen
     logs    Logs der API verfolgen
     down    Stack stoppen (Daten bleiben in den Volumes erhalten)
@@ -20,7 +21,7 @@
 #>
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('up', 'token', 'model', 'status', 'logs', 'down')]
+    [ValidateSet('up', 'token', 'model', 'netlab', 'status', 'logs', 'down')]
     [string]$Command = 'up',
     [string]$Model = 'granite3.2-vision',
     [switch]$NoBuild,
@@ -88,6 +89,16 @@ switch ($Command) {
     'model' {
         if ($NoGpu) { throw 'Ohne Lab-Overlay gibt es keinen Ollama-Container.' }
         Compose exec ollama ollama pull $Model
+    }
+    'netlab' {
+        # scripts/netlab.sh braucht root, ip und nsenter im Netz-/PID-Namespace
+        # des Docker-Daemons; unter Docker Desktop liefert das ein Hilfscontainer.
+        # Alles bleibt in der Docker-VM (eigene Bridge), kein Verkehr ins LAN.
+        $scripts = (Resolve-Path 'scripts').Path
+        & docker run --rm --privileged --network host --pid host `
+            -v /var/run/docker.sock:/var/run/docker.sock -v "${scripts}:/scripts:ro" `
+            docker:27.5.1-cli sh -c 'apk add -q bash iproute2 util-linux && bash /scripts/netlab.sh'
+        if ($LASTEXITCODE -ne 0) { throw 'Netzwerk-Lab fehlgeschlagen.' }
     }
     'status' { Compose ps }
     'logs' { Compose logs -f api }
