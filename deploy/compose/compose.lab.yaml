@@ -9,6 +9,12 @@
 # Docker Desktop mit WSL2-GPU-Unterstützung (Windows). Siehe docs/operations/LAB-SETUP.md.
 
 services:
+  api:
+    environment:
+      # Reserve für einen Kaltstart, falls das Modell doch entladen wurde
+      # (eigene Variable, weil .env aus .env.example bereits 120 setzt).
+      AKL_PROVIDER_TIMEOUT_SECS: ${AKL_LAB_PROVIDER_TIMEOUT_SECS:-300}
+
   ollama:
     image: ollama/ollama:0.12.6
     restart: unless-stopped
@@ -25,6 +31,9 @@ services:
       # langsamen Erstaufrufs offen, FA/q8_0 vorerst nicht gesetzt;
       # kleineren Kontext per Modellvariante setzen (docs/operations/LAB-SETUP.md).
       OLLAMA_CONTEXT_LENGTH: "${AKL_OLLAMA_CONTEXT:-4096}"
+      # Modell nach dem Laden nicht wieder entladen: Kaltstart auf der T600
+      # gemessen 131,7 s (> 120 s API-Limit). Vorwärmen: scripts\lab.ps1 warm.
+      OLLAMA_KEEP_ALIVE: "${AKL_OLLAMA_KEEP_ALIVE:--1}"
     volumes:
       - akl-ollama:/root/.ollama
     deploy:
