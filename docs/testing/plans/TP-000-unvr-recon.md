@@ -5,8 +5,8 @@
 | Testplan-ID | TP-000 |
 | Ziel | Umgebung für TP-001 exakt dokumentieren, **ohne** etwas an der UNVR zu verändern |
 | Erwartete Evidenzstufe danach | keine Fähigkeitsänderung (reine Umgebungsdokumentation) |
-| Status | Entwurf – wartet auf Freigabe |
-| Freigabe (Name, Datum) | — |
+| Status | **freigegeben** |
+| Freigabe (Name, Datum) | Projektverantwortlicher, 2026-10-27 (Chat: „Ja darfst alles machen“) |
 
 ## Umgebung
 
@@ -16,13 +16,13 @@
 | UniFi-Protect-Version | exakt aus *Protect → Einstellungen → System* ablesen: … |
 | Kameras (Modell, Firmware) | Liste aus der Protect-Oberfläche: … |
 | Netz | Subnetz/VLAN des PCs und der UNVR: … |
-| PC | Betriebssystem, Docker-Version, `nvidia-smi`-Ausgabe (T600), Coral sichtbar (ja/nein) |
+| PC | Windows, Repo unter `D:\GitHub\ai-keyless`; Docker-Desktop-Version, `nvidia-smi`-Ausgabe (T600), Coral sichtbar (ja/nein) |
 | AI-Keyless | Commit-SHA, Image-Digest |
 
 ## Erlaubte Aktionen (ausschließlich lesend)
 
 1. Protect-Version, Konsolen-Firmware und Kameraliste **manuell in der Protect-Oberfläche ablesen** (Projektverantwortlicher).
-2. Vom PC: Erreichbarkeit prüfen – `ping 192.168.10.181` und `curl -sk -o /dev/null -w '%{http_code}' https://192.168.10.181/` (nur HTTP-Statuscode, kein Login).
+2. Vom PC: Erreichbarkeit prüfen – PowerShell `Test-NetConnection 192.168.10.181 -Port 443` bzw. Git Bash `curl -sk -o /dev/null -w '%{http_code}' https://192.168.10.181/` (nur Erreichbarkeit/HTTP-Statuscode, kein Login).
 3. PC-Umgebung erfassen: OS, Docker-Version, `docker run --rm --gpus all nvidia/cuda:12.6.3-base-ubuntu24.04 nvidia-smi`, USB-Geräteliste (Coral).
 4. AI-Keyless-Lab nach `docs/operations/LAB-SETUP.md` starten; Bildtest mit `granite3.2-vision` auf der T600 ausführen und messen.
 
