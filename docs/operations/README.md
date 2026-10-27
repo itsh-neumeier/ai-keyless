@@ -105,6 +105,16 @@ scripts/restore.sh /pfad/zu/backups/akl-20261027T001500Z.dump
   Snapshot), Metadaten mit Schema-Version und SHA-256. Dateien mit Modus 600, Verzeichnis 700.
   Enthält Passwort- und Token-**Hashes**, Audit-Log und Konfiguration → wie ein Geheimnis behandeln.
 - **Nicht enthalten:** das Secret-Verzeichnis (`deploy/compose/secrets`) – separat sichern.
+- **Nicht enthalten:** die Geräteidentitäten (Volume `akl-devices`, `AKL_DEVICE_DIR`, privater
+  Schlüssel je Profil). Geht es verloren, erzeugt AI-Keyless eine neue Identität und Protect muss das
+  Gerät neu adoptieren. Bis `backup.sh` es mitsichert: Volume separat und verschlüsselt sichern.
+
+## Geräteidentität (`AKL_DEVICE_DIR`)
+
+Im Image `/var/lib/ai-keyless/devices` (Compose-Volume `akl-devices`, Eigentümer `nonroot`, Modus 0700).
+Je Profil ein Unterverzeichnis mit `identity.json` (Profilart, SHA-256-Fingerprint), `cert.pem` und
+`key.pem` (0600). Schlüssel stehen nie in der Datenbank, in Logs oder API-Antworten. Eine beschädigte
+oder vertauschte Identität wird beim Laden erkannt und **nicht** still ersetzt.
 - **Wiederherstellung:** prüft die Prüfsumme (manipulierte/defekte Dumps werden abgelehnt), stoppt
   die API, ersetzt die Datenbank, startet die API und prüft Readiness und Schema-Version. Nur auf
   gleiche oder neuere AI-Keyless-Versionen wiederherstellen.

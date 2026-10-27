@@ -21,6 +21,8 @@ pub struct Config {
     pub provider_allowed_hosts: Option<Vec<String>>,
     pub provider_timeout_secs: u64,
     pub secrets_dir: PathBuf,
+    /// Identitätsverzeichnis der Geräteprofile (privat, beschreibbar).
+    pub device_dir: Option<PathBuf>,
     pub jobs_per_hour: i64,
 }
 
@@ -40,6 +42,7 @@ impl std::fmt::Debug for Config {
             .field("provider_allowed_hosts", &self.provider_allowed_hosts)
             .field("provider_timeout_secs", &self.provider_timeout_secs)
             .field("secrets_dir", &self.secrets_dir)
+            .field("device_dir", &self.device_dir)
             .field("jobs_per_hour", &self.jobs_per_hour)
             .finish()
     }
@@ -121,6 +124,7 @@ impl Config {
             secrets_dir: get("AKL_SECRETS_DIR")
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("/run/secrets")),
+            device_dir: get("AKL_DEVICE_DIR").map(PathBuf::from),
             jobs_per_hour: match get("AKL_JOBS_PER_HOUR") {
                 None => crate::DEFAULT_JOBS_PER_HOUR,
                 Some(v) => v.parse().ok().filter(|n| (0..=100_000).contains(n)).ok_or(

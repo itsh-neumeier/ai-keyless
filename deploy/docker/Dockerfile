@@ -28,7 +28,8 @@ RUN --mount=type=secret,id=extra_ca,required=false \
     if [ -s /run/secrets/extra_ca ]; then export CARGO_HTTP_CAINFO=/run/secrets/extra_ca; fi; \
     cargo build --release --locked -p akl-api -p akl-netprobe \
  && cp target/release/ai-keyless-api /ai-keyless-api \
- && cp target/release/akl-netprobe /akl-netprobe
+ && cp target/release/akl-netprobe /akl-netprobe \
+ && mkdir -m 0700 /devices
 
 FROM ${RUNTIME_IMAGE}
 LABEL org.opencontainers.image.title="AI-Keyless" \
@@ -39,8 +40,12 @@ COPY --from=api /ai-keyless-api /usr/local/bin/ai-keyless-api
 # Netzwerk-Lab (AKL-M080-01): docker run --rm --network host --entrypoint akl-netprobe ai-keyless:dev …
 COPY --from=api /akl-netprobe /usr/local/bin/akl-netprobe
 COPY --from=web /src/apps/web/build /srv/web
+# Geräteidentitäten (privater Schlüssel je Profil, AKL-M040-01). Gehört nonroot,
+# damit ein leeres benanntes Volume diese Rechte übernimmt.
+COPY --from=api --chown=nonroot:nonroot /devices /var/lib/ai-keyless/devices
 ENV AKL_BIND=0.0.0.0:8090 \
     AKL_WEB_DIR=/srv/web \
+    AKL_DEVICE_DIR=/var/lib/ai-keyless/devices \
     AKL_LOG_FORMAT=json
 USER nonroot:nonroot
 EXPOSE 8090

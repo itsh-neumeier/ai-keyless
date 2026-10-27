@@ -16,6 +16,7 @@ name = "akl-api"
 version = "0.1.0"
 dependencies = [
  "akl-core",
+ "akl-device-lifecycle",
  "akl-persistence",
  "akl-protect-compat",
  "akl-providers",
@@ -46,6 +47,22 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+]
+
+[[package]]
+name = "akl-device-lifecycle"
+version = "0.1.0"
+dependencies = [
+ "akl-core",
+ "akl-protect-compat",
+ "base64 0.22.1",
+ "chrono",
+ "rcgen",
+ "rustls",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "uuid",
 ]
 
 [[package]]

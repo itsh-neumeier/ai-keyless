@@ -1,0 +1,23 @@
+[package]
+name = "akl-device-lifecycle"
+description = "AI-Keyless: Geräte-Lifecycle (Identität, Zustände; später Discovery/Adoption)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+akl-core.workspace = true
+akl-protect-compat.workspace = true
+base64.workspace = true
+chrono.workspace = true
+rcgen.workspace = true
+rustls.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true
