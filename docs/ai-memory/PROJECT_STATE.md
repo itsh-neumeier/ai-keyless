@@ -8,8 +8,9 @@
 |---|---|
 | AKL-M000 Recht/Bestand/Machbarkeit | fertig bis auf Hersteller-FAQ (Q-004, zurückgestellt) und Lizenzanfrage an Referenz (nur nach Freigabe) |
 | AKL-M010 Projektfundament | fertig; offen: OpenAPI-Generierung (M010-07), Repo-Governance (M010-08) |
-| AKL-M020 UI-System | Auth (Setup-Token, Login, Rollen, CSRF, Audit) fertig; offen: Komponentenbibliothek (M020-03), Konto deaktivieren/Passwort ändern (M020-04), Demo-Modus, a11y-Audit, CSP-Hashes, E2E in CI |
-| AKL-M030 Contract-Labor | Versionsprofile + konservativer Modus fertig (M030-01); offen: synthetischer Controller (M030-02), Fixtures (M030-03), Testplan-Vorlage (M030-04) |
+| AKL-M020 UI-System | Auth, Kontoverwaltung (deaktivieren, Passwort ändern) und E2E in CI fertig; offen: Komponentenbibliothek (M020-03), Demo-Modus (M020-05), a11y-Audit (M020-06), CSP-Hashes (M020-07) |
+| AKL-M030 Contract-Labor | Versionsprofile (M030-01) und Testplan-Vorlage + TP-001-Entwurf (M030-04) fertig; offen: synthetischer Controller (M030-02), Fixtures (M030-03) – beide nur auf Basis belegbarer Hypothesen sinnvoll |
+| AKL-M080 Betrieb | Backup/Restore + Wiederherstellungsprobe (CI) fertig; offen: Netzmodus-Bewertung (M080-01), Portainer (M080-02), ARM64 (P3), GPU-Profil (M080-06, Q-014) |
 | AKL-M060 Provider/Queue | Provider + SSRF-Schutz, Ollama, OpenAI-kompatibel (Mock), Queue, Worker, Limit, UI fertig; offen: OpenAI-kompatibel mit echtem Server, Cloud-Provider (Kostenrahmen Q-011), aggregierte Statistik |
 
 ## Belegter Funktionsumfang (Stand 2026-10-27)
@@ -29,8 +30,8 @@
 
 ## Nächstes Entwicklungspaket
 
-1. AKL-M020-08: Playwright-E2E (Setup, Login, Provider, Queue) in die CI übernehmen.
-2. AKL-M080-04: Backup/Restore mit automatisierter Wiederherstellungsprobe.
-3. AKL-M030-04: Testplan-Vorlage für native Tests (Voraussetzung, sobald eine Testumgebung existiert).
-4. AKL-M080-01: Netzwerkmodus-Bewertung (bridge/host/macvlan) per Messtest.
-5. AKL-M020-03/04: Komponentenbibliothek, Konto deaktivieren, Passwort ändern.
+1. AKL-M080-01: Netzwerkmodus-Bewertung (bridge/host/macvlan) per Messtest – Voraussetzung für Discovery.
+2. AKL-M020-06/07: Accessibility-Audit (axe in E2E) und CSP ohne `unsafe-inline`.
+3. AKL-M020-03: Komponentenbibliothek (Dialog, Drawer, Toast, Tabs, DataTable).
+4. AKL-M010-07: OpenAPI aus Rust-Typen generieren, Drift-Prüfung in CI.
+5. Danach M040 (Geräte-Lifecycle) nur mit belastbaren Protokoll-Hypothesen; native Abnahme erst mit Testumgebung (Q-003).
