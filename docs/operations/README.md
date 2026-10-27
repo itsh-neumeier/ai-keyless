@@ -55,6 +55,26 @@ synthetischen Testbild aus (löst eine Inferenz aus). Ergebnisse werden gespeich
   Dateinamen angeben.
 - Gemessene Modelle: `docs/compatibility/PROVIDERS.md`.
 
+## Verarbeitungs-Queue
+
+Jobs liegen persistent in PostgreSQL (`jobs`). Ein Worker im API-Prozess holt fällige Jobs
+(Priorität, dann Alter), hält dabei eine Lease (Provider-Zeitlimit + 60 s) und beachtet ein
+**globales, rollierendes Stundenlimit** (`AKL_JOBS_PER_HOUR`, Standard 12 – anfängliche
+Sicherheitsvorgabe, keine Leistungsgrenze; `0` hält die Verarbeitung an). Das Limit zählt
+Starts in `job_starts` und überlebt Neustarts.
+
+| Zustand | Bedeutung |
+|---|---|
+| Wartend / Wiederholung geplant | fällig ab `next_attempt_at` (Backoff 30 s · 2^n, max. 1 h) |
+| Läuft | Worker hält die Lease |
+| Abgeschlossen / Fehlgeschlagen | Ende; Fehlgeschlagen = Dead Letter nach `max_attempts` oder nicht wiederholbarem Fehler |
+| Unklar | Abbruch während eines Callbacks – **nie** automatisch wiederholt |
+| Abgebrochen | durch Operator |
+
+Abgelaufene Leases (Absturz/Neustart) werden minütlich erkannt: vor dem Callback → erneuter
+Versuch, im Callback → *Unklar*. Operatoren können wartende/fehlgeschlagene/unklare Jobs
+abbrechen und fehlgeschlagene/unklare nach Prüfung neu einreihen (UI *Verarbeitung*).
+
 ## Portainer
 
 Stack aus `deploy/compose/compose.yaml` anlegen, Umgebungsvariablen aus `.env.example` setzen,

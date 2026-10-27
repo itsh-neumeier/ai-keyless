@@ -15,7 +15,7 @@ use futures::Stream;
 use crate::{
     AppState,
     auth::{self, CurrentUser},
-    providers, status,
+    jobs, providers, status,
 };
 
 /// Intervall, in dem der Server den Status prüft. Clients erhalten nur
@@ -52,6 +52,14 @@ pub fn api() -> Router<AppState> {
             "/api/v1/providers/{id}/test-vision",
             post(providers::test_vision),
         )
+        .route(
+            "/api/v1/providers/{id}/probe-job",
+            post(providers::enqueue_probe),
+        )
+        .route("/api/v1/jobs", get(jobs::list))
+        .route("/api/v1/jobs/stats", get(jobs::stats))
+        .route("/api/v1/jobs/{id}/cancel", post(jobs::cancel))
+        .route("/api/v1/jobs/{id}/requeue", post(jobs::requeue))
         .route("/api/v1/system/status", get(system_status))
         .route("/api/v1/system/status/stream", get(system_status_stream))
         // Unbekannte API-Pfade nie an den SPA-Fallback weiterreichen.

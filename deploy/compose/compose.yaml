@@ -44,6 +44,8 @@ services:
       AKL_PROVIDER_ALLOW_PRIVATE: ${AKL_PROVIDER_ALLOW_PRIVATE:-true}
       AKL_PROVIDER_ALLOWED_HOSTS: ${AKL_PROVIDER_ALLOWED_HOSTS:-}
       AKL_PROVIDER_TIMEOUT_SECS: ${AKL_PROVIDER_TIMEOUT_SECS:-120}
+      # Globales, dauerhaftes Startlimit der Verarbeitungs-Queue (Sicherheitsvorgabe)
+      AKL_JOBS_PER_HOUR: ${AKL_JOBS_PER_HOUR:-12}
     secrets: [akl_database_url]
     ports:
       # Standardmäßig nur lokal erreichbar; für LAN-Zugriff AKL_ADMIN_BIND anpassen.

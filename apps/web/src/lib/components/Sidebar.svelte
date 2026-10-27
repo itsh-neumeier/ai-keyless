@@ -21,7 +21,7 @@
 		return item.href === '/'
 			? resolve('/')
 			: item.implemented
-				? resolve(item.href as '/devices' | '/models' | '/system' | '/settings')
+				? resolve(item.href as '/devices' | '/models' | '/processing' | '/system' | '/settings')
 				: resolve('/[section]', { section: item.href.slice(1) });
 	}
 

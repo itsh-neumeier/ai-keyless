@@ -32,7 +32,7 @@
 | T5 | I | Secrets in Logs/API/Browser | Secret-Dateien (`*_FILE`), Debug-Redaktion der DB-URL ✓, keine Secrets in API-Antworten, kein Browserstorage für Secrets, gitleaks in CI | teilweise ✓ |
 | T6 | I | Medien gelangen in Logs/Browser/externe APIs | In-Memory-Verarbeitung, minimale Retention, Opt-in pro Kamera und Provider, keine Fremdmedien in CI | geplant M060/M070 |
 | T7 | I/E | SSRF über frei konfigurierbare Provider-/Controller-URLs | Provider: nur http(s), keine Zugangsdaten/Query in URLs, Link-Local/Metadaten/0.0.0.0/Multicast/Broadcast immer gesperrt (auch IPv4-gemappt), Loopback nur per Opt-in, private Netze konfigurierbar, optionale Host-Allowlist, DNS einmal auflösen und auf geprüfte Adressen pinnen, keine Redirects, keine System-Proxys, Größen-/Zeitlimits; nur Admins dürfen Provider anlegen/testen | ✓ Provider (M060-02); Controller-URLs M040 |
-| T8 | D | Kosten-/Lastexplosion durch Ereignisflut | Start-Limit 12 Jobs/h, Queue-Grenzen, Timeouts, Backoff, Kostenlimits | geplant M060 |
+| T8 | D | Kosten-/Lastexplosion durch Ereignisflut | Dauerhaftes globales Startlimit (Standard 12/h, serialisiert per Advisory Lock, auch bei parallelen Workern getestet), Idempotenzschlüssel gegen Duplikate, Backoff, Max-Versuche, Provider-Zeitlimit, Payload ≤ 16 KiB ohne Medien; Kostenlimits für Cloud-Provider offen (Q-011) | ✓ Queue (M060-01/03) |
 | T9 | D | Polling-Sturm durch UI | SSE mit Server-seitiger Änderungsprüfung ✓ | ✓ |
 | T10 | E | Container-Ausbruch / Rechteausweitung | distroless, nonroot, `read_only`, `cap_drop: ALL`, `no-new-privileges` ✓ | ✓ (amd64 getestet) |
 | T11 | E | Netzwerkmodus host vergrößert Angriffsfläche | Nur Geräteschnittstelle im LAN, Admin-Port getrennt bindbar, Bewertung in NETWORKING.md | geplant M080 |

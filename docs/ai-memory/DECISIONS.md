@@ -19,3 +19,6 @@
 | 2026-10-26 | Zielplattformen: Linux-Server/VM und x86_64-NAS; ARM64 nachrangig (P3) | Interview | BACKLOG M080 |
 | 2026-10-26 | Provider-Reihenfolge: Ollama lokal → OpenAI-kompatibel lokal → OpenAI Cloud (Opt-in) → weitere Cloud | Interview (Q-011) | BACKLOG M060-05…08 |
 | 2026-10-26 | Hardware: NVIDIA < 12 GB, Intel/AMD-GPU, Coral Edge TPU; Coral nur für Objekterkennung, nicht für Captions | Interview; Edge TPU führt nur quantisierte TFLite-Modelle aus | BACKLOG M080-06, M100-02 |
+| 2026-10-27 | Worker vorerst im API-Prozess (ein Container); Auslagerung in `event-engine`-Crate/eigenen Prozess mit M070 | Einfachheit; Leases + Recovery machen Neustarts sicher | OVERVIEW.md |
+| 2026-10-27 | Job im Callback-Schritt abgebrochen → `uncertain`, nie automatisch wiederholt | Doppelte Protect-Ergebnisse vermeiden | core/src/job.rs |
+| 2026-10-27 | Verarbeitungs-UI aktualisiert alle 10 s nur bei sichtbarer Seite; Job-Ereignisstream folgt | kein Polling-Sturm, ausreichend bis M070 | processing/+page.svelte |

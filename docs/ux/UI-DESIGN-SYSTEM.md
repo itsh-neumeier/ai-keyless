@@ -26,7 +26,7 @@ Hauptbereich                      Admin
 ├─ Erkennungen      (M070)
 ├─ Suche            (M090)
 ├─ KI-Modelle       (Provider, Tests ✓ M060)
-├─ Verarbeitung     (M060)
+├─ Verarbeitung     (Queue, Limit, Aktionen ✓ M060)
 └─ Alarmierung      (M100)
 ```
 

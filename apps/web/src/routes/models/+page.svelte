@@ -95,6 +95,13 @@
 			const model = visionModel[p.id] || null;
 			await api(`/api/v1/providers/${p.id}/test-vision`, { method: 'POST', body: { model } });
 		});
+	let notice = $state<Record<string, string | null>>({});
+	const enqueueProbe = (p: ProviderView) =>
+		run(p.id, 'probe', async () => {
+			const model = visionModel[p.id] || null;
+			await api(`/api/v1/providers/${p.id}/probe-job`, { method: 'POST', body: { model } });
+			notice[p.id] = t('models.enqueued');
+		});
 	const remove = (p: ProviderView) =>
 		run(p.id, 'delete', async () => {
 			await api(`/api/v1/providers/${p.id}`, { method: 'DELETE' });
@@ -229,6 +236,9 @@
 						busy={busy[p.id] === 'vision'}
 						onconfirm={() => testVision(p)}>{t('models.testVision')}</ConfirmButton
 					>
+					<Button variant="ghost" busy={busy[p.id] === 'probe'} onclick={() => enqueueProbe(p)}
+						>{t('models.enqueueProbe')}</Button
+					>
 					<span class="ml-auto"></span>
 					<ConfirmButton
 						variant="ghost"
@@ -239,6 +249,7 @@
 				</div>
 				<div class="px-4 pb-3 empty:hidden">
 					<FormError message={rowError[p.id] ?? null} />
+					{#if notice[p.id]}<p class="text-[13px] text-ok" role="status">{notice[p.id]}</p>{/if}
 				</div>
 			{/if}
 		</section>

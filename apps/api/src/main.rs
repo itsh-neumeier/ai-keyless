@@ -53,6 +53,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     state.provider_timeout = Duration::from_secs(config.provider_timeout_secs);
     state.secrets_dir = config.secrets_dir.clone();
+    state.jobs_per_hour = config.jobs_per_hour;
+    if let Some(db) = state.db.clone() {
+        tracing::info!(
+            jobs_per_hour = state.jobs_per_hour,
+            "Verarbeitungs-Worker gestartet"
+        );
+        tokio::spawn(akl_api::worker::Worker::new(state.clone(), db).run());
+    }
     let router = app(state, config.web_dir.as_deref());
     let listener = tokio::net::TcpListener::bind(config.bind).await?;
     tracing::info!(addr = %config.bind, "lauscht");

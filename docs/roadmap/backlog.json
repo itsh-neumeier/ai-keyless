@@ -505,7 +505,7 @@
     {
       "id": "AKL-M060-01",
       "ms": "AKL-M060",
-      "status": "open",
+      "status": "done",
       "prio": "P0",
       "deps": [
         "AKL-M010-03"
@@ -531,7 +531,7 @@
     {
       "id": "AKL-M060-03",
       "ms": "AKL-M060",
-      "status": "open",
+      "status": "done",
       "prio": "P0",
       "deps": [
         "AKL-M060-01"
@@ -550,7 +550,7 @@
         "AKL-M060-01",
         "AKL-M060-02"
       ],
-      "title": "UI KI-Modelle (fertig) + Verarbeitung (offen, nach Queue)",
+      "title": "UI KI-Modelle + Verarbeitung (fertig; aggregierte Fehlerrate/Latenz-Statistik offen)",
       "accept": [
         "Latenz/Fehlerrate aus echten Messungen"
       ]

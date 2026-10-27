@@ -3,6 +3,7 @@
 pub mod auth;
 pub mod device;
 pub mod evidence;
+pub mod job;
 pub mod status;
 
 pub use auth::Role;

@@ -178,6 +178,47 @@ paths:
           content: { application/json: { schema: { type: object, required: [ok, model, latency_ms, text, matched, error_code], properties: { ok: { type: boolean }, model: { type: string }, latency_ms: { type: [integer, 'null'] }, text: { type: [string, 'null'] }, matched: { type: [boolean, 'null'] }, error_code: { type: [string, 'null'] } } } } }
         '403': { $ref: '#/components/responses/Error' }
         '422': { $ref: '#/components/responses/Error' }
+  /api/v1/providers/{id}/probe-job:
+    post:
+      summary: Bildtest als Job einreihen (Admin, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { model: { type: [string, 'null'] } } } } } }
+      responses:
+        '202': { description: eingereiht, content: { application/json: { schema: { $ref: '#/components/schemas/Job' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/jobs:
+    get:
+      summary: Jobs (neueste zuerst; jede Rolle)
+      parameters:
+        - { name: state, in: query, schema: { $ref: '#/components/schemas/JobState' } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 50 } }
+      responses:
+        '200': { description: Liste, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Job' } } } } }
+        '422': { $ref: '#/components/responses/Error' }
+  /api/v1/jobs/stats:
+    get:
+      summary: Queue-Kennzahlen inkl. Stundenlimit (jede Rolle)
+      responses:
+        '200':
+          description: Kennzahlen
+          content: { application/json: { schema: { type: object, required: [counts, oldest_ready_at, starts_last_hour, limit_per_hour], properties: { counts: { type: object, additionalProperties: { type: integer } }, oldest_ready_at: { type: [string, 'null'], format: date-time }, starts_last_hour: { type: integer }, limit_per_hour: { type: integer } } } } }
+  /api/v1/jobs/{id}/cancel:
+    post:
+      summary: Job abbrechen (Operator, CSRF; nicht für laufende/abgeschlossene)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '204': { description: abgebrochen }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/v1/jobs/{id}/requeue:
+    post:
+      summary: Fehlgeschlagenen/unklaren Job neu einreihen (Operator, CSRF)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/Csrf' }]
+      responses:
+        '204': { description: eingereiht }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
   /api/v1/system/status:
     get:
       summary: Belegter Systemstatus (jede Rolle)
@@ -213,6 +254,26 @@ components:
       type: object
       required: [id, username, role, disabled]
       properties: { id: { type: string, format: uuid }, username: { type: string }, role: { $ref: '#/components/schemas/Role' }, disabled: { type: boolean } }
+    JobState: { type: string, enum: [queued, running, completed, failed, retryable, uncertain, cancelled] }
+    Job:
+      type: object
+      required: [id, idempotency_key, kind, state, phase, priority, attempts, max_attempts, next_attempt_at, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        idempotency_key: { type: string }
+        kind: { type: string }
+        state: { $ref: '#/components/schemas/JobState' }
+        phase: { type: string, enum: [pending, processing, callback] }
+        priority: { type: integer }
+        attempts: { type: integer }
+        max_attempts: { type: integer }
+        next_attempt_at: { type: string, format: date-time }
+        last_error_code: { type: [string, 'null'] }
+        payload: { type: object }
+        result: { type: [object, 'null'] }
+        created_at: { type: string, format: date-time }
+        started_at: { type: [string, 'null'], format: date-time }
+        finished_at: { type: [string, 'null'], format: date-time }
     ProviderTest:
       type: object
       required: [kind, ok, tested_at]

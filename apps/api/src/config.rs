@@ -21,6 +21,7 @@ pub struct Config {
     pub provider_allowed_hosts: Option<Vec<String>>,
     pub provider_timeout_secs: u64,
     pub secrets_dir: PathBuf,
+    pub jobs_per_hour: i64,
 }
 
 impl std::fmt::Debug for Config {
@@ -39,6 +40,7 @@ impl std::fmt::Debug for Config {
             .field("provider_allowed_hosts", &self.provider_allowed_hosts)
             .field("provider_timeout_secs", &self.provider_timeout_secs)
             .field("secrets_dir", &self.secrets_dir)
+            .field("jobs_per_hour", &self.jobs_per_hour)
             .finish()
     }
 }
@@ -116,6 +118,15 @@ impl Config {
             secrets_dir: get("AKL_SECRETS_DIR")
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("/run/secrets")),
+            jobs_per_hour: match get("AKL_JOBS_PER_HOUR") {
+                None => crate::DEFAULT_JOBS_PER_HOUR,
+                Some(v) => v.parse().ok().filter(|n| (0..=100_000).contains(n)).ok_or(
+                    ConfigError::Invalid {
+                        name: "AKL_JOBS_PER_HOUR",
+                        reason: format!("0–100000 erwartet, erhalten: {v}"),
+                    },
+                )?,
+            },
         })
     }
 }
@@ -159,6 +170,9 @@ mod tests {
         );
         assert!(cfg(&[("AKL_PROVIDER_TIMEOUT_SECS", "0")]).is_err());
         assert!(cfg(&[("AKL_PROVIDER_ALLOW_PRIVATE", "vielleicht")]).is_err());
+        assert_eq!(cfg(&[]).unwrap().jobs_per_hour, 12);
+        assert_eq!(cfg(&[("AKL_JOBS_PER_HOUR", "0")]).unwrap().jobs_per_hour, 0);
+        assert!(cfg(&[("AKL_JOBS_PER_HOUR", "-1")]).is_err());
     }
 
     #[test]

@@ -4,9 +4,11 @@ pub mod auth;
 pub mod config;
 pub mod crypto;
 mod error;
+mod jobs;
 mod providers;
 mod routes;
 mod status;
+pub mod worker;
 
 use std::{
     path::{Path, PathBuf},
@@ -39,6 +41,10 @@ pub struct AppState {
     pub provider_timeout: Duration,
     /// Verzeichnis, aus dem Provider-Secrets per Name gelesen werden.
     pub secrets_dir: PathBuf,
+    /// Globales, dauerhaftes Limit gestarteter Jobs pro rollierender Stunde.
+    pub jobs_per_hour: i64,
+    /// Weckt den Worker, sobald ein Job eingereiht wurde.
+    pub job_signal: Arc<tokio::sync::Notify>,
 }
 
 impl AppState {
@@ -55,6 +61,8 @@ impl AppState {
             provider_policy: akl_providers::NetworkPolicy::default(),
             provider_timeout: Duration::from_secs(120),
             secrets_dir: PathBuf::from("/run/secrets"),
+            jobs_per_hour: DEFAULT_JOBS_PER_HOUR,
+            job_signal: Arc::default(),
         }
     }
 }
@@ -64,6 +72,9 @@ impl Default for AppState {
         Self::new(None, false)
     }
 }
+
+/// Anfängliche Sicherheitsvorgabe (keine Leistungsgrenze), siehe DECISIONS.md.
+pub const DEFAULT_JOBS_PER_HOUR: i64 = 12;
 
 const REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
 

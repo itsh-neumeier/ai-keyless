@@ -31,7 +31,7 @@
 | `apps/web` | SvelteKit-SPA, Design-System, i18n | nur HTTP-API | vorhanden |
 | `crates/protect-compat` | Versionsprofile (`profiles/*.json`, eingebettet und beim Laden validiert), Fähigkeitsfreigabe nach Evidenz, konservativer Modus; später Protokolladapter | core | Profile ✓ (M030-01), Adapter M030/M040 |
 | `crates/device-lifecycle` | Discovery, Adoption, Identität, Keepalive | core, protect-compat, persistence | M040 |
-| `crates/event-engine` | Persistente Queue, Jobs, Idempotenz, Limits, Callbacks | core, persistence, providers | M060 |
+| Queue/Worker | Persistente Queue (`persistence/src/jobs.rs`), Zustände (`core/src/job.rs`), Worker im API-Prozess (`apps/api/src/worker.rs`); eigenes Crate `event-engine`, sobald Protect-Callbacks dazukommen (M070) | core, persistence, providers | ✓ M060-01/03 |
 | `crates/providers` | Ollama/OpenAI-kompatibel, SSRF-Richtlinie (`policy.rs`), synthetisches Testbild | – | ✓ M060-02/05 |
 | `crates/observability` | Metriken, Health-Aggregation | core | M060/M080 |
 

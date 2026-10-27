@@ -181,7 +181,10 @@ fn not_found() -> ApiError {
 }
 
 /// Baut den Client; ein nicht lesbares Secret wird als Testergebnis gemeldet.
-fn build(state: &AppState, record: &ProviderRecord) -> Result<Provider, &'static str> {
+pub(crate) fn build_provider(
+    state: &AppState,
+    record: &ProviderRecord,
+) -> Result<Provider, &'static str> {
     let kind: ProviderKind = record.kind.parse().map_err(|_| "invalid_kind")?;
     let api_key = match &record.api_key_secret {
         Some(name) => Some(
@@ -219,7 +222,7 @@ pub async fn test_connection(
     user.require(Role::Admin)?;
     let db = state.db.as_ref().ok_or_else(ApiError::database_required)?;
     let record = db.get_provider(id).await?.ok_or_else(not_found)?;
-    let result = match build(&state, &record) {
+    let result = match build_provider(&state, &record) {
         Err(code) => ConnectionResult {
             ok: false,
             latency_ms: None,
@@ -300,7 +303,7 @@ pub async fn test_vision(
         })?
         .to_owned();
 
-    let result = match build(&state, &record) {
+    let result = match build_provider(&state, &record) {
         Err(code) => VisionTestResult {
             ok: false,
             model: model.clone(),
@@ -367,4 +370,61 @@ mod tests {
             assert!(!valid_secret_name(bad), "{bad}");
         }
     }
+}
+
+#[derive(Deserialize)]
+pub struct ProbeJobRequest {
+    #[serde(default)]
+    model: Option<String>,
+}
+
+/// Reiht einen Bildtest als Job in die Verarbeitungs-Queue ein (zählt für das
+/// Stundenlimit). Dient dem Nachweis von Queue, Worker und Limits.
+pub async fn enqueue_probe(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    user: CurrentUser,
+    Path(id): Path<Uuid>,
+    ApiJson(req): ApiJson<ProbeJobRequest>,
+) -> Result<Response, ApiError> {
+    user.require(Role::Admin)?;
+    let db = state.db.as_ref().ok_or_else(ApiError::database_required)?;
+    let record = db.get_provider(id).await?.ok_or_else(not_found)?;
+    let model = req
+        .model
+        .as_deref()
+        .map(str::trim)
+        .filter(|m| !m.is_empty())
+        .or(record.default_model.as_deref())
+        .ok_or_else(|| {
+            unprocessable(
+                "model_required",
+                "Modell angeben oder Standardmodell setzen",
+            )
+        })?
+        .to_owned();
+    let key = format!(
+        "{}:{}:{}",
+        crate::worker::KIND_VISION_PROBE,
+        id,
+        Uuid::new_v4()
+    );
+    let payload = serde_json::json!({ "provider_id": id, "model": model });
+    let job = match db
+        .enqueue_job(&key, crate::worker::KIND_VISION_PROBE, &payload, 0, 3)
+        .await?
+    {
+        akl_persistence::jobs::EnqueueOutcome::Created(job)
+        | akl_persistence::jobs::EnqueueOutcome::Duplicate(job) => job,
+    };
+    state.job_signal.notify_one();
+    db.audit(
+        &user.user.username,
+        "job.enqueued",
+        Some(&job.id.to_string()),
+        serde_json::json!({ "kind": job.kind, "provider": record.name, "model": model }),
+        correlation(&headers),
+    )
+    .await?;
+    Ok((StatusCode::ACCEPTED, Json(job)).into_response())
 }
