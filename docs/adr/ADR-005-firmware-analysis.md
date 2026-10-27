@@ -41,6 +41,13 @@ auf dem Lab-PC), nicht versioniert.
 **Evidenz:** Statische Erkenntnisse sind `needs_evidence` – sie beschreiben Herstellerverhalten,
 belegen aber keine Fähigkeit von AI-Keyless. `native_verified` weiterhin nur per Testplan mit Readback.
 
+## Erweiterung 2026-10-27: Software der eigenen Konsole
+
+Auf Entscheidung des Projektverantwortlichen („Ja, laden und prüfen“) gilt dieselbe Regelung für
+Firmware/Software der **eigenen** Konsole (UniFi OS und darin enthaltenes UniFi Protect), um zu
+verstehen, welche Discovery-Antworten und Adoptionsdaten Protect von einem AI-Key-Gerät erwartet.
+Gleiche Grenzen wie oben; signierte Download-Links werden nicht gespeichert.
+
 ## Konsequenzen
 
 - Schnellere, gezieltere Hypothesen für Discovery/Adoption/Kontrollkanal.

@@ -75,6 +75,8 @@ Aussagen sind `needs_evidence`, bis ein eigener Testplan sie bestätigt (TP-002)
 | Quelle | Abgerufen | Status | Nutzung |
 |---|---|---|---|
 | AI-Key-Firmware vom Update-Server des Herstellers, `https://fw-update.ui.com/api/firmware/f966bb8d-3c4f-438a-91aa-788be18911f1/data` (Link vom Projektverantwortlichen, 2026-10-27) | 2026-10-27 | proprietär; nur lokal unter `D:\ai-keyless-firmware\`, **nicht** im Repository | Statische Analyse; Erkenntnisse in eigenen Worten in `docs/compatibility/FIRMWARE-NOTES.md` (mit Version und SHA-256). Keine Schlüssel, kein Code, keine Dateien übernommen. |
+| AI-Key-Firmware v2.0.4 (Vollabbild), `https://fw-update.ui.com/api/firmware/13efe860-69b4-4f1f-b75d-34713bfb499e/data`, SHA-256 laut Hersteller `442a6ad0…2b5f50` | 2026-10-27 | proprietär; nur lokal | wie oben |
+| UniFi OS v6.0.11+dd9ab55 (Plattform UNVRINS) der eigenen Konsole, `https://fw-update.ui.com/api/firmware/7a682b92-00d9-4f49-b35e-8a0530409a71/data`, SHA-256 laut Hersteller `0ad05ae6…458ad6` (ein zuvor genannter signierter Link war abgelaufen und wird nicht gespeichert) | 2026-10-27 | proprietär; nur lokal unter `D:\ai-keyless-firmware\unvr\` | Prüfen, ob/welches Protect enthalten ist; Controller-Erwartungen an Discovery/Adoption (ADR-005, Erweiterung) |
 
 ## 5. Drittabhängigkeiten
 
