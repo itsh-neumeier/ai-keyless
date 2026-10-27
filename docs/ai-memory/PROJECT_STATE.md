@@ -29,12 +29,14 @@
 - Provider-Reihenfolge: Ollama → OpenAI-kompatibel lokal → OpenAI Cloud (nach Kostenfreigabe) → weitere Cloud.
 - GitHub: Draft-PR #1 erlaubt; Issues noch nicht.
 
-## In Review (Draft-PRs, Stand 2026-10-27)
+## Gemergt in `main` (Stand 2026-10-27, CI grün)
 
-- #39 TP-000, #40 Kaltstart T600 (keep_alive/Warm-up), #41 Netzwerk-Lab (AKL-M080-01, `synthetic_verified`),
-  #42 Geräteidentität (AKL-M040-01), #43 Lifecycle-Service + Kill-Switch (AKL-M040-02), #44 Discovery-Fixtures/
-  Codec/TP-002/ADR-005 (AKL-M030-03), #45 Identitäts-Backup (AKL-M080-04b), #46 Geräte-UI (AKL-M040-06).
-  Kette lokal konfliktfrei auf `main` geprüft; kombinierter Stand 109 Rust-Tests + 20 Web-Tests grün.
+- #39 TP-000, #40 Kaltstart T600, #41 Netzwerk-Lab (AKL-M080-01), #42 Geräteidentität (AKL-M040-01),
+  #43 Lifecycle-Service + Kill-Switch (AKL-M040-02), #44 Discovery-Fixtures/Codec/TP-002/ADR-005 (AKL-M030-03),
+  #45 Identitäts-Backup (AKL-M080-04b), #46 Geräte-UI (AKL-M040-06), #47 a11y-Audit (AKL-M020-06),
+  #48 CSP ohne `unsafe-inline` (AKL-M020-07).
+- **Offen und blockiert: Geräte-Emulation gegenüber Protect** (Discovery-Antwort AKL-M040-03, Adoption
+  AKL-M040-04). Noch kein Responder. Übergabe: `docs/roadmap/HANDOFF-AKL-M040-03-04.md`.
 
 ## Nächstes Entwicklungspaket
 
