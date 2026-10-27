@@ -1,5 +1,9 @@
 # Übergabe: Discovery-Antwort und Adoption (AKL-M040-03, AKL-M040-04)
 
+> **Stand 2026-10-27 (spät): synthetisch umgesetzt** in `crates/device-lifecycle/src/{discovery,adoption,control}.rs`
+> (Branches `feat/AKL-M040-03-discovery-responder`, `feat/AKL-M040-04-adoption`). Offen: Verdrahtung in
+> `akl-api`, Credential-Rotation, danach TP-001. Details: `docs/ai-memory/SESSION_HANDOFF.md`.
+
 > Zweck: Diese Datei beschreibt die noch fehlende Geräte-Emulation, sodass eine **andere**
 > Claude-Code-Sitzung oder ein Mensch sie umsetzen kann. Sie enthält keinen Protokollcode, sondern
 > Vorgaben, vorhandene Bausteine, Akzeptanzkriterien und Auflagen.

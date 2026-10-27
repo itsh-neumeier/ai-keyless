@@ -59,8 +59,8 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 |---|---|---|---|---|---|
 | AKL-M040-01 | Persistente Geräteidentität + Schlüssel/Zertifikate (Secret-Store) | P0 | ⬜ offen | AKL-M030-03 | Identität überlebt Neustart<br>Schlüssel nie in DB/Logs |
 | AKL-M040-02 | Lifecycle-Service mit Zustandsautomat + Transition-Log | P0 | ⬜ offen | AKL-M040-01 | Unzulässige Übergänge abgelehnt<br>Kill-Switch |
-| AKL-M040-03 | Discovery (UDP) gegen synthetischen Controller | P0 | ⬜ offen | AKL-M040-02, AKL-M080-01 | synthetic_verified |
-| AKL-M040-04 | Adoption, Credential-Rotation, Keepalive, Reconnect (synthetisch) | P0 | ⬜ offen | AKL-M040-03 | synthetic_verified inkl. Restart |
+| AKL-M040-03 | Discovery (UDP) gegen synthetischen Controller | P0 | 🔄 in Arbeit | AKL-M040-02, AKL-M080-01 | synthetic_verified |
+| AKL-M040-04 | Adoption, Credential-Rotation, Keepalive, Reconnect (synthetisch) | P0 | 🔄 in Arbeit | AKL-M040-03 | synthetic_verified inkl. Restart |
 | AKL-M040-05 | Nativer Akzeptanztest Adoption an der UNVR (192.168.10.181) – nur in einer Sitzung auf dem PC des Projektverantwortlichen | P0 | ⛔ blockiert | AKL-M040-04, AKL-M030-04, AKL-M000-06 | native_verified-Nachweis gemäß MATRIX.md |
 | AKL-M040-06 | UI Geräte: Profile, Zustand, Evidenz, Recovery-Assistent | P1 | ⬜ offen | AKL-M040-02, AKL-M020-03 | Echtzeit per SSE<br>keine vorgetäuschten Zustände |
 

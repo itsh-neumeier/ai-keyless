@@ -1,6 +1,6 @@
 [package]
 name = "akl-device-lifecycle"
-description = "AI-Keyless: Geräte-Lifecycle (Identität, Zustände, Discovery; später Adoption)"
+description = "AI-Keyless: Geräte-Lifecycle (Identität, Zustände, Discovery, Adoption, Kontrollkanal)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -19,6 +19,7 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
+tokio-rustls.workspace = true
 uuid.workspace = true
 
 [dev-dependencies]

@@ -150,4 +150,8 @@ impl Lifecycle {
     pub fn db(&self) -> &Database {
         &self.db
     }
+
+    pub fn identities(&self) -> &IdentityStore {
+        &self.identities
+    }
 }

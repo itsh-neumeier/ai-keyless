@@ -11,12 +11,12 @@ use std::{
     time::Duration,
 };
 
-use akl_protect_compat::tls::Fingerprint;
+use akl_protect_compat::tls::{self, Fingerprint};
 use rustls::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
     net::TcpListener,
-    task::JoinHandle,
+    task::{JoinHandle, JoinSet},
 };
 use tokio_rustls::TlsAcceptor;
 
@@ -31,9 +31,33 @@ pub enum Behavior {
     Reset,
 }
 
+/// Zertifikat und Schlüssel des Simulators. Wiederverwendbar, damit ein
+/// "neu gestarteter" Controller denselben Fingerprint behält.
+#[derive(Clone)]
+pub struct SimCert {
+    cert_der: Vec<u8>,
+    key_der: Vec<u8>,
+}
+
+impl SimCert {
+    pub fn generate() -> std::io::Result<Self> {
+        let cert = rcgen::generate_simple_self_signed(vec!["localhost".into(), "127.0.0.1".into()])
+            .map_err(std::io::Error::other)?;
+        Ok(Self {
+            cert_der: cert.cert.der().to_vec(),
+            key_der: cert.signing_key.serialize_der(),
+        })
+    }
+
+    pub fn fingerprint(&self) -> Fingerprint {
+        Fingerprint::of(&self.cert_der)
+    }
+}
+
 pub struct SimController {
     pub addr: SocketAddr,
     pub fingerprint: Fingerprint,
+    cert: SimCert,
     received: Arc<Mutex<Vec<String>>>,
     task: JoinHandle<()>,
 }
@@ -45,18 +69,23 @@ impl SimController {
     }
 
     pub async fn start_on(bind: &str, behavior: Behavior) -> std::io::Result<Self> {
-        let cert = rcgen::generate_simple_self_signed(vec!["localhost".into(), "127.0.0.1".into()])
-            .map_err(std::io::Error::other)?;
-        let cert_der: CertificateDer<'static> = cert.cert.der().clone();
-        let fingerprint = Fingerprint::of(cert_der.as_ref());
-        let key = PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(cert.signing_key.serialize_der()));
+        Self::start_with(bind, behavior, SimCert::generate()?).await
+    }
+
+    pub async fn start_with(
+        bind: &str,
+        behavior: Behavior,
+        cert: SimCert,
+    ) -> std::io::Result<Self> {
+        let fingerprint = cert.fingerprint();
+        let key = PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(cert.key_der.clone()));
         let config = rustls::ServerConfig::builder_with_provider(Arc::new(
             rustls::crypto::aws_lc_rs::default_provider(),
         ))
         .with_safe_default_protocol_versions()
         .map_err(std::io::Error::other)?
         .with_no_client_auth()
-        .with_single_cert(vec![cert_der], key)
+        .with_single_cert(vec![CertificateDer::from(cert.cert_der.clone())], key)
         .map_err(std::io::Error::other)?;
         let acceptor = TlsAcceptor::from(Arc::new(config));
 
@@ -65,13 +94,17 @@ impl SimController {
         let received = Arc::new(Mutex::new(Vec::new()));
         let log = received.clone();
         let task = tokio::spawn(async move {
+            // Verbindungen gehören zum Simulator: wird er beendet, endet das
+            // JoinSet und mit ihm jede offene Verbindung (wie ein Neustart).
+            let mut connections = JoinSet::new();
             loop {
+                while connections.try_join_next().is_some() {}
                 let Ok((tcp, _)) = listener.accept().await else {
                     return;
                 };
                 let acceptor = acceptor.clone();
                 let log = log.clone();
-                tokio::spawn(async move {
+                connections.spawn(async move {
                     match behavior {
                         Behavior::Reset => drop(tcp),
                         Behavior::Silent => {
@@ -98,9 +131,15 @@ impl SimController {
         Ok(Self {
             addr,
             fingerprint,
+            cert,
             received,
             task,
         })
+    }
+
+    /// Zertifikat für einen späteren Neustart mit gleichem Fingerprint.
+    pub fn cert(&self) -> SimCert {
+        self.cert.clone()
     }
 
     /// Alles, was Clients nach erfolgreichem Handshake gesendet haben.
@@ -113,6 +152,29 @@ impl Drop for SimController {
     fn drop(&mut self) {
         self.task.abort();
     }
+}
+
+/// Spielt die Controller-Seite gegenüber einem Geräte-Endpunkt: verbindet
+/// sich nur mit dem gepinnten Gerätezertifikat, sendet eine Zeile und liefert
+/// die erste Antwortzeile (`None`, wenn das Gerät ohne Antwort schließt).
+pub async fn send_line_pinned(
+    device: SocketAddr,
+    device_pin: Fingerprint,
+    line: &str,
+    timeout: Duration,
+) -> Result<Option<String>, tls::ConnectError> {
+    let stream =
+        tls::connect_pinned(&device.ip().to_string(), device.port(), device_pin, timeout).await?;
+    let (read, mut write) = tokio::io::split(stream);
+    let exchange = async {
+        write.write_all(line.as_bytes()).await?;
+        write.write_all(b"\n").await?;
+        BufReader::new(read).lines().next_line().await
+    };
+    tokio::time::timeout(timeout, exchange)
+        .await
+        .map_err(|_| tls::ConnectError::Timeout)?
+        .map_err(tls::ConnectError::Io)
 }
 
 /// Sendet eine Discovery-Suchanfrage als Unicast an `target` (wie TP-002 von

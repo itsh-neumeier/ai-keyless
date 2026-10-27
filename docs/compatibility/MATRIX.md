@@ -29,9 +29,9 @@ ein echtes UniFi-Protect-System getestet.
 | Funktion | Protect-Version | Kamera | Stufe | Anmerkung |
 |---|---|---|---|---|
 | UDP/LAN-Discovery: Antwort auf Suchanfrage | – (nur `akl-protect-sim`) | – | `synthetic_verified` | AI-Keyless 0.1.0, 2026-10-27: `crates/device-lifecycle/tests/discovery.rs` (echte PG 17) – v1/v2-Probe beantwortet, fremde/fehlerhafte Pakete ohne Antwort und ohne Zustandswechsel, Kill-Switch/deaktiviert ⇒ stumm, Rate-Limit je Absender. Gegenüber Protect `needs_evidence` (DISC-H07, TP-001); im Profil-JSON daher unverändert |
-| Adoption / Identität / Zertifikate | – | – | `planned` | AKL-M040 |
-| Kontrollkanal (UCP4/WebSocket) | – | – | `needs_evidence` | Vertrag unbekannt |
-| Keepalive / Reconnect | – | – | `planned` | |
+| Adoption (eigenes Zertifikat, Controller-Pin vor Token-Übergabe, Token nur als 0600-Datei) | – (nur `akl-protect-sim`) | – | `synthetic_verified` | AI-Keyless 0.1.0, 2026-10-27: `crates/device-lifecycle/tests/adoption.rs` (echte PG 17) – `discovered → pending_adoption → adopted`; falscher Pin/unerreichbar ⇒ Rückweg `→ discovered`, kein Token gesendet/gespeichert; fremde Quelle ohne Handshake; Kill-Switch/Zustand/ungültige Anfrage abgelehnt. Zeilenformat ist synthetischer Platzhalter; gegenüber Protect `needs_evidence` (Q-006, TP-001). Credential-Rotation: `planned` |
+| Kontrollkanal (UCP4/WebSocket) | – | – | `needs_evidence` | Vertrag unbekannt (Q-007); synthetischer Platzhalter-Kanal siehe nächste Zeile |
+| Keepalive / Reconnect / Neustart-Readback (synthetischer Kanal) | – (nur `akl-protect-sim`) | – | `synthetic_verified` | AI-Keyless 0.1.0, 2026-10-27: `adopted → online`; Controller weg ⇒ `reconnecting → offline`, zurück ⇒ `online`; Dienstneustart ⇒ `reconnecting → online` ohne Neu-Adoption; geändertes Controller-Zertifikat ⇒ `error`, Token nicht gesendet; `→ disabled` beendet den Kanal. Gegenüber Protect `needs_evidence` |
 | On-demand-Beschreibung | – | – | `planned` | Referenz: 7.3.60, G5 Flex |
 | Automatische Beschreibung + Persistenz | – | – | `planned` | Referenz: 7.3.60, G5 Flex (1 Event) |
 | Find Anything (nativ) | – | – | `needs_evidence` | Such-Vertrag offen (CLIP vs. E5) |

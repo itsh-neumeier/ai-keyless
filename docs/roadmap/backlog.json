@@ -421,7 +421,7 @@
     {
       "id": "AKL-M040-03",
       "ms": "AKL-M040",
-      "status": "open",
+      "status": "in_progress",
       "prio": "P0",
       "deps": [
         "AKL-M040-02",
@@ -435,7 +435,7 @@
     {
       "id": "AKL-M040-04",
       "ms": "AKL-M040",
-      "status": "open",
+      "status": "in_progress",
       "prio": "P0",
       "deps": [
         "AKL-M040-03"
