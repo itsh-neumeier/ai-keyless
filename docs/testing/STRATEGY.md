@@ -19,7 +19,11 @@
 - Ergebnisse werden ehrlich berichtet; übersprungene Tests werden als übersprungen genannt.
 - `synthetic_verified` ≠ `native_verified`.
 
-## Vorlage nativer Testplan (Kurzform, Freigabe erforderlich)
+## Native Tests
+
+Vorlage: `NATIVE-TESTPLAN-TEMPLATE.md`, Pläne unter `plans/` (TP-001 Adoption als Entwurf), Nachweise unter `docs/compatibility/evidence/`.
+
+### Kurzform (Freigabe erforderlich)
 
 Ziel · Umgebung (Konsole, Protect-Version, Kamera+FW, Netz/VLAN) · Vorbedingungen & Rückweg
 (Deaktivierung, Entfernen des Geräts) · Schritte · erwartete Beobachtung inkl. Readback ·

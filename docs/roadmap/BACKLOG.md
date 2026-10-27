@@ -51,7 +51,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | AKL-M030-01 | crate protect-compat: Versionsprofile + konservativer Modus (+ API/UI unter Geräte) | P0 | ✅ erledigt | AKL-M010-01 | Unbekannte Version → konservativ + Warnung (Test) |
 | AKL-M030-02 | Synthetischer Controller (TLS, Pinning, Fehlerfälle) als Testharness | P0 | ⬜ offen | AKL-M030-01 | Deterministische Tests ohne echtes Material |
 | AKL-M030-03 | Contract-Fixtures Discovery/Adoption/Callback als needs_evidence-Hypothesen | P0 | ⬜ offen | AKL-M030-02 | Jede Fixture mit Quelle + Evidenzstufe |
-| AKL-M030-04 | Native Testplan-Vorlage + Freigabeprozess für Live-Tests | P1 | ⬜ offen | – | Vorlage in docs/testing<br>Freigabe durch Projektverantwortlichen |
+| AKL-M030-04 | Native Testplan-Vorlage, Nachweisformat, Entwurf TP-001 (Adoption) | P1 | ✅ erledigt | – | Vorlage in docs/testing<br>Freigabe durch Projektverantwortlichen |
 
 ## AKL-M040 – AI-Key-Geräte-Lifecycle
 

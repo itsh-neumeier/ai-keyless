@@ -381,10 +381,10 @@
     {
       "id": "AKL-M030-04",
       "ms": "AKL-M030",
-      "status": "open",
+      "status": "done",
       "prio": "P1",
       "deps": [],
-      "title": "Native Testplan-Vorlage + Freigabeprozess für Live-Tests",
+      "title": "Native Testplan-Vorlage, Nachweisformat, Entwurf TP-001 (Adoption)",
       "accept": [
         "Vorlage in docs/testing",
         "Freigabe durch Projektverantwortlichen"
