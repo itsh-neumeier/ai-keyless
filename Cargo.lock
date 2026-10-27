@@ -49,6 +49,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "akl-netprobe"
+version = "0.1.0"
+
+[[package]]
 name = "akl-persistence"
 version = "0.1.0"
 dependencies = [
