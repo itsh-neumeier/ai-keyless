@@ -64,6 +64,7 @@ Prioritäten: P0 kritisch · P1 hoch · P2 mittel · P3 später.
 | AKL-M040-05 | Nativer Akzeptanztest Adoption an der UNVR (192.168.10.181) – nur in einer Sitzung auf dem PC des Projektverantwortlichen | P0 | ⛔ blockiert | AKL-M040-04, AKL-M030-04, AKL-M000-06 | native_verified-Nachweis gemäß MATRIX.md |
 | AKL-M040-06 | UI Geräte: Profile, Zustand, Evidenz, Recovery-Assistent | P1 | ⬜ offen | AKL-M040-02, AKL-M020-03 | Echtzeit per SSE<br>keine vorgetäuschten Zustände |
 | AKL-M040-07 | Geräte-Emulation im Dienst verdrahten (opt-in AKL_DEVICE_EMULATION, Controller-Pin per Konfiguration) | P0 | 🔄 in Arbeit | AKL-M040-04 | standardmäßig aus<br>ohne bestätigten Controller keine Adoption<br>Kill-Switch beendet alle Endpunkte |
+| AKL-M040-08 | UI: Emulationsstatus, Controller-Bindung, Bindung entfernen; Compose-Overlay macvlan | P1 | 🔄 in Arbeit | AKL-M040-07 | nie Token in der UI<br>Entfernen nur bei disabled<br>Overlay bricht ohne Pflichtwerte ab |
 
 ## AKL-M050 – Protect-Kamerainventar
 

@@ -1,5 +1,17 @@
 # Session-Handoff
 
+## Sitzung 2026-10-28 (Lab-PC) – AKL-M040-08 UI + macvlan-Overlay
+
+- Stand PRs: #51, #52, #53 offen, CI je vollständig grün; Merge weiter durch die Rechteprüfung blockiert
+  (Projektverantwortlicher merged selbst: #51 → #52 → #53, jeweils Basis auf `main` umstellen).
+- Branch `feat/AKL-M040-08-devices-ui-binding` (auf #53): Geräte-UI zeigt Emulationsstatus, Controller je Profil
+  (nie Token) und „Bindung entfernen“ (nur `disabled` mit Bindung, mit Bestätigung); Texte de/en; Lebenszyklus-Hinweis
+  aktualisiert. Overlay `deploy/compose/compose.emulation.yaml` (macvlan, Bind nur auf LAN-IP, Pflichtwerte per `:?`),
+  `.env.example` ergänzt.
+- Tests: Web format/lint/svelte-check (0/0)/21 Tests/Build grün (Container `node:22-bookworm`); Compose `config`
+  mit und ohne Pflichtwerte geprüft. **UI nicht im Browser angesehen**, Overlay nie im echten Netz gestartet.
+- Lab-PC ist Docker Desktop ⇒ macvlan/host erreichen das echte LAN nicht; für TP-001 Linux-Host im LAN nötig.
+
 ## Sitzung 2026-10-27, Nacht (Lab-PC) – PRs #51/#52, API-Anbindung AKL-M040-07
 
 - #51 (M040-03) und #52 (M040-04, gestapelt) als Draft geöffnet, CI auf beiden vollständig grün.

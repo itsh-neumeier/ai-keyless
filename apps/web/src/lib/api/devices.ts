@@ -19,6 +19,8 @@ export interface DeviceProfile {
 	display_name: string;
 	/** SHA-256 des Gerätezertifikats; `null` ohne Identität. */
 	fingerprint: string | null;
+	/** Gespeicherte Adoption (öffentliche Teile, nie das Token); `null` ohne Bindung. */
+	controller: ControllerInfo | null;
 	created_at: string;
 	updated_at: string;
 }
@@ -31,9 +33,28 @@ export interface KillSwitch {
 	changed_by: string | null;
 }
 
+export interface ControllerInfo {
+	ip: string;
+	port: number;
+	/** SHA-256 des vom Admin bestätigten Controller-Zertifikats. */
+	fingerprint: string;
+}
+
+/** Konfigurierte Geräte-Emulation (AKL_DEVICE_EMULATION), nur synthetisch verifiziert. */
+export interface Emulation {
+	enabled: boolean;
+	controller: ControllerInfo | null;
+}
+
 export interface DeviceList {
 	kill_switch: KillSwitch;
+	emulation: Emulation;
 	profiles: DeviceProfile[];
+}
+
+/** Bindung lässt sich nur bei deaktiviertem Profil entfernen (Server prüft ebenfalls). */
+export function canForgetController(p: Pick<DeviceProfile, 'state' | 'controller'>): boolean {
+	return p.state === 'disabled' && p.controller !== null;
 }
 
 export interface Transition {
