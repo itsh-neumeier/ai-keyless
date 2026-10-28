@@ -1,0 +1,41 @@
+# Overlay: Geräte-Emulation über eine eigene LAN-IP (macvlan), AKL-M040-07.
+#
+# Nur auf einem **Linux-Host im LAN** sinnvoll. Unter Docker Desktop (Windows/macOS) hängt macvlan an
+# der VM, nicht am echten LAN (docs/operations/NETWORKING.md) – dort erreicht Protect den Container nicht.
+#
+# Start (nach Freigabe von TP-001 und UNVR-Konfigurationsbackup):
+#   docker compose -f deploy/compose/compose.yaml -f deploy/compose/compose.emulation.yaml \
+#     --env-file deploy/compose/.env up -d
+#
+# Pflichtwerte in .env (ohne sie bricht `docker compose` mit einer Meldung ab):
+#   AKL_LAN_PARENT   Netzwerkkarte des Hosts im LAN, z. B. eth0
+#   AKL_LAN_SUBNET   z. B. 192.168.10.0/24
+#   AKL_LAN_GATEWAY  z. B. 192.168.10.1
+#   AKL_LAN_IP       freie, außerhalb des DHCP-Bereichs reservierte Adresse, z. B. 192.168.10.250
+# Controller (vom Admin geprüft; alle drei oder keiner ⇒ nur Discovery):
+#   AKL_CONTROLLER_IP, AKL_CONTROLLER_PORT, AKL_CONTROLLER_FINGERPRINT
+#
+# Hinweis: Der Host selbst erreicht eine macvlan-IP ohne Zusatzinterface nicht (Linux-Eigenschaft);
+# die Admin-UI bleibt über den veröffentlichten Port der Standard-Compose erreichbar.
+# Rückweg: Kill-Switch in der UI oder AKL_DEVICE_KILL_SWITCH=true, Overlay weglassen, Gerät in Protect entfernen.
+
+services:
+  api:
+    environment:
+      AKL_DEVICE_EMULATION: "true"
+      # Nur auf der LAN-IP lauschen, nicht auf den internen Compose-Netzen.
+      AKL_DISCOVERY_BIND: ${AKL_LAN_IP:?AKL_LAN_IP fehlt}:10001
+      AKL_ADOPTION_BIND: ${AKL_LAN_IP:?AKL_LAN_IP fehlt}:8080
+    networks:
+      lan:
+        ipv4_address: ${AKL_LAN_IP:?AKL_LAN_IP fehlt}
+
+networks:
+  lan:
+    driver: macvlan
+    driver_opts:
+      parent: ${AKL_LAN_PARENT:?AKL_LAN_PARENT fehlt (Netzwerkkarte im LAN)}
+    ipam:
+      config:
+        - subnet: ${AKL_LAN_SUBNET:?AKL_LAN_SUBNET fehlt}
+          gateway: ${AKL_LAN_GATEWAY:?AKL_LAN_GATEWAY fehlt}

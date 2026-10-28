@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ApiError, api } from '#lib/api/client.ts';
 	import {
+		canForgetController,
 		deviceSignature,
 		type DeviceKind,
 		type DeviceList,
@@ -89,6 +90,11 @@
 			await api(`/api/v1/devices/${p.id}/enable`, { method: 'POST' });
 		});
 
+	const forgetController = (p: DeviceProfile) =>
+		run(p.id, 'forget', async () => {
+			await api(`/api/v1/devices/${p.id}/forget-controller`, { method: 'POST' });
+		});
+
 	async function create(event: SubmitEvent) {
 		event.preventDefault();
 		creating = true;
@@ -165,6 +171,21 @@
 		{/if}
 	</div>
 	<div class="px-4 empty:hidden"><FormError message={killError} /></div>
+	{#if list}
+		<p class="border-b border-line px-4 py-2 text-xs text-muted">
+			<span class="font-medium text-fg">{t('devices.emulation')}:</span>
+			{#if !list.emulation.enabled}
+				{t('devices.emulationOff')}
+			{:else if list.emulation.controller}
+				{t('devices.emulationOn')} · {t('devices.controller')}
+				<span class="font-mono"
+					>{list.emulation.controller.ip}:{list.emulation.controller.port}</span
+				>
+			{:else}
+				{t('devices.emulationDiscoveryOnly')}
+			{/if}
+		</p>
+	{/if}
 
 	<div class="px-4 py-3">
 		<FormError message={loadError} />
@@ -190,6 +211,14 @@
 						{t('devices.fingerprint')}:
 						<span class="font-mono break-all">{p.fingerprint ?? '—'}</span>
 					</p>
+					{#if p.controller}
+						<p class="mt-1 text-xs text-muted">
+							{t('devices.controller')}:
+							<span class="font-mono">{p.controller.ip}:{p.controller.port}</span>
+							<span class="mx-1 text-faint">·</span>
+							<span class="font-mono break-all">{p.controller.fingerprint}</span>
+						</p>
+					{/if}
 					<div class="mt-2 flex flex-wrap items-center gap-2">
 						<Button variant="ghost" busy={busy[p.id] === 'history'} onclick={() => toggleHistory(p)}
 							>{history[p.id] ? t('devices.hideHistory') : t('devices.showHistory')}</Button
@@ -199,6 +228,14 @@
 								<Button variant="secondary" busy={busy[p.id] === 'enable'} onclick={() => enable(p)}
 									>{t('devices.enable')}</Button
 								>
+								{#if canForgetController(p)}
+									<ConfirmButton
+										variant="ghost"
+										confirmLabel={t('devices.forgetConfirm')}
+										busy={busy[p.id] === 'forget'}
+										onconfirm={() => forgetController(p)}>{t('devices.forget')}</ConfirmButton
+									>
+								{/if}
 							{:else}
 								<ConfirmButton
 									variant="secondary"

@@ -1,6 +1,6 @@
 # Projektstand
 
-> Zuletzt aktualisiert: 2026-10-27 (Nacht) · Branch `feat/AKL-M040-07-api-wiring`
+> Zuletzt aktualisiert: 2026-10-28 · Branch `feat/AKL-M040-08-devices-ui-binding`
 
 ## Aktive Meilensteine
 
@@ -41,7 +41,8 @@
 1. Merges der Kette #39 → #46 (Reihenfolge in SESSION_HANDOFF).
 2. AKL-M020-06/07: Accessibility-Audit (axe in E2E) und CSP ohne `unsafe-inline`.
 - **Discovery-Antwort/Adoption (#5, #6) synthetisch umgesetzt (Spätsitzung 2026-10-27)**; Firmware-Analyse weiter eingestellt.
-  Verdrahtung (AKL-M040-07) gebaut; nächster Schritt: Merges #51 → #52 → M040-07, Lab-Compose host/macvlan, dann TP-001 mit Freigabe.
+  Verdrahtung (AKL-M040-07, #53), UI + macvlan-Overlay (AKL-M040-08) gebaut; nächster Schritt: Merges #51 → #52 → #53 → M040-08,
+  Linux-Host im LAN für TP-001 (Docker Desktop reicht nicht), dann TP-001 mit Freigabe je Lauf.
 3. AKL-M020-03: Komponentenbibliothek (Dialog, Drawer, Toast, Tabs, DataTable).
 4. AKL-M010-07: OpenAPI aus Rust-Typen generieren, Drift-Prüfung in CI.
 5. Danach M040 (Geräte-Lifecycle) nur mit belastbaren Protokoll-Hypothesen; native Abnahme erst mit Testumgebung (Q-003).

@@ -491,6 +491,21 @@
       ]
     },
     {
+      "id": "AKL-M040-08",
+      "ms": "AKL-M040",
+      "status": "in_progress",
+      "prio": "P1",
+      "deps": [
+        "AKL-M040-07"
+      ],
+      "title": "UI: Emulationsstatus, Controller-Bindung, Bindung entfernen; Compose-Overlay macvlan",
+      "accept": [
+        "nie Token in der UI",
+        "Entfernen nur bei disabled",
+        "Overlay bricht ohne Pflichtwerte ab"
+      ]
+    },
+    {
       "id": "AKL-M050-01",
       "ms": "AKL-M050",
       "status": "open",

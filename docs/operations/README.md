@@ -158,6 +158,15 @@ der Adoption als `controller.token` (0600) neben der Identität und ist damit Te
 Identitäts-Backups. Das Netz muss host oder macvlan sein (`NETWORKING.md`); im Bridge-Netz erreicht die
 Discovery den Container nicht. Kill-Switch oder deaktiviertes Profil beenden alle drei Dienste.
 
+**Betrieb im LAN:** Overlay `deploy/compose/compose.emulation.yaml` (macvlan, eigene LAN-IP;
+Pflichtwerte `AKL_LAN_PARENT`, `AKL_LAN_SUBNET`, `AKL_LAN_GATEWAY`, `AKL_LAN_IP`, siehe Kopf der Datei).
+Discovery und Adoption lauschen dann nur auf dieser IP. Nur auf einem Linux-Host im LAN – unter
+Docker Desktop hängt macvlan an der VM. Mit `docker compose … config` geprüft (2026-10-28), nie gegen
+ein echtes Netz gestartet.
+
+In der UI (*Geräte*) stehen Emulationsstatus, Controller je Profil und – bei deaktiviertem Profil mit
+Bindung – „Bindung entfernen“ (mit Bestätigung).
+
 `GET /api/v1/devices` zeigt den Emulationsstatus (`emulation`) und je Profil die gespeicherte Bindung
 (`controller`: IP, Port, Fingerprint – nie das Token). **Gerät entfernen:** Profil deaktivieren
 (`POST /api/v1/devices/{id}/disable`), dann `POST /api/v1/devices/{id}/forget-controller` (nur Admin,
